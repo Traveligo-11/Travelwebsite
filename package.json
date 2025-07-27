@@ -1,18 +1,21 @@
 {
-  "name": "traveligo-website",
-  "homepage": "https://Traveligo-11.github.io/traveligo/",
+  "name": "server",
+  "homepage": "https://github.com/Traveligo-11/traveligo.git/",
   "version": "1.0.0",
-  "private": true,
+  "description": "",
+  "license": "ISC",
+  "author": "",
   "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
     "dev": "vite",
     "build": "vite build",
+    "lint": "eslint .",
     "preview": "vite preview",
     "clean": "rimraf dist",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "predeploy":"npm run build",
+    "deploy":"gh-pages -d dist"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -34,6 +37,7 @@
     "firebase": "^11.10.0",
     "framer-motion": "^12.23.6",
     "gh-pages": "^6.3.0",
+    "gi": "^1.0.0",
     "google-reviews-widget": "^1.0.4",
     "nodemailer": "^7.0.5",
     "prop-types": "^15.8.1",
