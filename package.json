@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "homepage": "https://github.com/Traveligo-11/traveligo.git/",
+  "homepage": "https://Traveligo-11.github.io/traveligo/",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
@@ -13,10 +13,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "clean": "rimraf dist",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "vercel-build": "npm install --legacy-peer-deps && npm run build"
+    "clean": "rimraf dist"
+    
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
