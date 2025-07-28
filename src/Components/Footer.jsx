@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import logo from './Logo.jpeg';
+const Logo = "/images/Logo.jpeg"; 
 import { useState } from 'react';
 import { FaFacebook, FaYoutube, FaInstagram, FaLinkedin, FaArrowRight, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
 import { FaXTwitter, FaHeart } from 'react-icons/fa6';
