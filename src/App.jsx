@@ -36,9 +36,9 @@ import BookingPolicy from './Footer/policy.jsx';
 import HimachalManaliPackages from './Footer/Himachal.jsx'
 import RajasthanPackages from './Footer/Rajasthan.jsx'
 import Goa from './Footer/Goa.jsx'
-import KeralaPackages from './Footer/Kerala,jsx'
-import DubaiPackages from './Footer/Dubai.jsx'
-import BaliPackages from './Footer/Bali.jsx'
+import Kerala from './Footer/Kerala.jsx'
+import Dubai from './Footer/Dubai.jsx'
+import Bali from './Footer/Bali.jsx'
 import ThailandPackages from './Footer/Thailand.jsx'
 import KashmirPackage from './Footer/kashmir.jsx'
 import LadakhAdventures from './Footer/ladkah.jsx'
@@ -88,9 +88,9 @@ function App() {
             <Route path="/Himachal" element={<HimachalManaliPackages />} />
             <Route path="/Rajasthan" element={<RajasthanPackages />} />
             <Route path="/Goa" element={<Goa />} />
-            <Route path="/Kerala" element={<KeralaPackages />} />
-            <Route path="/Dubai" element={<DubaiPackages />} />
-            <Route path="/Bali" element={<BaliPackages />} />
+            <Route path="/Kerala" element={<Kerala />} />
+            <Route path="/Dubai" element={<Dubai/>} />
+            <Route path="/Bali" element={<Bali />} />
             <Route path="/Thailand" element={<ThailandPackages />} />
             <Route path="/kashmir" element={<KashmirPackage />} />
             <Route path="/ladakh" element={<LadakhAdventures />} />
