@@ -14,7 +14,7 @@ import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 
 // Footer Pages (all renamed to PascalCase)
-import About from './Footer/About';
+import About from './Footer/about';
 import Careers from './Footer/Careers';
 import Blog from './Footer/Blog';
 import Investors from './Footer/Investors';
