@@ -11,7 +11,7 @@ import Cabs from './Pages/Cabs';
 
 // Components
 import Navbar from './Components/Navbar';
-import About from "./Footer/About.jsx";
+
 
 // Footer Pages (all renamed to PascalCase)
 import About from './Footer/About';
