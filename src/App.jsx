@@ -24,7 +24,7 @@ import PrivacyPolicy from './Footer/privacy.jsx';
 import TermsOfUse from './Footer/terms.jsx';
 import Feedback from './Footer/feedback.jsx';
 import InternationalFlights from './Footer/internationalflights.jsx';
-import InternationalHotels from './Footer/Internationalhotels.jsx';
+import InternationalHotels from './Footer/internationalhotels.jsx';
 import HolidayPackages from './Footer/HolidayPackages.jsx';
 import DealsOffers from './Footer/DealsOffers.jsx';
 import BusinessTravel from './Footer/BusinessTravel.jsx';
