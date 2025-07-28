@@ -76,13 +76,11 @@ const Gallery = () => {
 
   return (
     <section className="relative py-24 bg-gradient-to-b from-pink-50 to-white overflow-hidden">
-      {/* Floating decorative elements */}
       <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent z-10"></div>
       <div className="absolute top-1/4 right-10 w-64 h-64 bg-pink-100 rounded-full opacity-10 mix-blend-multiply filter blur-[100px] animate-float"></div>
       <div className="absolute bottom-1/3 left-10 w-72 h-72 bg-pink-200 rounded-full opacity-10 mix-blend-multiply filter blur-[100px] animate-float-delay"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
-        {/* STUNNING HEADER SECTION */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -90,11 +88,9 @@ const Gallery = () => {
           viewport={{ once: true }}
           className="text-center mb-20 relative"
         >
-          {/* Decorative elements */}
           <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-pink-300 rounded-full opacity-5 filter blur-3xl"></div>
           <div className="absolute -bottom-5 right-20 w-16 h-16 bg-white rounded-full opacity-20"></div>
           
-          {/* Animated badge */}
           <motion.div
             whileHover={{ scale: 1.05, rotate: [0, -5, 5, -5, 0] }}
             className="inline-flex items-center px-6 py-3 bg-white border border-pink-200 rounded-full shadow-pink-sm mb-8 backdrop-blur-sm"
@@ -106,7 +102,6 @@ const Gallery = () => {
             <span className="text-sm font-medium text-pink-600">Client Memories</span>
           </motion.div>
 
-          {/* Main heading with gradient text */}
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 font-serif relative">
             <span className="relative">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-pink-600 to-pink-500">
@@ -118,7 +113,6 @@ const Gallery = () => {
             <span className="text-gray-800">That Inspire</span>
           </h1>
 
-          {/* Animated divider */}
           <motion.div 
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
@@ -127,7 +121,6 @@ const Gallery = () => {
             className="w-40 h-1 bg-gradient-to-r from-pink-100 via-pink-400 to-pink-100 mx-auto mb-8 rounded-full"
           ></motion.div>
 
-          {/* Subheading with typing animation effect */}
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -143,7 +136,6 @@ const Gallery = () => {
           </motion.p>
         </motion.div>
 
-        {/* Gallery Grid with Framer Motion */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
           <AnimatePresence>
             {displayedPhotos.map((photo, index) => (
@@ -185,7 +177,6 @@ const Gallery = () => {
           </AnimatePresence>
         </div>
 
-        {/* Animated Button */}
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -218,10 +209,8 @@ const Gallery = () => {
         </motion.div>
       </div>
       
-      {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent z-10"></div>
       
-      {/* Global styles */}
       <style jsx global>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
@@ -231,8 +220,6 @@ const Gallery = () => {
         .animate-float-delay { animation: float 8s ease-in-out 2s infinite; }
         .shadow-pink-sm { box-shadow: 0 4px 20px -5px rgba(236, 72, 153, 0.3); }
         .shadow-pink-lg { box-shadow: 0 25px 50px -12px rgba(236, 72, 153, 0.25); }
-        
-        /* Typewriter effect */
         .typewriter {
           display: inline-block;
           overflow: hidden;
@@ -240,12 +227,10 @@ const Gallery = () => {
           white-space: nowrap;
           animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
         }
-        
         @keyframes typing {
           from { width: 0 }
           to { width: 100% }
         }
-        
         @keyframes blink-caret {
           from, to { border-color: transparent }
           50% { border-color: pink; }
