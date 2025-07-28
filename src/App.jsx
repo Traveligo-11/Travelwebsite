@@ -35,9 +35,9 @@ import ContactUs from './Footer/contact.jsx';
 import BookingPolicy from './Footer/policy.jsx';
 import HimachalManaliPackages from './Footer/Himachal.jsx'
 import RajasthanPackages from './Footer/Rajasthan.jsx'
-import GoaPackages from './Footer/Goa,jsx'
+import Goa from './Footer/Goa.jsx'
 import KeralaPackages from './Footer/Kerala,jsx'
-import DubaiPackages from './Footer/Dubai,jsx'
+import DubaiPackages from './Footer/Dubai.jsx'
 import BaliPackages from './Footer/Bali.jsx'
 import ThailandPackages from './Footer/Thailand.jsx'
 import KashmirPackage from './Footer/kashmir.jsx'
@@ -87,7 +87,7 @@ function App() {
             <Route path="/policy" element={<BookingPolicy />} />
             <Route path="/Himachal" element={<HimachalManaliPackages />} />
             <Route path="/Rajasthan" element={<RajasthanPackages />} />
-            <Route path="/Goa" element={<GoaPackages />} />
+            <Route path="/Goa" element={<Goa />} />
             <Route path="/Kerala" element={<KeralaPackages />} />
             <Route path="/Dubai" element={<DubaiPackages />} />
             <Route path="/Bali" element={<BaliPackages />} />
