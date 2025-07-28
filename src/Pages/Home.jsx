@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
-import { FaPlane, FaHotel, FaUmbrellaBeach, FaStar, FaRegStar, FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaTimes, FaSearch, FaQuoteLeft } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { 
+  FaPlane, FaHotel, FaUmbrellaBeach, FaStar, FaRegStar, 
+  FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, 
+  FaCalendarAlt, FaUserFriends, FaTimes, FaSearch, FaQuoteLeft 
+} from 'react-icons/fa';
 import { IoIosFlash, IoMdHeart } from 'react-icons/io';
 import { GiSuitcase } from 'react-icons/gi';
-import { Link, useNavigate } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -36,6 +40,16 @@ const Home = () => {
   const [searchActive, setSearchActive] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [showAllPackages, setShowAllPackages] = useState(false);
+
+  // Categories for filtering
+  const categories = [
+    { id: 'all', name: 'All Packages' },
+    { id: 'luxury', name: 'Luxury' },
+    { id: 'adventure', name: 'Adventure' },
+    { id: 'cultural', name: 'Cultural' },
+    { id: 'beach', name: 'Beach' },
+    { id: 'international', name: 'International' }
+  ];
 
   // Initialize EmailJS
   useEffect(() => {
@@ -117,7 +131,38 @@ const Home = () => {
     }
   ];
 
-  // Holiday packages data
+  // Testimonials data
+  const testimonials = [
+    {
+      id: 1,
+      quote: "Our Kashmir tour with Traveligo was magical! The houseboat stay on Dal Lake and the Shikara ride at sunset were unforgettable. The team took care of every detail, making it a stress-free vacation.",
+      name: "Mrs Rana Nazar",
+      location: "Kashmir, May 2023",
+      rating: 5,
+      image: "/images/Client3.jpeg",
+      destinationImage: "/images/kashmir.jpeg"
+    },
+    {
+      id: 2,
+      quote: "The Gulmarg gondola ride was the highlight of our Kashmir trip. Traveligo's local guide knew all the best spots for photography and helped us avoid the crowds. Perfect winter getaway!",
+      name: "Mr Nihal",
+      location: "Gulmarg, January 2023",
+      rating: 5,
+      image: "/images/Client4.jpeg",
+      destinationImage: "/images/Gulmarg.jpeg"
+    },
+    {
+      id: 3,
+      quote: "Pahalgam through Traveligo was like stepping into paradise. The Betaab Valley visit and the stay at a cozy cottage were perfect. Their attention to detail made all the difference in our experience.",
+      name: "Mr Kiran",
+      location: "Pahalgam, July 2023",
+      rating: 5,
+      image: "/images/Client1.jpeg",
+      destinationImage: "/images/pahalgam.jpeg"
+    }
+  ];
+
+  // Holiday packages data (all packages included)
   const holidayPackages = [
     {
       id: 1,
@@ -385,8 +430,7 @@ const Home = () => {
       ],
       tag: "Beach Lover",
       category: "international"
-    },
-    
+    }
   ];
 
   // Auto-rotate carousel
