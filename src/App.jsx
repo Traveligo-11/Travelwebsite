@@ -33,7 +33,7 @@ import TravelGuide from './Footer/travelguide.jsx';
 import CorporateTravel from './Footer/corporatetravel.jsx';
 import ContactUs from './Footer/contact.jsx';
 import BookingPolicy from './Footer/policy.jsx';
-import HimachalManaliPackages from './Footer/Himachal,jsx'
+import HimachalManaliPackages from './Footer/Himachal.jsx'
 import RajasthanPackages from './Footer/Rajasthan.jsx'
 import GoaPackages from './Footer/Goa,jsx'
 import KeralaPackages from './Footer/Kerala,jsx'
