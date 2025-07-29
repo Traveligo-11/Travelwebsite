@@ -5,7 +5,8 @@ import emailjs from '@emailjs/browser';
 
 // Initialize EmailJS with your User ID
 emailjs.init('37pN2ThzFwwhwk7ai'); // Replace with your actual EmailJS User ID
-
+ 
+      
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -34,8 +35,9 @@ const ContactUs = () => {
 
     try {
       await emailjs.send(
-        'service_bdm6dl3', // Replace with your EmailJS Service ID
-        'template_jr1dnto', // Replace with your EmailJS Template ID
+          'service_ov629rm',
+        'template_jr1dnto',
+      
         {
           from_name: formData.name,
           from_email: formData.email,
@@ -129,7 +131,6 @@ const ContactUs = () => {
                   <p className="text-gray-600">Tours.Traveligo.in</p>
                 </div>
               </div>
-
               <div className="flex items-start">
                 <div className="bg-pink-100 p-3 rounded-full mr-4">
                   <FaMapMarkerAlt className="text-pink-600 text-xl" />

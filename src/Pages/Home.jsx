@@ -539,8 +539,8 @@ const Home = () => {
       };
 
       const response = await emailjs.send(
-        'service_bdm6dl3',
-        'travel_booking_template',
+        'service_ov629rm',
+        'template_jr1dnto',
         {
           package_name: selectedPackage.title,
           package_price: selectedPackage.price,

@@ -224,8 +224,8 @@ const Ladakh = () => {
      emailjs.init('37pN2ThzFwwhwk7ai');
     
     emailjs.send(
-      'service_bdm6dl3',
-      'template_q7y750i',
+         'service_ov629rm',
+        'template_jr1dnto',
       {
         package_name: selectedPackage.title,
         package_price: selectedPackage.price,

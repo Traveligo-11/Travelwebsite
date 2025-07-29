@@ -163,8 +163,8 @@ const GangtokDarjeeling = () => {
 
       // Send the email using EmailJS
       const response = await emailjs.send(
-        'service_bdm6dl3',
-        'template_q7y750i',
+              'service_ov629rm',
+        'template_jr1dnto',
         templateParams
       );
 

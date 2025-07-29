@@ -460,7 +460,7 @@ const Holidays = () => {
     setFormStatus({ submitting: true, success: false, error: false });
 
     emailjs.sendForm(
-      'service_bdm6dl3',
+      'service_ov629rm',
         'template_jr1dnto',
         templateParams,
         '37pN2ThzFwwhwk7ai'

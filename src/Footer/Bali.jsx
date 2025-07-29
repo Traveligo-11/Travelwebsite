@@ -187,10 +187,10 @@ const Bali = () => {
     };
 
     emailjs.send(
-      'YOUR_EMAILJS_SERVICE_ID', 
-      'YOUR_EMAILJS_TEMPLATE_ID',
+      'service_ov629rm',
+        'template_jr1dnto',
       templateParams,
-      'YOUR_EMAILJS_USER_ID'
+      '37pN2ThzFwwhwk7ai'
     )
     .then((response) => {
       console.log('SUCCESS!', response.status, response.text);

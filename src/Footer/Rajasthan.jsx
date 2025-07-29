@@ -30,8 +30,8 @@ const Rajasthan = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
 
   // EmailJS configuration
-  const SERVICE_ID = 'service_bdm6dl3';
-  const TEMPLATE_ID = 'template_q7y750i';
+  const SERVICE_ID = 'service_ov629rm';
+  const TEMPLATE_ID = 'template_jr1dnto';
   const USER_ID = '37pN2ThzFwwhwk7ai';
 
   // Gallery images
