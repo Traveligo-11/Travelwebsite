@@ -5,18 +5,45 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { validationResult, query } = require('express-validator');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security Middleware
-app.use(helmet());
-app.use(express.json({ limit: '10kb' }));
+// ======================
+// ENHANCED CONFIGURATION
+// ======================
+const ENVIRONMENT = process.env.NODE_ENV || 'development';
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY; // Changed from hardcoded key
+const TRUSTED_PROXIES = process.env.TRUSTED_PROXIES?.split(',') || [];
 
-// Enhanced CORS configuration
+// =================
+// SECURITY MIDDLEWARE
+// =================
+app.set('trust proxy', TRUSTED_PROXIES.length ? TRUSTED_PROXIES : false);
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "maps.googleapis.com"],
+      connectSrc: ["'self'", "maps.googleapis.com"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
+}));
+
+app.use(express.json({ limit: '10kb' }));
+app.use(compression());
+app.use(morgan(ENVIRONMENT === 'development' ? 'dev' : 'combined'));
+
+// ==============
+// CORS CONFIG
+// ==============
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.PRODUCTION_URL
+  ...(process.env.ALLOWED_ORIGINS?.split(',') || [])
 ].filter(Boolean);
 
 app.use(cors({
@@ -24,85 +51,109 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   methods: ['GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later'
+// ================
+// RATE LIMITING
+// ================
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests',
+      retryAfter: req.rateLimit.resetTime
+    });
+  }
 });
-app.use('/api/', limiter);
 
-// Request validation middleware
+app.use('/api/', apiLimiter);
+
+// =====================
+// VALIDATION MIDDLEWARE
+// =====================
 const validateReviewRequest = [
   query('placeId')
     .notEmpty().withMessage('placeId is required')
     .isString().withMessage('placeId must be a string')
+    .isLength({ min: 20, max: 100 }).withMessage('Invalid placeId length')
     .trim()
-    .escape()
+    .escape(),
+  query('language')
+    .optional()
+    .isString().withMessage('Language must be a string')
+    .isLength({ min: 2, max: 5 }).withMessage('Invalid language code')
 ];
 
-// Google Reviews Proxy Endpoint
+// ======================
+// GOOGLE REVIEWS ENDPOINT
+// ======================
 app.get('/api/google-reviews', validateReviewRequest, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ 
       success: false,
       errors: errors.array(),
-      example: `${req.protocol}://${req.get('host')}/api/google-reviews?placeId=ChIJEYz5td6P4TgRR3RtM-eoN-E`
+      documentation: `${req.protocol}://${req.get('host')}/docs`
     });
   }
 
-  const { placeId } = req.query;
+  const { placeId, language = 'en' } = req.query;
 
   try {
-    const response = await axios.get(
-      'https://maps.googleapis.com/maps/api/place/details/json',
-      {
-        params: {
-          place_id: placeId,
-          fields: 'reviews,rating,user_ratings_total',
-          key: process.env.AIzaSyD-ALeRtrojIcBboKSUAEhqdCAco-ZI45k,
-          language: 'en'
-        },
-        timeout: 10000,
-        headers: {
-          'Accept-Encoding': 'gzip'
-        }
+    const response = await axios.get('https://maps.googleapis.com/maps/api/place/details/json', {
+      params: {
+        place_id: placeId,
+        fields: 'reviews,rating,user_ratings_total',
+        key: GOOGLE_API_KEY,
+        language,
+        sessiontoken: req.ip // For tracking purposes
+      },
+      timeout: 10000,
+      headers: {
+        'Accept-Encoding': 'gzip',
+        'User-Agent': `TravelApp/1.0 (${req.ip})`
       }
-    );
+    });
 
     if (response.data.status !== 'OK') {
       return res.status(400).json({
         success: false,
         error: 'Google API Error',
-        details: response.data.error_message || 'Failed to fetch place details',
         status: response.data.status,
-        solution: 'Check if the placeId is correct and API key is valid'
+        solution: 'Check placeId and API key validity'
       });
     }
 
-    // Transform and filter reviews
+    // Process reviews with enhanced sanitization
     const reviews = (response.data.result.reviews || [])
+      .filter(review => review.text && review.rating)
       .map(review => ({
         id: review.time,
-        text: review.text,
+        text: review.text.replace(/[<>]/g, ''), // Basic sanitization
         rating: review.rating,
-        author: review.author_name,
-        photo: review.profile_photo_url || null,
-        date: new Date(review.time * 1000).toISOString().split('T')[0],
-        relative_time: review.relative_time_description || null
-      }))
-      .filter(review => review.text && review.rating); // Only include reviews with text and rating
+        author: review.author_name.substring(0, 50), // Limit length
+        photo: review.profile_photo_url ? 
+          `${review.profile_photo_url.split('=')[0]}=s128-c` : null, // Standardize photo size
+        date: new Date(review.time * 1000).toISOString(),
+        relative_time: review.relative_time_description
+      }));
 
-    // Cache control headers
-    res.set('Cache-Control', 'public, max-age=3600'); // 1 hour cache
+    // Cache headers with validation
+    res.set({
+      'Cache-Control': 'public, max-age=3600, must-revalidate',
+      'ETag': `W/"${placeId}-${Date.now()}"`
+    });
 
     res.json({
       success: true,
@@ -110,92 +161,127 @@ app.get('/api/google-reviews', validateReviewRequest, async (req, res) => {
         reviews,
         rating: response.data.result.rating,
         totalRatings: response.data.result.user_ratings_total,
-        place_id: placeId
+        place_id: placeId,
+        attribution: 'Powered by Google Places API'
       },
       meta: {
         count: reviews.length,
-        source: 'Google Places API'
+        source: 'Google Places API',
+        request_id: req.id
       }
     });
 
   } catch (error) {
-    console.error('Google Reviews Error:', error);
-    
-    let status = 500;
-    let errorMessage = 'Internal Server Error';
-    let details = null;
-
-    if (error.response) {
-      status = error.response.status;
-      errorMessage = error.response.data.error_message || 'Google API Error';
-      details = error.response.data;
-    } else if (error.request) {
-      errorMessage = 'No response from Google API';
-    } else if (error.code === 'ECONNABORTED') {
-      errorMessage = 'Request timeout';
-      status = 408;
-    }
-
-    res.status(status).json({ 
+    // Enhanced error handling
+    const errorResponse = {
       success: false,
-      error: errorMessage,
-      ...(process.env.NODE_ENV === 'development' && { details: error.message })
-    });
+      error: 'Service unavailable',
+      request_id: req.id
+    };
+
+    if (error.code === 'ECONNABORTED') {
+      errorResponse.error = 'Request timeout';
+      res.status(408).json(errorResponse);
+    } else if (error.response) {
+      errorResponse.error = 'Google API Error';
+      errorResponse.details = error.response.data?.error_message || 'Invalid response';
+      res.status(error.response.status).json(errorResponse);
+    } else {
+      errorResponse.error = 'Internal Server Error';
+      if (ENVIRONMENT === 'development') {
+        errorResponse.stack = error.stack;
+      }
+      res.status(500).json(errorResponse);
+    }
   }
 });
 
-// Health check endpoint with more details
-app.get('/health', (req, res) => {
+// =================
+// DOCUMENTATION
+// =================
+app.get('/docs', (req, res) => {
   res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memoryUsage: process.memoryUsage(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
-
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found',
-    availableEndpoints: [
-      'GET /api/google-reviews?placeId=YOUR_PLACE_ID',
-      'GET /health'
+    endpoints: [
+      {
+        method: 'GET',
+        path: '/api/google-reviews',
+        description: 'Fetch Google reviews for a place',
+        parameters: [
+          { name: 'placeId', required: true, type: 'string', example: 'ChIJEYz5td6P4TgRR3RtM-eoN-E' },
+          { name: 'language', required: false, type: 'string', example: 'en' }
+        ],
+        example: `${req.protocol}://${req.get('host')}/api/google-reviews?placeId=ChIJEYz5td6P4TgRR3RtM-eoN-E`
+      }
     ]
   });
 });
 
-// Error handler middleware
+// ==============
+// HEALTH CHECK
+// ==============
+app.get('/health', (req, res) => {
+  const healthcheck = {
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    dbStatus: 'N/A',
+    environment: ENVIRONMENT
+  };
+  
+  res.status(200).json(healthcheck);
+});
+
+// ==============
+// ERROR HANDLERS
+// ==============
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Endpoint not found',
+    documentation: `${req.protocol}://${req.get('host')}/docs`
+  });
+});
+
 app.use((err, req, res, next) => {
   console.error('Server Error:', err);
+  
   res.status(500).json({
     success: false,
     error: 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(ENVIRONMENT === 'development' && { 
+      message: err.message,
+      stack: err.stack 
+    })
   });
 });
 
-// Start server
+// ==============
+// SERVER START
+// ==============
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Google Reviews endpoint: GET /api/google-reviews?placeId=YOUR_PLACE_ID`);
-  console.log(`Example Place ID: ChIJEYz5td6P4TgRR3RtM-eoN-E`);
+  console.log(`
+  🚀 Server running in ${ENVIRONMENT} mode
+  ➡️  Port: ${PORT}
+  ➡️  Docs: http://localhost:${PORT}/docs
+  ➡️  Health: http://localhost:${PORT}/health
+  `);
 });
 
-// Graceful shutdown
+// =================
+// GRACEFUL SHUTDOWN
+// =================
 const shutdown = (signal) => {
-  console.log(`${signal} received - shutting down gracefully`);
+  console.log(`\n${signal} received - shutting down gracefully`);
+  
   server.close(() => {
-    console.log('Server closed');
+    console.log('HTTP server closed');
+    // Add any cleanup tasks here
     process.exit(0);
   });
-  
-  // Force shutdown after timeout
+
   setTimeout(() => {
-    console.error('Force shutdown after timeout');
+    console.error('Could not close connections in time - forcing shutdown');
     process.exit(1);
   }, 10000);
 };
