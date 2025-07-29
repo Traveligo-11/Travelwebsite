@@ -150,7 +150,6 @@ const Footer = () => {
               className="flex items-center mb-8"
             >
               <img src={logo} alt="Traveligo" className="h-20 mr-4" />
-             
             </motion.div>
             
             <motion.div 
@@ -242,7 +241,14 @@ const Footer = () => {
                   <div className="p-3 bg-pink-100 rounded-full mr-4 mt-1 group-hover:bg-pink-200 transition-colors">
                     <FaMapMarkerAlt className="text-pink-500 text-lg" />
                   </div>
-                  <span className="text-gray-700 group-hover:text-pink-600 transition-colors">First Boulevard road lane Dalgate Srinagar 190001</span>
+                  <div>
+                    <p className="text-gray-700 group-hover:text-pink-600 transition-colors">
+                      First Boulevard road lane Dalgate Srinagar 190001
+                    </p>
+                    <p className="text-gray-700 group-hover:text-pink-600 transition-colors mt-2">
+                      Abul Fazal Enclave Part 2, Jamia Nagar, Okhla, New Delhi, 110025
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -280,7 +286,7 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Newsletter Section (Search Bar) */}
+        {/* Newsletter Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

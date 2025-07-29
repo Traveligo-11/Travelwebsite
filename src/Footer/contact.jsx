@@ -139,6 +139,8 @@ const ContactUs = () => {
                   <h3 className="text-lg font-semibold text-gray-800">Visit Us</h3>
                   <p className="text-gray-600">First Boulevard road lane Dalgate Srinagar 190001, Jammu & Kashmir</p>
                   <p className="text-gray-600">Jammu & Kashmir, India - 190001</p>
+                  <p className="text-gray-600">Abul Fazal Enclave Part 2, Jamia Nagar, Okhla, New Delhi, 110025</p>
+                  <p className="text-gray-600">New Delhi, 110025</p>
                 </div>
               </div>
 
