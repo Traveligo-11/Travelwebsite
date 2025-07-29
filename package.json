@@ -1,13 +1,16 @@
 {
-  "name": "server",
+  "name": "travelwebsite",
   "version": "1.0.0",
   "type": "module",
+  "private": true,
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "dev": "vite",
-    "build": "npm install --legacy-peer-deps && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -15,6 +18,7 @@
     "@heroicons/react": "^2.1.1",
     "@tailwindcss/vite": "^4.1.11",
     "emailjs-com": "^3.2.0",
+    "express": "^5.1.0",
     "framer-motion": "^12.23.11",
     "react": "^18.3.1",
     "react-datepicker": "^8.4.0",
@@ -28,9 +32,30 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",
     "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.2.5",
     "vite": "^5.2.0"
   },
   "engines": {
-    "node": ">=18.0.0"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "description": "Travel website with React and Express",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/websy33/Travel.git"
+  },
+  "keywords": [
+    "travel",
+    "react",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/websy33/Travel/issues"
+  },
+  "homepage": "https://github.com/websy33/Travel#readme"
 }
