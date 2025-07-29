@@ -23,7 +23,6 @@ import FAQs from './Footer/faqs.jsx';
 import PrivacyPolicy from './Footer/privacy.jsx';
 import TermsOfUse from './Footer/terms.jsx';
 import Feedback from './Footer/feedback.jsx';
-import InternationalFlights from './Footer/internationalflights.jsx';
 import InternationalHotels from './Footer/internationalhotels.jsx';
 import HolidayPackages from './Footer/HolidayPackages.jsx';
 import DealsOffers from './Footer/DealsOffers.jsx';
@@ -75,7 +74,6 @@ function App() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/feedback" element={<Feedback />} />
-            <Route path="/internationalflights" element={<InternationalFlights />} />
             <Route path="/internationalhotels" element={<InternationalHotels />} />
             <Route path="/holiday-packages" element={<HolidayPackages />} />
             <Route path="/deals-offers" element={<DealsOffers />} />
