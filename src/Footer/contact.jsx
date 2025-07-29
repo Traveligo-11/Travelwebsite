@@ -124,6 +124,10 @@ const ContactUs = () => {
                   <p className="text-gray-600">info@traveligo.in</p>
                   <p className="text-gray-600">enquiry@traveligo.in</p>
                 </div>
+                  <div>
+                  <h3 className="text-lg font-semibold text-gray-800">Landing Page</h3>
+                  <p className="text-gray-600">Tours.Traveligo.in</p>
+                </div>
               </div>
 
               <div className="flex items-start">
