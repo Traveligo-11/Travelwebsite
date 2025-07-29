@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaPlane, FaHotel, FaUmbrellaBeach, FaTrain, FaTaxi, FaUserFriends, FaCalendarAlt, FaMapMarkerAlt } from 'react-icons/fa';
-
+import React from 'react'; 
 const HeroSearch = ({ activeTab, setActiveTab }) => {
   const [fromCity, setFromCity] = useState('');
   const [toCity, setToCity] = useState('');

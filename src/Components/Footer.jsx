@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-const Logo = "/images/Logo.jpeg"; 
+import logo from './logo.jpeg';
 import { useState } from 'react';
 import { FaFacebook, FaYoutube, FaInstagram, FaLinkedin, FaArrowRight, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
 import { FaXTwitter, FaHeart } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
 import { init, send } from 'emailjs-com';
-
+import React from 'react'; 
 // Initialize EmailJS
 init("37pN2ThzFwwhwk7ai");
 
