@@ -1,15 +1,105 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   FaPlane, FaHotel, FaUmbrellaBeach, FaStar, FaRegStar, 
   FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, 
-  FaCalendarAlt, FaUserFriends, FaTimes, FaSearch, FaQuoteLeft 
+  FaCalendarAlt, FaUserFriends, FaTimes, FaSearch, FaQuoteLeft,
+  FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaHeart
 } from 'react-icons/fa';
+import { FiMessageSquare } from 'react-icons/fi';
 import { IoIosFlash, IoMdHeart } from 'react-icons/io';
 import { GiSuitcase } from 'react-icons/gi';
 import emailjs from '@emailjs/browser';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import kanikaman from "/videos/kanikaman.mp4";
+import ishan from "/videos/ishan.mp4";
+import Rashmika from "/videos/Rashmika.mp4";
+import Raza from '/videos/raza.mp4';
+
+// Chat Boat Component
+const ChatBoat = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+
+  const handleSendMessage = () => {
+    if (inputValue.trim() === '') return;
+    
+    // Add user message
+    setMessages(prev => [...prev, { text: inputValue, sender: 'user' }]);
+    
+    // Simulate bot response after a delay
+    setTimeout(() => {
+      setMessages(prev => [...prev, { 
+        text: "Thanks for your message! Our travel experts will get back to you soon.", 
+        sender: 'bot' 
+      }]);
+    }, 1000);
+    
+    setInputValue('');
+  };
+
+  return (
+    <div className="fixed bottom-8 right-8 z-50">
+      {isOpen ? (
+        <div className="w-80 h-96 bg-white rounded-t-xl shadow-xl flex flex-col">
+          <div className="bg-pink-600 text-white p-3 rounded-t-xl flex justify-between items-center">
+            <h3 className="font-bold">Travel Assistant</h3>
+            <button onClick={() => setIsOpen(false)} className="text-white">
+              <FaTimes className="h-4 w-4" />
+            </button>
+          </div>
+          
+          <div className="flex-1 p-4 overflow-y-auto">
+            {messages.length === 0 ? (
+              <div className="text-center text-gray-500 h-full flex flex-col justify-center">
+                <p>How can we help you with your travel plans?</p>
+              </div>
+            ) : (
+              messages.map((msg, index) => (
+                <div 
+                  key={index} 
+                  className={`mb-3 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}
+                >
+                  <div 
+                    className={`inline-block px-4 py-2 rounded-lg max-w-xs ${msg.sender === 'user' ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-800'}`}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          <div className="p-3 border-t flex">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500"
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            />
+            <button
+              onClick={handleSendMessage}
+              className="bg-pink-600 text-white px-4 py-2 rounded-r-lg hover:bg-pink-700"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-pink-600 text-white p-4 rounded-full shadow-lg hover:bg-pink-700 transition-colors flex items-center justify-center"
+        >
+          <FiMessageSquare className="h-6 w-6" />
+        </button>
+      )}
+    </div>
+  );
+};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -40,6 +130,16 @@ const Home = () => {
   const [searchActive, setSearchActive] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [showAllPackages, setShowAllPackages] = useState(false);
+  const [likedVideos, setLikedVideos] = useState([]);
+  
+  // Video testimonials state
+  const [videoStates, setVideoStates] = useState([
+    { isPlaying: false, isMuted: false, progress: 0 },
+    { isPlaying: false, isMuted: false, progress: 0 },
+    { isPlaying: false, isMuted: false, progress: 0 },
+    { isPlaying: false, isMuted: false, progress: 0 }
+  ]);
+  const videoRefs = useRef([]);
 
   // Categories for filtering
   const categories = [
@@ -49,6 +149,42 @@ const Home = () => {
     { id: 'cultural', name: 'Cultural' },
     { id: 'beach', name: 'Beach' },
     { id: 'international', name: 'International' }
+  ];
+
+  // Video testimonials data
+  const videoTestimonials = [
+    {
+      id: 6,
+      name: 'Ishan Khattar',
+      role: 'Bollywood Actor',
+      content: ishan,
+      thumbnail: '/images/ishan.jpeg',
+      bgGradient: 'from-violet-500 to-fuchsia-500',
+    },
+    {
+      id: 7,
+      name: 'Kanika Man',
+      role: 'Artist',
+      content: kanikaman,
+      thumbnail: '/images/kanikamann.jpeg',
+      bgGradient: 'from-indigo-500 to-blue-500',
+    },
+    {
+      id: 8,
+      name: 'Rashmika Kaur',
+      role: 'Singer',
+      content: Rashmika,
+      thumbnail: '/images/rashmika.jpeg',
+      bgGradient: 'from-emerald-500 to-teal-500',
+    },
+    {
+      id: 9,
+      name: 'Dr Raza',
+      role: 'Doctor',
+      content: Raza,
+      thumbnail: '/images/raza.jpeg',
+      bgGradient: 'from-amber-500 to-orange-500',
+    },
   ];
 
   // Initialize EmailJS
@@ -449,12 +585,99 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Video progress tracking
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVideoStates(prevStates => {
+        return prevStates.map((state, index) => {
+          const video = videoRefs.current[index];
+          if (!video) return state;
+          
+          const newProgress = video.duration > 0 
+            ? (video.currentTime / video.duration) * 100 
+            : 0;
+            
+          return {
+            ...state,
+            progress: newProgress
+          };
+        });
+      });
+    }, 500);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // Color variables
   const primaryColor = 'bg-pink-600';
   const primaryHoverColor = 'hover:bg-pink-700';
   const primaryTextColor = 'text-pink-600';
   const primaryBorderColor = 'border-pink-600';
   const primaryBgLight = 'bg-pink-50';
+
+  // Video controls
+  const togglePlay = (index) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+    
+    if (video.paused) {
+      video.play();
+      setVideoStates(prevStates => {
+        const newStates = [...prevStates];
+        newStates[index] = { ...newStates[index], isPlaying: true };
+        return newStates;
+      });
+    } else {
+      video.pause();
+      setVideoStates(prevStates => {
+        const newStates = [...prevStates];
+        newStates[index] = { ...newStates[index], isPlaying: false };
+        return newStates;
+      });
+    }
+  };
+
+  const toggleMute = (index) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+    
+    video.muted = !video.muted;
+    setVideoStates(prevStates => {
+      const newStates = [...prevStates];
+      newStates[index] = { ...newStates[index], isMuted: video.muted };
+      return newStates;
+    });
+  };
+
+  const handleVideoHover = (index, isHovering) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+    
+    if (isHovering && !videoStates[index].isPlaying) {
+      video.currentTime = 0;
+      video.play();
+      setVideoStates(prevStates => {
+        const newStates = [...prevStates];
+        newStates[index] = { ...newStates[index], isPlaying: true };
+        return newStates;
+      });
+    } else if (!isHovering && videoStates[index].isPlaying) {
+      video.pause();
+      setVideoStates(prevStates => {
+        const newStates = [...prevStates];
+        newStates[index] = { ...newStates[index], isPlaying: false };
+        return newStates;
+      });
+    }
+  };
+
+  const toggleLike = (videoId) => {
+    if (likedVideos.includes(videoId)) {
+      setLikedVideos(likedVideos.filter(id => id !== videoId));
+    } else {
+      setLikedVideos([...likedVideos, videoId]);
+    }
+  };
 
   // Carousel navigation
   const nextSlide = () => {
@@ -615,7 +838,7 @@ const Home = () => {
       {/* Search Button (floating) */}
       <button 
         onClick={() => setSearchActive(true)}
-        className={`fixed bottom-8 right-8 ${primaryColor} text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300 ${searchActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`fixed bottom-25 right-8 ${primaryColor} text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300 ${searchActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         <FaSearch className="h-6 w-6" />
       </button>
@@ -732,7 +955,12 @@ const Home = () => {
           </div>
         </div>
       </section>
-
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
       {/* Trending Cities Section with Links */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1044,6 +1272,117 @@ const Home = () => {
                 aria-label={`Go to testimonial ${index + 1}`}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Video Testimonials Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Video Testimonials
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Watch our travelers share their unforgettable experiences
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {videoTestimonials.map((testimonial, index) => (
+              <div 
+                key={testimonial.id}
+                className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16] group"
+                onMouseEnter={() => handleVideoHover(index, true)}
+                onMouseLeave={() => handleVideoHover(index, false)}
+              >
+                <video
+                  ref={el => videoRefs.current[index] = el}
+                  src={testimonial.content}
+                  loop
+                  muted={videoStates[index].isMuted}
+                  className="w-full h-full object-cover"
+                  playsInline
+                  preload="metadata"
+                  poster={testimonial.thumbnail}
+                />
+                
+                {/* Video overlay with gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-6">
+                  {/* Top info */}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-xl text-white">{testimonial.name}</h3>
+                      <p className="text-sm text-pink-200">{testimonial.role}</p>
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(testimonial.id);
+                      }}
+                      className={`p-2 rounded-full ${likedVideos.includes(testimonial.id) ? 'bg-pink-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'} transition-colors`}
+                    >
+                      <FaHeart className="h-5 w-5" />
+                    </button>
+                  </div>
+                  
+                  {/* Center play button */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <button
+                      onClick={() => togglePlay(index)}
+                      className={`p-5 rounded-full ${videoStates[index].isPlaying ? 'bg-white/30' : 'bg-white/20'} hover:bg-white/40 backdrop-blur-md shadow-lg transform group-hover:scale-110 transition-transform`}
+                    >
+                      {videoStates[index].isPlaying ? (
+                        <FaPause className="text-white text-2xl" />
+                      ) : (
+                        <FaPlay className="text-white text-2xl" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Bottom controls */}
+                  <div className="flex flex-col gap-3">
+                    <div className="w-full bg-gray-600 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className="bg-pink-500 h-1.5 rounded-full"
+                        style={{ width: `${videoStates[index].progress}%` }}
+                      />
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleMute(index);
+                        }}
+                        className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                      >
+                        {videoStates[index].isMuted ? (
+                          <FaVolumeMute className="text-white h-4 w-4" />
+                        ) : (
+                          <FaVolumeUp className="text-white h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Play indicator */}
+                {!videoStates[index].isPlaying && (
+                  <div className="absolute top-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <FaPlay size={10} /> PLAY
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <button 
+              className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
+            >
+              View More Testimonials <FaArrowRight className="ml-2" />
+            </button>
           </div>
         </div>
       </section>
@@ -1383,6 +1722,7 @@ const Home = () => {
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         >
                           <option value="">Select Budget</option>
+                          <option value="">(Below 50000)</option>
                           <option value="economy">Economy (₹50,000 - ₹1,00,000)</option>
                           <option value="mid-range">Mid-Range (₹1,00,000 - ₹2,00,000)</option>
                           <option value="premium">Premium (₹2,00,000 - ₹4,00,000)</option>
@@ -1419,6 +1759,8 @@ const Home = () => {
           </div>
         </div>
       )}
+
+    
     </div>
   );
 };

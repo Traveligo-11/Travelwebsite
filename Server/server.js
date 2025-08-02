@@ -288,3 +288,99 @@ const shutdown = (signal) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+// Add to your existing server.js, right before the health check endpoint
+
+// =====================
+// FLIGHT API ENDPOINT
+// =====================
+const validateFlightRequest = [
+  query('origin')
+    .notEmpty().withMessage('Origin airport code is required')
+    .isString().withMessage('Origin must be a string')
+    .isLength({ min: 3, max: 4 }).withMessage('Invalid airport code length'),
+  query('destination')
+    .notEmpty().withMessage('Destination airport code is required')
+    .isString().withMessage('Destination must be a string')
+    .isLength({ min: 3, max: 4 }).withMessage('Invalid airport code length'),
+  query('date')
+    .optional()
+    .isISO8601().withMessage('Date must be in YYYY-MM-DD format')
+    .toDate()
+];
+
+app.get('/api/flights', validateFlightRequest, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ 
+      success: false,
+      errors: errors.array()
+    });
+  }
+
+  const { origin, destination, date = new Date().toISOString().split('T')[0] } = req.query;
+
+  try {
+    // First check cache
+    const cacheKey = `flights:${origin}:${destination}:${date}`;
+    const cached = await cache.get(cacheKey);
+    
+    if (cached) {
+      return res.json({
+        success: true,
+        data: cached,
+        cached: true
+      });
+    }
+
+    // Call the actual flight API
+    const response = await axios.get('https://www.airiq.in/flights', {
+      params: {
+        origin,
+        destination,
+        date
+      },
+      headers: {
+        'Authorization': `Bearer ${process.env.FLIGHT_API_KEY}`,
+        'Accept': 'application/json'
+      },
+      timeout: 10000
+    });
+
+    // Process flight data
+    const flights = response.data.flights.map(flight => ({
+      id: flight.id,
+      airline: flight.airline.name,
+      flightNumber: flight.flightNumber,
+      origin: flight.origin.code,
+      destination: flight.destination.code,
+      departureTime: flight.departure.time,
+      arrivalTime: flight.arrival.time,
+      duration: flight.duration,
+      price: flight.price.amount,
+      currency: flight.price.currency,
+      aircraft: flight.aircraft,
+      status: flight.status
+    }));
+
+    // Cache for 1 hour
+    await cache.set(cacheKey, flights, 'EX', 3600);
+
+    res.json({
+      success: true,
+      data: flights,
+      cached: false
+    });
+
+  } catch (error) {
+    console.error('Flight API Error:', error);
+    
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || 'Failed to fetch flight data';
+    
+    res.status(status).json({
+      success: false,
+      error: message,
+      details: ENVIRONMENT === 'development' ? error.message : undefined
+    });
+  }
+});

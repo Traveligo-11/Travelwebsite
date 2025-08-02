@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaHeart, FaMountain, FaSnowflake, FaSpa, FaHotel, FaChevronDown, FaTimes } from 'react-icons/fa';
+import { FaStar, FaHeart, FaMountain, FaSnowflake, FaSpa, FaHotel, FaChevronDown, FaTimes, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiRiver, GiWoodCabin, GiCampingTent } from 'react-icons/gi';
 import emailjs from '@emailjs/browser';
 
@@ -20,14 +20,25 @@ const Himachal = () => {
     arrivalDate: '',
     departureDate: '',
     adults: 1,
-    kids: '',
+    kids: 0,
     kidsAges: '',
     hotelCategory: '3',
     mealsIncluded: 'yes',
     budget: '',
     package: '',
-    message: ''
+    message: '',
+    specialRequests: []
   });
+
+  const specialRequestOptions = [
+    'Candlelight Dinner',
+    'Anniversary Cake',
+    'Flower Decoration',
+    'Honeymoon Suite',
+    'Private Guide',
+    'Adventure Activities',
+    'Spa Package'
+  ];
 
   // Gallery images
   const galleryImages = [
@@ -161,14 +172,83 @@ const Himachal = () => {
     }));
   };
 
+  const handleSpecialRequestChange = (option) => {
+    setFormData(prev => {
+      if (prev.specialRequests.includes(option)) {
+        return {
+          ...prev,
+          specialRequests: prev.specialRequests.filter(item => item !== option)
+        };
+      } else {
+        return {
+          ...prev,
+          specialRequests: [...prev.specialRequests, option]
+        };
+      }
+    });
+  };
+
+  const incrementAdults = () => {
+    setFormData(prev => ({
+      ...prev,
+      adults: prev.adults + 1
+    }));
+  };
+
+  const decrementAdults = () => {
+    if (formData.adults > 1) {
+      setFormData(prev => ({
+        ...prev,
+        adults: prev.adults - 1
+      }));
+    }
+  };
+
+  const incrementKids = () => {
+    setFormData(prev => ({
+      ...prev,
+      kids: prev.kids + 1
+    }));
+  };
+
+  const decrementKids = () => {
+    if (formData.kids > 0) {
+      setFormData(prev => ({
+        ...prev,
+        kids: prev.kids - 1
+      }));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormStatus(null); // Reset status
     
-    emailjs.sendForm(
-     'service_ov629rm',
-        'template_jr1dnto',
-      form.current, 
+    // Prepare the data to send
+    const templateParams = {
+      package_name: formData.package,
+      duration: selectedPackage?.duration,
+      destination: "Himachal Pradesh",
+      package_price: selectedPackage?.price,
+      from_name: formData.name,
+      from_email: formData.email,
+      phone_number: formData.phone,
+      arrivalDate: formData.arrivalDate,
+      departureDate: formData.departureDate,
+      adults: formData.adults,
+      kids: formData.kids,
+      kidsAges: formData.kidsAges,
+      hotelCategory: formData.hotelCategory,
+      mealsIncluded: formData.mealsIncluded === 'yes' ? 'Included' : 'Excluded',
+      budget: formData.budget || 'Not specified',
+      message: formData.message + (formData.specialRequests.length > 0 ? 
+        `\n\nSpecial Requests:\n- ${formData.specialRequests.join('\n- ')}` : '')
+    };
+    
+    emailjs.send(
+      'service_ov629rm',
+      'template_jr1dnto',
+      templateParams,
       '37pN2ThzFwwhwk7ai'
     )
     .then((result) => {
@@ -182,13 +262,14 @@ const Himachal = () => {
           arrivalDate: '',
           departureDate: '',
           adults: 1,
-          kids: '',
+          kids: 0,
           kidsAges: '',
           hotelCategory: '3',
           mealsIncluded: 'yes',
           budget: '',
           package: '',
-          message: ''
+          message: '',
+          specialRequests: []
         });
         // Close form after 2 seconds
         setTimeout(() => {
@@ -237,10 +318,10 @@ const Himachal = () => {
               <h3 className="text-2xl font-bold text-gray-800 mb-2">Book {selectedPackage?.title}</h3>
               <p className="text-gray-600 mb-6">{selectedPackage?.duration} | {selectedPackage?.price}</p>
               
-              <form ref={form} onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-gray-700 mb-1">Full Name</label>
+                    <label className="block text-gray-700 mb-1">Full Name *</label>
                     <input
                       type="text"
                       name="name"
@@ -252,7 +333,7 @@ const Himachal = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 mb-1">Email</label>
+                    <label className="block text-gray-700 mb-1">Email *</label>
                     <input
                       type="email"
                       name="email"
@@ -264,7 +345,7 @@ const Himachal = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 mb-1">Phone</label>
+                    <label className="block text-gray-700 mb-1">Phone *</label>
                     <input
                       type="tel"
                       name="phone"
@@ -277,7 +358,7 @@ const Himachal = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-gray-700 mb-1">Arrival Date</label>
+                      <label className="block text-gray-700 mb-1">Arrival Date *</label>
                       <input
                         type="date"
                         name="arrivalDate"
@@ -289,7 +370,7 @@ const Himachal = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-gray-700 mb-1">Departure Date</label>
+                      <label className="block text-gray-700 mb-1">Departure Date *</label>
                       <input
                         type="date"
                         name="departureDate"
@@ -303,38 +384,67 @@ const Himachal = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-gray-700 mb-1">Adults</label>
-                      <select
-                        name="adults"
-                        value={formData.adults}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {[1, 2, 3, 4, 5].map(num => (
-                          <option key={num} value={num}>{num}</option>
-                        ))}
-                      </select>
+                      <label className="block text-gray-700 mb-1">Adults *</label>
+                      <div className="flex items-center">
+                        <button
+                          type="button"
+                          onClick={decrementAdults}
+                          className="px-3 py-1 bg-gray-200 rounded-l-lg hover:bg-gray-300"
+                        >
+                          <FaMinus />
+                        </button>
+                        <input
+                          type="number"
+                          name="adults"
+                          value={formData.adults}
+                          onChange={handleInputChange}
+                          min="1"
+                          className="w-full px-4 py-2 border-t border-b border-gray-300 text-center"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={incrementAdults}
+                          className="px-3 py-1 bg-gray-200 rounded-r-lg hover:bg-gray-300"
+                        >
+                          <FaPlus />
+                        </button>
+                      </div>
                     </div>
                     
                     <div>
                       <label className="block text-gray-700 mb-1">Children</label>
-                      <select
-                        name="kids"
-                        value={formData.kids}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="0">0</option>
-                        {[1, 2, 3, 4].map(num => (
-                          <option key={num} value={num}>{num}</option>
-                        ))}
-                      </select>
+                      <div className="flex items-center">
+                        <button
+                          type="button"
+                          onClick={decrementKids}
+                          className="px-3 py-1 bg-gray-200 rounded-l-lg hover:bg-gray-300"
+                          disabled={formData.kids <= 0}
+                        >
+                          <FaMinus />
+                        </button>
+                        <input
+                          type="number"
+                          name="kids"
+                          value={formData.kids}
+                          onChange={handleInputChange}
+                          min="0"
+                          className="w-full px-4 py-2 border-t border-b border-gray-300 text-center"
+                        />
+                        <button
+                          type="button"
+                          onClick={incrementKids}
+                          className="px-3 py-1 bg-gray-200 rounded-r-lg hover:bg-gray-300"
+                        >
+                          <FaPlus />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   
                   {formData.kids > 0 && (
                     <div>
-                      <label className="block text-gray-700 mb-1">Children Ages (comma separated)</label>
+                      <label className="block text-gray-700 mb-1">Children Ages (comma separated) *</label>
                       <input
                         type="text"
                         name="kidsAges"
@@ -342,17 +452,19 @@ const Himachal = () => {
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. 5, 8"
+                        required={formData.kids > 0}
                       />
                     </div>
                   )}
                   
                   <div>
-                    <label className="block text-gray-700 mb-1">Hotel Category</label>
+                    <label className="block text-gray-700 mb-1">Hotel Category *</label>
                     <select
                       name="hotelCategory"
                       value={formData.hotelCategory}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
                     >
                       <option value="3">3 Star</option>
                       <option value="4">4 Star</option>
@@ -363,7 +475,7 @@ const Himachal = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 mb-1">Meals Included?</label>
+                    <label className="block text-gray-700 mb-1">Meals Included? *</label>
                     <div className="flex space-x-4">
                       <label className="flex items-center">
                         <input
@@ -373,6 +485,7 @@ const Himachal = () => {
                           checked={formData.mealsIncluded === 'yes'}
                           onChange={handleInputChange}
                           className="mr-2"
+                          required
                         />
                         Yes
                       </label>
@@ -404,12 +517,26 @@ const Himachal = () => {
                   
                   <div>
                     <label className="block text-gray-700 mb-1">Special Requests</label>
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      {specialRequestOptions.map((option, index) => (
+                        <label key={index} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={formData.specialRequests.includes(option)}
+                            onChange={() => handleSpecialRequestChange(option)}
+                            className="mr-2"
+                          />
+                          {option}
+                        </label>
+                      ))}
+                    </div>
                     <textarea
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
                       rows="3"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Any other special requests or notes..."
                     ></textarea>
                   </div>
 

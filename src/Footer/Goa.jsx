@@ -5,7 +5,8 @@ import {
   FaStar, FaHeart, FaUmbrellaBeach, FaCamera, 
   FaChevronDown, FaCocktail, FaWater, FaCalendarAlt,
   FaPhoneAlt, FaEnvelope, FaQuoteLeft, FaMapMarkerAlt,
-  FaUser, FaUsers, FaCommentAlt, FaExclamationCircle, FaPaperPlane
+  FaUser, FaUsers, FaCommentAlt, FaExclamationCircle, FaPaperPlane,
+  FaPlus, FaMinus
 } from 'react-icons/fa';
 import { GiWaveSurfer, GiBoatFishing, GiIsland, GiPalmTree, GiSunglasses } from 'react-icons/gi';
 import { RiHotelFill, RiSailboatLine } from 'react-icons/ri';
@@ -18,6 +19,9 @@ const Goa = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [childrenAges, setChildrenAges] = useState([]);
   
   const form = useRef();
 
@@ -139,16 +143,64 @@ const Goa = () => {
     window.scrollTo({top: 0, behavior: 'smooth'});
   };
 
+  const handleAdultChange = (value) => {
+    const newValue = adults + value;
+    if (newValue >= 1 && newValue <= 50) {
+      setAdults(newValue);
+    }
+  };
+
+  const handleChildChange = (value) => {
+    const newValue = children + value;
+    if (newValue >= 0 && newValue <= 10) {
+      setChildren(newValue);
+      // Adjust children ages array
+      if (value > 0) {
+        setChildrenAges([...childrenAges, ...Array(value).fill('')]);
+      } else {
+        setChildrenAges(childrenAges.slice(0, newValue));
+      }
+    }
+  };
+
+  const handleChildAgeChange = (index, age) => {
+    const newAges = [...childrenAges];
+    newAges[index] = age;
+    setChildrenAges(newAges);
+  };
+
   const sendEmail = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    emailjs.sendForm(
-            'service_ov629rm',
-        'template_jr1dnto',
-      form.current, 
-      '37pN2ThzFwwhwk7ai'
+    // Prepare form data with children ages
+    const formData = new FormData(form.current);
+    const data = Object.fromEntries(formData.entries());
+    data.childrenAges = childrenAges.join(', ');
+
+    emailjs.init('37pN2ThzFwwhwk7ai');
+    
+    emailjs.send(
+      'service_ov629rm',
+      'template_jr1dnto',
+      {
+        package_name: data.package,
+        destination: 'Goa, India',
+        package_price: packages.find(p => p.title === data.package)?.price || 'Custom',
+        from_name: data.user_name,
+        from_email: data.user_email,
+        phone_number: data.user_phone,
+        arrivalDate: data.arrival_date,
+        departureDate: data.departure_date,
+        adults: data.adults,
+        kids: children,
+        kidsAges: childrenAges.join(', '),
+        hotelCategory: data.hotel_category,
+        mealsIncluded: data.meals_included,
+        budget: data.budget,
+        message: data.message
+      }
     )
     .then((result) => {
         console.log(result.text);
@@ -157,6 +209,9 @@ const Goa = () => {
           setIsSubmitted(false);
           setShowBookingForm(false);
           form.current.reset();
+          setAdults(2);
+          setChildren(0);
+          setChildrenAges([]);
         }, 3000);
     }, (error) => {
         console.log(error.text);
@@ -322,11 +377,11 @@ const Goa = () => {
                           transition={{ delay: 0.5 }}
                         >
                           <label className="text-gray-700 mb-1 flex items-center">
-                            <FaCalendarAlt className="mr-2 text-blue-500" /> Travel Date*
+                            <FaCalendarAlt className="mr-2 text-blue-500" /> Arrival Date*
                           </label>
                           <input
                             type="date"
-                            name="travel_date"
+                            name="arrival_date"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             required
                           />
@@ -338,24 +393,185 @@ const Goa = () => {
                           transition={{ delay: 0.6 }}
                         >
                           <label className="text-gray-700 mb-1 flex items-center">
-                            <FaUsers className="mr-2 text-blue-500" /> Guests*
+                            <FaCalendarAlt className="mr-2 text-blue-500" /> Departure Date*
                           </label>
-                          <select
-                            name="guests"
+                          <input
+                            type="date"
+                            name="departure_date"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             required
-                          >
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                              <option key={num} value={num}>{num} {num === 1 ? 'person' : 'people'}</option>
-                            ))}
-                          </select>
+                          />
                         </motion.div>
                       </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          <label className="text-gray-700 mb-1 flex items-center">
+                            <FaUsers className="mr-2 text-blue-500" /> Adults*
+                          </label>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => handleAdultChange(-1)}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-l-lg"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
+                              name="adults"
+                              value={adults}
+                              min="1"
+                              max="50"
+                              readOnly
+                              className="w-full px-4 py-3 border-t border-b border-gray-300 text-center"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleAdultChange(1)}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-r-lg"
+                            >
+                              <FaPlus />
+                            </button>
+                          </div>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.6 }}
+                        >
+                          <label className="text-gray-700 mb-1 flex items-center">
+                            <FaUsers className="mr-2 text-blue-500" /> Children
+                          </label>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => handleChildChange(-1)}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-l-lg"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
+                              name="children"
+                              value={children}
+                              min="0"
+                              max="10"
+                              readOnly
+                              className="w-full px-4 py-3 border-t border-b border-gray-300 text-center"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleChildChange(1)}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-r-lg"
+                            >
+                              <FaPlus />
+                            </button>
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      {children > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          transition={{ duration: 0.3 }}
+                          className="overflow-hidden"
+                        >
+                          <label className="text-gray-700 mb-1 block">Children Ages*</label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {Array.from({ length: children }).map((_, index) => (
+                              <div key={index} className="mb-2">
+                                <label className="text-sm text-gray-600 block mb-1">Child {index + 1} Age</label>
+                                <input
+                                  type="number"
+                                  value={childrenAges[index] || ''}
+                                  onChange={(e) => handleChildAgeChange(index, e.target.value)}
+                                  min="0"
+                                  max="17"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  required
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
 
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.7 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <RiHotelFill className="mr-2 text-blue-500" /> Hotel Category*
+                        </label>
+                        <select
+                          name="hotel_category"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        >
+                          <option value="">Select hotel category</option>
+                          <option value="3 Star">3 Star</option>
+                          <option value="4 Star">4 Star</option>
+                          <option value="5 Star">5 Star</option>
+                          <option value="Luxury Resort">Luxury Resort</option>
+                          <option value="Beachfront Villa">Beachfront Villa</option>
+                        </select>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.8 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <MdOutlineRestaurant className="mr-2 text-blue-500" /> Meals Included*
+                        </label>
+                        <select
+                          name="meals_included"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        >
+                          <option value="">Select meal option</option>
+                          <option value="Breakfast Only">Breakfast Only</option>
+                          <option value="Breakfast & Dinner">Breakfast & Dinner</option>
+                          <option value="All Meals Included">All Meals Included</option>
+                          <option value="No Meals">No Meals</option>
+                        </select>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.9 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <FaCommentAlt className="mr-2 text-blue-500" /> Approximate Budget (without flights)*
+                        </label>
+                        <select
+                          name="budget"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        >
+                          <option value="">Select budget range</option>
+                          <option value="₹20,000 - ₹30,000">₹20,000 - ₹30,000</option>
+                          <option value="₹30,000 - ₹50,000">₹30,000 - ₹50,000</option>
+                          <option value="₹50,000 - ₹75,000">₹50,000 - ₹75,000</option>
+                          <option value="₹75,000 - ₹1,00,000">₹75,000 - ₹1,00,000</option>
+                          <option value="₹1,00,000+">₹1,00,000+</option>
+                        </select>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.0 }}
                       >
                         <label className="text-gray-700 mb-1 flex items-center">
                           <FaCommentAlt className="mr-2 text-blue-500" /> Special Requests
@@ -364,7 +580,11 @@ const Goa = () => {
                           name="message"
                           rows="3"
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          placeholder="Any special requests? (e.g., candlelight dinner, cake, room decorations, etc.)"
                         ></textarea>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Popular requests: Candlelight dinner, Anniversary cake, Honeymoon decorations, etc.
+                        </div>
                       </motion.div>
                     </div>
 

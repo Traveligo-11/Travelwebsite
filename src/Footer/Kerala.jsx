@@ -6,7 +6,8 @@ import {
   FaChevronDown, FaPhoneAlt, FaEnvelope, 
   FaUser, FaUsers, FaCommentAlt, FaExclamationCircle, 
   FaPaperPlane, FaMapMarkerAlt, FaQuoteLeft,
-  FaCalendarAlt, FaImages, FaArrowLeft, FaArrowRight
+  FaCalendarAlt, FaImages, FaArrowLeft, FaArrowRight,
+  FaPlus, FaMinus
 } from 'react-icons/fa';
 import { GiBoatFishing, GiPalmTree, GiElephant, GiWaterfall, GiWaveSurfer } from 'react-icons/gi';
 import { RiHotelFill, RiPlantFill, RiSailboatLine } from 'react-icons/ri';
@@ -22,6 +23,30 @@ const Kerala = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showGallery, setShowGallery] = useState(false);
   
+  // Form state
+  const [formData, setFormData] = useState({
+    user_name: '',
+    user_email: '',
+    user_phone: '',
+    package: '',
+    travel_date: '',
+    adults: 2,
+    children: 0,
+    childrenAges: '',
+    hotelCategory: '3',
+    mealsIncluded: 'yes',
+    budget: '',
+    specialRequests: {
+      candlelightDinner: false,
+      anniversaryCake: false,
+      flowerDecor: false,
+      privateBoat: false,
+      ayurvedaSession: false,
+      other: ''
+    },
+    message: ''
+  });
+
   const form = useRef();
 
   const galleryImages = [
@@ -170,8 +195,73 @@ const Kerala = () => {
   };
 
   const handleBookNow = (packageTitle) => {
+    setFormData(prev => ({
+      ...prev,
+      package: packageTitle
+    }));
     setShowBookingForm(true);
     window.scrollTo({top: 0, behavior: 'smooth'});
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSpecialRequestChange = (e) => {
+    const { name, checked, value } = e.target;
+    if (name === 'other') {
+      setFormData(prev => ({
+        ...prev,
+        specialRequests: {
+          ...prev.specialRequests,
+          other: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        specialRequests: {
+          ...prev.specialRequests,
+          [name]: checked
+        }
+      }));
+    }
+  };
+
+  const incrementAdults = () => {
+    setFormData(prev => ({
+      ...prev,
+      adults: prev.adults + 1
+    }));
+  };
+
+  const decrementAdults = () => {
+    if (formData.adults > 1) {
+      setFormData(prev => ({
+        ...prev,
+        adults: prev.adults - 1
+      }));
+    }
+  };
+
+  const incrementChildren = () => {
+    setFormData(prev => ({
+      ...prev,
+      children: prev.children + 1
+    }));
+  };
+
+  const decrementChildren = () => {
+    if (formData.children > 0) {
+      setFormData(prev => ({
+        ...prev,
+        children: prev.children - 1
+      }));
+    }
   };
 
   const sendEmail = (e) => {
@@ -179,11 +269,45 @@ const Kerala = () => {
     setIsLoading(true);
     setError(null);
 
-    emailjs.sendForm(
-         'service_ov629rm',
-        'template_jr1dnto', 
-      form.current, 
-      '37pN2ThzFwwhwk7ai'
+    // Prepare special requests text
+    const specialRequests = [];
+    if (formData.specialRequests.candlelightDinner) specialRequests.push("Candlelight Dinner");
+    if (formData.specialRequests.anniversaryCake) specialRequests.push("Anniversary Cake");
+    if (formData.specialRequests.flowerDecor) specialRequests.push("Flower Decoration");
+    if (formData.specialRequests.privateBoat) specialRequests.push("Private Boat");
+    if (formData.specialRequests.ayurvedaSession) specialRequests.push("Ayurveda Session");
+    if (formData.specialRequests.other) specialRequests.push(formData.specialRequests.other);
+    
+    const specialRequestsText = specialRequests.length > 0 
+      ? specialRequests.join(", ") 
+      : 'No special requests';
+
+    // Prepare template parameters
+    const templateParams = {
+      from_name: formData.user_name,
+      from_email: formData.user_email,
+      phone_number: formData.user_phone,
+      package_name: formData.package,
+      package_price: packages.find(pkg => pkg.title === formData.package)?.price || '',
+      destination: "Kerala",
+      arrivalDate: formData.travel_date,
+      departureDate: formData.travel_date, // In a real app, you might have separate arrival/departure
+      adults: formData.adults,
+      kids: formData.children,
+      kidsAges: formData.childrenAges,
+      hotelCategory: formData.hotelCategory === '3' ? '3 Star' : 
+                    formData.hotelCategory === '4' ? '4 Star' : '5 Star',
+      mealsIncluded: formData.mealsIncluded === 'yes' ? 'Included' : 'Excluded',
+      budget: formData.budget || 'Not specified',
+      message: `${formData.message}\n\nSpecial Requests: ${specialRequestsText}`
+    };
+
+    emailjs.init('37pN2ThzFwwhwk7ai');
+    
+    emailjs.send(
+      'service_ov629rm',
+      'template_jr1dnto',
+      templateParams
     )
     .then((result) => {
         console.log(result.text);
@@ -191,7 +315,28 @@ const Kerala = () => {
         setTimeout(() => {
           setIsSubmitted(false);
           setShowBookingForm(false);
-          form.current.reset();
+          setFormData({
+            user_name: '',
+            user_email: '',
+            user_phone: '',
+            package: '',
+            travel_date: '',
+            adults: 2,
+            children: 0,
+            childrenAges: '',
+            hotelCategory: '3',
+            mealsIncluded: 'yes',
+            budget: '',
+            specialRequests: {
+              candlelightDinner: false,
+              anniversaryCake: false,
+              flowerDecor: false,
+              privateBoat: false,
+              ayurvedaSession: false,
+              other: ''
+            },
+            message: ''
+          });
         }, 3000);
     }, (error) => {
         console.log(error.text);
@@ -286,6 +431,8 @@ const Kerala = () => {
                         <input
                           type="text"
                           name="user_name"
+                          value={formData.user_name}
+                          onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                           required
                         />
@@ -302,6 +449,8 @@ const Kerala = () => {
                         <input
                           type="email"
                           name="user_email"
+                          value={formData.user_email}
+                          onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                           required
                         />
@@ -318,6 +467,8 @@ const Kerala = () => {
                         <input
                           type="tel"
                           name="user_phone"
+                          value={formData.user_phone}
+                          onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                           required
                         />
@@ -333,6 +484,8 @@ const Kerala = () => {
                         </label>
                         <select
                           name="package"
+                          value={formData.package}
+                          onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white transition-all"
                           required
                         >
@@ -343,54 +496,255 @@ const Kerala = () => {
                         </select>
                       </motion.div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.5 }}
-                        >
-                          <label className="text-gray-700 mb-1 flex items-center">
-                            <FaCalendarAlt className="mr-2 text-green-500" /> Travel Date*
-                          </label>
-                          <input
-                            type="date"
-                            name="travel_date"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-                            required
-                          />
-                        </motion.div>
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <FaCalendarAlt className="mr-2 text-green-500" /> Travel Date*
+                        </label>
+                        <input
+                          type="date"
+                          name="travel_date"
+                          value={formData.travel_date}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                          required
+                        />
+                      </motion.div>
 
+                      <div className="grid grid-cols-2 gap-4">
                         <motion.div
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.6 }}
                         >
                           <label className="text-gray-700 mb-1 flex items-center">
-                            <FaUsers className="mr-2 text-green-500" /> Guests*
+                            <FaUsers className="mr-2 text-green-500" /> Adults*
                           </label>
-                          <select
-                            name="guests"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-                            required
-                          >
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                              <option key={num} value={num}>{num} {num === 1 ? 'person' : 'people'}</option>
-                            ))}
-                          </select>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={decrementAdults}
+                              className="bg-gray-200 text-gray-700 px-3 py-2 rounded-l-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
+                              name="adults"
+                              value={formData.adults}
+                              onChange={handleInputChange}
+                              min="1"
+                              className="w-full px-4 py-2 border-t border-b border-gray-300 text-center"
+                              required
+                            />
+                            <button
+                              type="button"
+                              onClick={incrementAdults}
+                              className="bg-gray-200 text-gray-700 px-3 py-2 rounded-r-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <FaPlus />
+                            </button>
+                          </div>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.7 }}
+                        >
+                          <label className="text-gray-700 mb-1 flex items-center">
+                            <FaUsers className="mr-2 text-green-500" /> Children
+                          </label>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={decrementChildren}
+                              className="bg-gray-200 text-gray-700 px-3 py-2 rounded-l-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
+                              name="children"
+                              value={formData.children}
+                              onChange={handleInputChange}
+                              min="0"
+                              className="w-full px-4 py-2 border-t border-b border-gray-300 text-center"
+                            />
+                            <button
+                              type="button"
+                              onClick={incrementChildren}
+                              className="bg-gray-200 text-gray-700 px-3 py-2 rounded-r-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <FaPlus />
+                            </button>
+                          </div>
                         </motion.div>
                       </div>
+
+                      {formData.children > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <label className="text-gray-700 mb-1 flex items-center">
+                            <FaUsers className="mr-2 text-green-500" /> Children Ages (comma separated)
+                          </label>
+                          <input
+                            type="text"
+                            name="childrenAges"
+                            value={formData.childrenAges}
+                            onChange={handleInputChange}
+                            placeholder="e.g. 5, 8, 12"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                          />
+                        </motion.div>
+                      )}
 
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.7 }}
+                        transition={{ delay: 0.8 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <RiHotelFill className="mr-2 text-green-500" /> Hotel Category*
+                        </label>
+                        <select
+                          name="hotelCategory"
+                          value={formData.hotelCategory}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                          required
+                        >
+                          <option value="3">3 Star</option>
+                          <option value="4">4 Star</option>
+                          <option value="5">5 Star</option>
+                        </select>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.9 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <MdOutlineRestaurant className="mr-2 text-green-500" /> Meals Included*
+                        </label>
+                        <select
+                          name="mealsIncluded"
+                          value={formData.mealsIncluded}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                          required
+                        >
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.0 }}
+                      >
+                        <label className="text-gray-700 mb-1 flex items-center">
+                          <FaMoneyBillWave className="mr-2 text-green-500" /> Approximate Budget (without flights)
+                        </label>
+                        <input
+                          type="text"
+                          name="budget"
+                          value={formData.budget}
+                          onChange={handleInputChange}
+                          placeholder="e.g. ₹50,000 - ₹75,000"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                        />
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.1 }}
                       >
                         <label className="text-gray-700 mb-1 flex items-center">
                           <FaCommentAlt className="mr-2 text-green-500" /> Special Requests
                         </label>
+                        <div className="space-y-2 mb-3">
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              name="candlelightDinner"
+                              checked={formData.specialRequests.candlelightDinner}
+                              onChange={handleSpecialRequestChange}
+                              className="rounded text-green-600"
+                            />
+                            <span>Candlelight Dinner</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              name="anniversaryCake"
+                              checked={formData.specialRequests.anniversaryCake}
+                              onChange={handleSpecialRequestChange}
+                              className="rounded text-green-600"
+                            />
+                            <span>Anniversary Cake</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              name="flowerDecor"
+                              checked={formData.specialRequests.flowerDecor}
+                              onChange={handleSpecialRequestChange}
+                              className="rounded text-green-600"
+                            />
+                            <span>Flower Decoration</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              name="privateBoat"
+                              checked={formData.specialRequests.privateBoat}
+                              onChange={handleSpecialRequestChange}
+                              className="rounded text-green-600"
+                            />
+                            <span>Private Boat</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              name="ayurvedaSession"
+                              checked={formData.specialRequests.ayurvedaSession}
+                              onChange={handleSpecialRequestChange}
+                              className="rounded text-green-600"
+                            />
+                            <span>Ayurveda Session</span>
+                          </label>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              className="rounded text-green-600 opacity-0"
+                              disabled
+                            />
+                            <input
+                              type="text"
+                              name="other"
+                              value={formData.specialRequests.other}
+                              onChange={handleSpecialRequestChange}
+                              placeholder="Other requests"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                            />
+                          </div>
+                        </div>
                         <textarea
                           name="message"
+                          value={formData.message}
+                          onChange={handleInputChange}
                           rows="3"
+                          placeholder="Any additional information or requests..."
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                         ></textarea>
                       </motion.div>
@@ -995,7 +1349,8 @@ const Kerala = () => {
               whileTap={{ scale: 0.95 }}
               className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-white/10 transition-all"
             >
-              <FaPhoneAlt className="inline mr-2" /> +91 9796337997            </motion.button>
+              <FaPhoneAlt className="inline mr-2" /> +91 9796337997
+            </motion.button>
           </motion.div>
         </div>
       </div>

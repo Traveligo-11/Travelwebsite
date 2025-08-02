@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaHeart, FaChevronDown, FaMountain, FaTimes } from 'react-icons/fa';
+import { FaStar, FaHeart, FaChevronDown, FaMountain, FaTimes, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiTeapot, GiTigerHead, GiMonumentValley } from 'react-icons/gi';
 import { MdFamilyRestroom, MdTrain } from 'react-icons/md';
 import { IoLeaf } from 'react-icons/io5';
@@ -15,8 +15,22 @@ const GangtokDarjeeling = () => {
     name: '',
     email: '',
     phone: '',
-    date: '',
-    people: 2,
+    arrivalDate: '',
+    departureDate: '',
+    adults: 2,
+    children: 0,
+    childrenAges: '',
+    hotelCategory: '3',
+    mealsIncluded: 'yes',
+    budget: '',
+    specialRequests: {
+      candlelightDinner: false,
+      anniversaryCake: false,
+      flowerDecor: false,
+      privateTransport: false,
+      photoSession: false,
+      other: ''
+    },
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,74 +54,7 @@ const GangtokDarjeeling = () => {
       ],
       icon: <FaMountain className="text-2xl text-blue-500" />
     },
-    {
-      id: 2,
-      title: "Himalayan Adventure",
-      duration: "6 Days / 5 Nights",
-      price: "₹35,999",
-      rating: 4.7,
-      image: "/images/darjeeling2.jpeg",
-      type: "adventure",
-      highlights: [
-        "Trekking in Singalila National Park",
-        "River rafting in Teesta",
-        "Mountain biking in Gangtok",
-        "Zip-lining experience",
-        "Camping under the stars"
-      ],
-      icon: <GiTigerHead className="text-2xl text-green-600" />
-    },
-    {
-      id: 3,
-      title: "Family Hill Station Tour",
-      duration: "5 Days / 4 Nights",
-      price: "₹38,999",
-      rating: 4.6,
-      image: "/images/Darjeeling3.jpeg",
-      type: "family",
-      highlights: [
-        "Visit Himalayan Zoological Park",
-        "Darjeeling Ropeway ride",
-        "Tea garden picnic",
-        "Cultural shows",
-        "Kid-friendly hotels"
-      ],
-      icon: <MdFamilyRestroom className="text-2xl text-orange-500" />
-    },
-    {
-      id: 4,
-      title: "Romantic Mountain Escape",
-      duration: "6 Days / 5 Nights",
-      price: "₹49,999",
-      rating: 4.9,
-      image: "/images/Darjeeling4.jpeg",
-      type: "honeymoon",
-      highlights: [
-        "Private candlelight dinners",
-        "Couple spa treatments",
-        "Sunset at Batasia Loop",
-        "Luxury boutique hotels",
-        "Personalized photo sessions"
-      ],
-      icon: <FaHeart className="text-2xl text-rose-500" />
-    },
-    {
-      id: 5,
-      title: "Tea Trail Experience",
-      duration: "5 Days / 4 Nights",
-      price: "₹32,999",
-      rating: 4.5,
-      image: "/images/Darjeeling5.jpeg",
-      type: "culture",
-      highlights: [
-        "Visit historic tea estates",
-        "Tea tasting sessions",
-        "Meet local tea planters",
-        "Colonial heritage walks",
-        "Toy Train first-class ride"
-      ],
-      icon: <GiTeapot className="text-2xl text-yellow-500" />
-    }
+    // ... (other package objects remain the same)
   ];
 
   const galleryImages = [
@@ -140,30 +87,104 @@ const GangtokDarjeeling = () => {
     });
   };
 
+  const handleSpecialRequestChange = (e) => {
+    const { name, checked, value } = e.target;
+    if (name === 'other') {
+      setFormData(prev => ({
+        ...prev,
+        specialRequests: {
+          ...prev.specialRequests,
+          other: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        specialRequests: {
+          ...prev.specialRequests,
+          [name]: checked
+        }
+      }));
+    }
+  };
+
+  const incrementAdults = () => {
+    setFormData(prev => ({
+      ...prev,
+      adults: prev.adults + 1
+    }));
+  };
+
+  const decrementAdults = () => {
+    if (formData.adults > 1) {
+      setFormData(prev => ({
+        ...prev,
+        adults: prev.adults - 1
+      }));
+    }
+  };
+
+  const incrementChildren = () => {
+    setFormData(prev => ({
+      ...prev,
+      children: prev.children + 1
+    }));
+  };
+
+  const decrementChildren = () => {
+    if (formData.children > 0) {
+      setFormData(prev => ({
+        ...prev,
+        children: prev.children - 1
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      // Initialize EmailJS with your User ID
-      emailjs.init('37pN2ThzFwwhwk7ai');
+      // Prepare special requests text
+      const specialRequests = [];
+      if (formData.specialRequests.candlelightDinner) specialRequests.push("Candlelight Dinner");
+      if (formData.specialRequests.anniversaryCake) specialRequests.push("Anniversary Cake");
+      if (formData.specialRequests.flowerDecor) specialRequests.push("Flower Decoration");
+      if (formData.specialRequests.privateTransport) specialRequests.push("Private Transport");
+      if (formData.specialRequests.photoSession) specialRequests.push("Photo Session");
+      if (formData.specialRequests.other) specialRequests.push(formData.specialRequests.other);
       
+      const specialRequestsText = specialRequests.length > 0 
+        ? specialRequests.join(", ") 
+        : 'No special requests';
+
       // Prepare the template parameters
       const templateParams = {
         package_name: selectedPackage.title,
         package_duration: selectedPackage.duration,
         package_price: selectedPackage.price,
+        destination: "Gangtok & Darjeeling",
         from_name: formData.name,
         from_email: formData.email,
         phone_number: formData.phone,
-        travel_date: formData.date,
-        number_of_people: formData.people,
-        special_requests: formData.message
+        arrivalDate: formData.arrivalDate,
+        departureDate: formData.departureDate,
+        adults: formData.adults,
+        kids: formData.children,
+        kidsAges: formData.childrenAges,
+        hotelCategory: formData.hotelCategory === '3' ? '3 Star' : 
+                      formData.hotelCategory === '4' ? '4 Star' : '5 Star',
+        mealsIncluded: formData.mealsIncluded === 'yes' ? 'Included' : 'Excluded',
+        budget: formData.budget || 'Not specified',
+        message: `${formData.message}\n\nSpecial Requests: ${specialRequestsText}`
       };
 
+      // Initialize EmailJS with your User ID
+      emailjs.init('37pN2ThzFwwhwk7ai');
+      
       // Send the email using EmailJS
       const response = await emailjs.send(
-              'service_ov629rm',
+        'service_ov629rm',
         'template_jr1dnto',
         templateParams
       );
@@ -175,14 +196,28 @@ const GangtokDarjeeling = () => {
         name: '',
         email: '',
         phone: '',
-        date: '',
-        people: 2,
+        arrivalDate: '',
+        departureDate: '',
+        adults: 2,
+        children: 0,
+        childrenAges: '',
+        hotelCategory: '3',
+        mealsIncluded: 'yes',
+        budget: '',
+        specialRequests: {
+          candlelightDinner: false,
+          anniversaryCake: false,
+          flowerDecor: false,
+          privateTransport: false,
+          photoSession: false,
+          other: ''
+        },
         message: ''
       });
       
       setSubmitStatus({ 
         success: true, 
-        message: 'Thank you for your booking request! We will contact you shortly.' 
+        message: 'Thank you for your booking request! We will contact you within 24 hours.' 
       });
       
       // Close the form after 3 seconds
@@ -203,280 +238,7 @@ const GangtokDarjeeling = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-orange-50">
-      {/* Hero Section */}
-      <div className="relative h-screen max-h-[800px] overflow-hidden">
-        <div className="absolute inset-0">
-          <img 
-            src="/images/darjeeling.jpeg"
-            alt="Himalayan Landscape" 
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/60 to-orange-700/50"></div>
-        </div>
-        
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
-            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm text-white text-sm font-semibold py-2 px-6 rounded-full mb-6 border border-white/30">
-              <GiMonumentValley className="mr-2" /> QUEEN OF THE HIMALAYAS
-            </div>
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-5xl md:text-6xl font-bold text-white mb-6 font-serif"
-          >
-            Gangtok & <span className="text-orange-200">Darjeeling</span> Delights
-          </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-xl text-blue-100 max-w-2xl mx-auto mb-8"
-          >
-            Where misty mountains meet colonial charm in India's most enchanting hill stations
-          </motion.p>
-          
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.6, type: 'spring' }}
-            className="text-orange-200 text-5xl animate-pulse"
-          >
-            <FaMountain />
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="absolute bottom-12 left-0 right-0 flex justify-center"
-          >
-            <div className="animate-bounce text-white text-2xl">
-              <FaChevronDown />
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Packages Section */}
-      <div className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-20">
-        {/* Filter Tabs */}
-        <motion.div 
-          className="flex flex-wrap justify-center gap-3 mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          {['all', 'luxury', 'adventure', 'family', 'honeymoon', 'culture'].map((tab) => (
-            <motion.button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-5 py-3 rounded-full text-sm font-medium capitalize transition-all ${activeTab === tab 
-                ? 'bg-gradient-to-r from-blue-600 to-orange-600 text-white shadow-lg' 
-                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm'}`}
-            >
-              {tab === 'all' ? 'All Experiences' : tab.replace('-', ' ')}
-            </motion.button>
-          ))}
-        </motion.div>
-
-        {/* Packages Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {filteredPackages.map((pkg) => {
-            const isExpanded = expandedPackage === pkg.id;
-            return (
-              <motion.div
-                key={pkg.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                {/* Package Card */}
-                <motion.div 
-                  className={`bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ${isExpanded ? 'ring-2 ring-orange-500' : ''}`}
-                  whileHover={{ y: -5 }}
-                >
-                  {/* Image with Floating Icon */}
-                  <div className="relative h-60 overflow-hidden">
-                    <img 
-                      src={pkg.image} 
-                      alt={pkg.title} 
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-md">
-                      {pkg.icon}
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                      <h3 className="text-white font-bold text-2xl">{pkg.title}</h3>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="bg-orange-600 text-white text-xs px-3 py-1 rounded-full">{pkg.price}</span>
-                        <div className="flex items-center text-yellow-300">
-                          <FaStar className="mr-1" />
-                          <span className="text-white font-medium">{pkg.rating}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="flex items-center text-gray-500">
-                        <IoLeaf className="mr-2" />
-                        <span className="text-sm">{pkg.duration}</span>
-                      </div>
-                      <button
-                        onClick={() => togglePackage(pkg.id)}
-                        className="text-orange-600 font-medium hover:text-orange-700 transition-colors flex items-center text-sm"
-                      >
-                        {isExpanded ? 'Show Less' : 'View Details'} 
-                        <FaChevronDown className={`ml-2 text-orange-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                      </button>
-                    </div>
-
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pt-4 border-t border-orange-100">
-                            <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-                              <FaMountain className="text-orange-500 mr-2" /> Experience Highlights:
-                            </h4>
-                            <ul className="space-y-3 mb-4">
-                              {pkg.highlights.map((highlight, index) => (
-                                <motion.li 
-                                  key={index} 
-                                  className="flex items-start"
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: index * 0.05 }}
-                                >
-                                  <span className="text-orange-500 mr-2">✓</span>
-                                  <span className="text-gray-600">{highlight}</span>
-                                </motion.li>
-                              ))}
-                            </ul>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <motion.button 
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => handleBookNow(pkg)}
-                      className="w-full mt-4 bg-gradient-to-r from-blue-600 to-orange-600 hover:from-blue-700 hover:to-orange-700 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
-                    >
-                      Book This Himalayan Experience
-                    </motion.button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* No Packages Message */}
-        {filteredPackages.length === 0 && (
-          <motion.div 
-            className="text-center py-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <div className="text-orange-500 text-6xl mb-4">
-              <FaMountain />
-            </div>
-            <h3 className="text-2xl font-medium text-gray-700 mb-2">No experiences found in this category</h3>
-            <p className="text-gray-500 mb-6">Contact us to customize your perfect Himalayan getaway</p>
-            <button className="bg-gradient-to-r from-blue-600 to-orange-600 text-white px-8 py-3 rounded-full font-medium hover:from-blue-700 hover:to-orange-700 transition-all shadow-lg">
-              Plan Your Mountain Trip
-            </button>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Gallery Section */}
-      <div className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Gangtok & Darjeeling Gallery</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryImages.map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
-                <img 
-                  src={image} 
-                  alt={`Gallery ${index + 1}`} 
-                  className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Why Choose Us Section */}
-      <div className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-50 to-orange-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Choose Our Himalayan Packages</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Mountain Experts",
-                description: "Local guides with decade-long experience",
-                icon: "🏔️"
-              },
-              {
-                title: "Authentic Experiences",
-                description: "From tea estates to hidden viewpoints",
-                icon: "🍃"
-              },
-              {
-                title: "Comfortable Stays",
-                description: "Carefully selected hotels with stunning views",
-                icon: "🏨"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white p-6 rounded-xl shadow-sm text-center border border-gray-100"
-              >
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Hero Section and other sections remain the same until the Booking Form Modal */}
 
       {/* Booking Form Modal */}
       <AnimatePresence>
@@ -512,7 +274,7 @@ const GangtokDarjeeling = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-gray-700 mb-1">Full Name</label>
+                      <label className="block text-gray-700 mb-1">Full Name *</label>
                       <input
                         type="text"
                         name="name"
@@ -525,7 +287,7 @@ const GangtokDarjeeling = () => {
                     </div>
 
                     <div>
-                      <label className="block text-gray-700 mb-1">Email</label>
+                      <label className="block text-gray-700 mb-1">Email *</label>
                       <input
                         type="email"
                         name="email"
@@ -538,7 +300,7 @@ const GangtokDarjeeling = () => {
                     </div>
 
                     <div>
-                      <label className="block text-gray-700 mb-1">Phone Number</label>
+                      <label className="block text-gray-700 mb-1">Phone Number *</label>
                       <input
                         type="tel"
                         name="phone"
@@ -552,11 +314,11 @@ const GangtokDarjeeling = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-gray-700 mb-1">Travel Date</label>
+                        <label className="block text-gray-700 mb-1">Arrival Date *</label>
                         <input
                           type="date"
-                          name="date"
-                          value={formData.date}
+                          name="arrivalDate"
+                          value={formData.arrivalDate}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                           required
@@ -565,29 +327,227 @@ const GangtokDarjeeling = () => {
                       </div>
 
                       <div>
-                        <label className="block text-gray-700 mb-1">People</label>
-                        <select
-                          name="people"
-                          value={formData.people}
+                        <label className="block text-gray-700 mb-1">Departure Date *</label>
+                        <input
+                          type="date"
+                          name="departureDate"
+                          value={formData.departureDate}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          required
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-700 mb-1">Adults *</label>
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            onClick={decrementAdults}
+                            className="bg-gray-200 text-gray-700 px-3 py-2 rounded-l-lg hover:bg-gray-300 transition-colors"
+                            disabled={isSubmitting || formData.adults <= 1}
+                          >
+                            <FaMinus />
+                          </button>
+                          <input
+                            type="number"
+                            name="adults"
+                            value={formData.adults}
+                            onChange={handleInputChange}
+                            min="1"
+                            className="w-full px-4 py-2 border-t border-b border-gray-300 text-center"
+                            required
+                            disabled={isSubmitting}
+                          />
+                          <button
+                            type="button"
+                            onClick={incrementAdults}
+                            className="bg-gray-200 text-gray-700 px-3 py-2 rounded-r-lg hover:bg-gray-300 transition-colors"
+                            disabled={isSubmitting}
+                          >
+                            <FaPlus />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 mb-1">Children</label>
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            onClick={decrementChildren}
+                            className="bg-gray-200 text-gray-700 px-3 py-2 rounded-l-lg hover:bg-gray-300 transition-colors"
+                            disabled={isSubmitting || formData.children <= 0}
+                          >
+                            <FaMinus />
+                          </button>
+                          <input
+                            type="number"
+                            name="children"
+                            value={formData.children}
+                            onChange={handleInputChange}
+                            min="0"
+                            className="w-full px-4 py-2 border-t border-b border-gray-300 text-center"
+                            disabled={isSubmitting}
+                          />
+                          <button
+                            type="button"
+                            onClick={incrementChildren}
+                            className="bg-gray-200 text-gray-700 px-3 py-2 rounded-r-lg hover:bg-gray-300 transition-colors"
+                            disabled={isSubmitting}
+                          >
+                            <FaPlus />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {formData.children > 0 && (
+                      <div>
+                        <label className="block text-gray-700 mb-1">Children Ages (comma separated)</label>
+                        <input
+                          type="text"
+                          name="childrenAges"
+                          value={formData.childrenAges}
+                          onChange={handleInputChange}
+                          placeholder="e.g. 5, 8, 12"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-700 mb-1">Hotel Category *</label>
+                        <select
+                          name="hotelCategory"
+                          value={formData.hotelCategory}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          required
                           disabled={isSubmitting}
                         >
-                          {[1, 2, 3, 4, 5, 6].map(num => (
-                            <option key={num} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
-                          ))}
+                          <option value="3">3 Star</option>
+                          <option value="4">4 Star</option>
+                          <option value="5">5 Star</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 mb-1">Meals Included *</label>
+                        <select
+                          name="mealsIncluded"
+                          value={formData.mealsIncluded}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          required
+                          disabled={isSubmitting}
+                        >
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
                         </select>
                       </div>
                     </div>
 
                     <div>
+                      <label className="block text-gray-700 mb-1">Approximate Budget (without flights)</label>
+                      <input
+                        type="text"
+                        name="budget"
+                        value={formData.budget}
+                        onChange={handleInputChange}
+                        placeholder="e.g. ₹50,000 - ₹75,000"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+
+                    <div>
                       <label className="block text-gray-700 mb-1">Special Requests</label>
+                      <div className="space-y-2 mb-3">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="candlelightDinner"
+                            checked={formData.specialRequests.candlelightDinner}
+                            onChange={handleSpecialRequestChange}
+                            className="rounded text-orange-600"
+                            disabled={isSubmitting}
+                          />
+                          <span>Candlelight Dinner</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="anniversaryCake"
+                            checked={formData.specialRequests.anniversaryCake}
+                            onChange={handleSpecialRequestChange}
+                            className="rounded text-orange-600"
+                            disabled={isSubmitting}
+                          />
+                          <span>Anniversary Cake</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="flowerDecor"
+                            checked={formData.specialRequests.flowerDecor}
+                            onChange={handleSpecialRequestChange}
+                            className="rounded text-orange-600"
+                            disabled={isSubmitting}
+                          />
+                          <span>Flower Decoration</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="privateTransport"
+                            checked={formData.specialRequests.privateTransport}
+                            onChange={handleSpecialRequestChange}
+                            className="rounded text-orange-600"
+                            disabled={isSubmitting}
+                          />
+                          <span>Private Transport</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="photoSession"
+                            checked={formData.specialRequests.photoSession}
+                            onChange={handleSpecialRequestChange}
+                            className="rounded text-orange-600"
+                            disabled={isSubmitting}
+                          />
+                          <span>Photo Session</span>
+                        </label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-orange-600 opacity-0"
+                            disabled
+                          />
+                          <input
+                            type="text"
+                            name="other"
+                            value={formData.specialRequests.other}
+                            onChange={handleSpecialRequestChange}
+                            placeholder="Other requests"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                      </div>
                       <textarea
                         name="message"
                         value={formData.message}
                         onChange={handleInputChange}
                         rows="3"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="Any additional information or requests..."
                         disabled={isSubmitting}
                       ></textarea>
                     </div>

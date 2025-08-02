@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaHeart, FaChevronDown, FaShoppingBag, FaUmbrellaBeach, FaRegCalendarAlt, FaUser, FaChild, FaHotel, FaUtensils, FaWallet } from 'react-icons/fa';
+import { FaStar, FaHeart, FaChevronDown, FaShoppingBag, FaUmbrellaBeach, FaRegCalendarAlt, FaUser, FaChild, FaHotel, FaUtensils, FaWallet, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiDesert, GiPalmTree, GiGoldBar, GiModernCity, GiPearlNecklace, GiSailboat, GiSandsOfTime } from 'react-icons/gi';
 import { RiHotelFill, RiVipCrownFill } from 'react-icons/ri';
 import { BiDrink, BiHappyHeartEyes } from 'react-icons/bi';
@@ -27,14 +27,25 @@ const Dubai = () => {
     arrivalDate: '',
     departureDate: '',
     adults: 1,
-    kids: '0',
+    kids: 0,
     kidsAges: '',
     hotelCategory: '3',
     mealsIncluded: 'yes',
     budget: '',
     package: '',
-    message: ''
+    message: '',
+    specialRequests: []
   });
+
+  // Special request options
+  const specialRequestOptions = [
+    { id: 'cake', label: 'Birthday/Anniversary Cake' },
+    { id: 'candlelight', label: 'Candlelight Dinner' },
+    { id: 'honeymoon', label: 'Honeymoon Decorations' },
+    { id: 'photoshoot', label: 'Professional Photoshoot' },
+    { id: 'spa', label: 'Spa Treatment' },
+    { id: 'guide', label: 'Private Guide' }
+  ];
 
   const packages = [
     {
@@ -200,28 +211,67 @@ const Dubai = () => {
     }));
   };
 
+  const handleSpecialRequestChange = (id) => {
+    setFormData(prev => {
+      if (prev.specialRequests.includes(id)) {
+        return {
+          ...prev,
+          specialRequests: prev.specialRequests.filter(item => item !== id)
+        };
+      } else {
+        return {
+          ...prev,
+          specialRequests: [...prev.specialRequests, id]
+        };
+      }
+    });
+  };
+
+  const incrementCount = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: Math.min(prev[field] + 1, field === 'adults' ? 50 : 20)
+    }));
+  };
+
+  const decrementCount = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: Math.max(prev[field] - 1, field === 'adults' ? 1 : 0)
+    }));
+  };
+
   const sendEmail = (e) => {
     e.preventDefault();
     setIsLoading(true);
 
+    const templateParams = {
+      package_name: formData.package,
+      destination: "Dubai",
+      package_price: packages.find(pkg => pkg.title === formData.package)?.price || 'Custom Package',
+      duration: packages.find(pkg => pkg.title === formData.package)?.duration || 'Custom Duration',
+      from_name: formData.name,
+      from_email: formData.email,
+      phone_number: formData.phone,
+      arrivalDate: formData.arrivalDate,
+      departureDate: formData.departureDate,
+      adults: formData.adults,
+      kids: formData.kids,
+      kidsAges: formData.kidsAges,
+      hotelCategory: formData.hotelCategory,
+      mealsIncluded: formData.mealsIncluded === 'yes' ? 'Included' : 'Excluded',
+      budget: formData.budget || 'Not specified',
+      message: formData.message + 
+        (formData.specialRequests.length > 0 
+          ? `\n\nSpecial Requests: ${formData.specialRequests.map(id => 
+              specialRequestOptions.find(opt => opt.id === id)?.label).join(', ')}` 
+          : '')
+    };
+
     emailjs.send(
-      'service_bdm6dl3',
-      'template_q7y750i',
-      {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        arrivalDate: formData.arrivalDate,
-        departureDate: formData.departureDate,
-        adults: formData.adults,
-        kids: formData.kids,
-        kidsAges: formData.kidsAges,
-        hotelCategory: formData.hotelCategory,
-        mealsIncluded: formData.mealsIncluded,
-        budget: formData.budget,
-        package: formData.package,
-        message: formData.message
-      }
+      'service_ov629rm',
+      'template_jr1dnto',
+      templateParams
     )
     .then((result) => {
       toast.success('Booking request sent successfully! We will contact you shortly.', {
@@ -241,13 +291,14 @@ const Dubai = () => {
         arrivalDate: '',
         departureDate: '',
         adults: 1,
-        kids: '0',
+        kids: 0,
         kidsAges: '',
         hotelCategory: '3',
         mealsIncluded: 'yes',
         budget: '',
         package: '',
-        message: ''
+        message: '',
+        specialRequests: []
       });
     }, (error) => {
       toast.error('Failed to send booking request. Please try again later.', {
@@ -330,7 +381,7 @@ const Dubai = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-gradient-to-r from-amber-600 to-gray-600 hover:from-amber-700 hover:to-gray-700 text-white px-8 py-4 rounded-full font-bold shadow-xl hover:shadow-2xl transition-all flex items-center"
+            className="bg-gradient-to-r from-amber-600 to-gray-600 text-white px-8 py-4 rounded-full font-bold shadow-xl hover:shadow-2xl transition-all flex items-center"
             onClick={() => openBookingModal()}
           >
             <RiVipCrownFill className="mr-2" /> Book Your VIP Experience
@@ -931,60 +982,71 @@ const Dubai = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="adults" className="block text-sm font-medium text-gray-700 mb-1">Adults *</label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                              <FaUser />
-                            </div>
-                            <select
+                          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => decrementCount('adults')}
+                              className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="adults"
                               name="adults"
                               value={formData.adults}
                               onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white appearance-none"
+                              className="w-full px-4 py-3 text-center border-0 focus:ring-0"
+                              min="1"
+                              max="50"
                               required
+                            />
+                            <button
+                              type="button"
+                              onClick={() => incrementCount('adults')}
+                              className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                             >
-                              {[1, 2, 3, 4, 5, 6].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                              ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                              <FaChevronDown className="h-4 w-4" />
-                            </div>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
 
                         <div>
                           <label htmlFor="kids" className="block text-sm font-medium text-gray-700 mb-1">Children</label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                              <FaChild />
-                            </div>
-                            <select
+                          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => decrementCount('kids')}
+                              className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="kids"
                               name="kids"
                               value={formData.kids}
                               onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white appearance-none"
+                              className="w-full px-4 py-3 text-center border-0 focus:ring-0"
+                              min="0"
+                              max="20"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => incrementCount('kids')}
+                              className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                             >
-                              <option value="0">0 Children</option>
-                              {[1, 2, 3, 4].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
-                              ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                              <FaChevronDown className="h-4 w-4" />
-                            </div>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
 
                         {formData.kids > 0 && (
                           <div className="md:col-span-2">
-                            <label htmlFor="kidsAges" className="block text-sm font-medium text-gray-700 mb-1">Children Ages</label>
+                            <label htmlFor="kidsAges" className="block text-sm font-medium text-gray-700 mb-1">Children Ages *</label>
                             <div className="relative">
                               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                </svg>
+                                <FaChild />
                               </div>
                               <input
                                 type="text"
@@ -994,6 +1056,7 @@ const Dubai = () => {
                                 onChange={handleInputChange}
                                 placeholder="Ages separated by commas (e.g., 5, 8)"
                                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
+                                required
                               />
                             </div>
                           </div>
@@ -1064,7 +1127,7 @@ const Dubai = () => {
                       </h4>
                       <div className="space-y-4">
                         <div>
-                          <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-1">Budget (per person)</label>
+                          <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-1">Budget (per person) *</label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                               <FaWallet />
@@ -1077,12 +1140,37 @@ const Dubai = () => {
                               onChange={handleInputChange}
                               placeholder="e.g., ₹50,000 - ₹75,000"
                               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white"
+                              required
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Special Requests</label>
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            {specialRequestOptions.map(option => (
+                              <label key={option.id} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.specialRequests.includes(option.id)}
+                                  onChange={() => handleSpecialRequestChange(option.id)}
+                                  className="hidden"
+                                />
+                                <div className={`w-5 h-5 rounded border flex items-center justify-center ${formData.specialRequests.includes(option.id) ? 'bg-amber-500 border-amber-500' : 'border-gray-300'}`}>
+                                  {formData.specialRequests.includes(option.id) && (
+                                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                  )}
+                                </div>
+                                <span className="text-gray-700 text-sm">{option.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Additional Requests</label>
                           <textarea
                             id="message"
                             name="message"
@@ -1090,7 +1178,7 @@ const Dubai = () => {
                             onChange={handleInputChange}
                             rows="3"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white"
-                            placeholder="Any special requirements or preferences (dietary needs, accessibility requirements, room preferences, etc.)"
+                            placeholder="Any other special requirements or preferences"
                           ></textarea>
                         </div>
                       </div>

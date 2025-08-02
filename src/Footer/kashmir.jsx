@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaHeart, FaChevronDown, FaTimes, FaCamera, FaSpa, FaUser, FaEnvelope, FaPhone, FaCalendarAlt, FaUsers, FaChild, FaHotel, FaUtensils, FaWallet } from 'react-icons/fa';
+import { FaStar, FaHeart, FaChevronDown, FaTimes, FaCamera, FaSpa, FaUser, FaEnvelope, FaPhone, FaCalendarAlt, FaUsers, FaChild, FaHotel, FaUtensils, FaWallet, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiWoodCabin, GiBoatFishing, GiFlowerPot, GiShoppingBag } from 'react-icons/gi';
 import { MdFamilyRestroom, MdLocalDining, MdDirectionsBike } from 'react-icons/md';
 import { IoLeaf } from 'react-icons/io5';
@@ -23,12 +23,23 @@ const Kashmir = () => {
     arrivalDate: '',
     departureDate: '',
     adults: 1,
-    kids: '',
+    kids: 0,
     kidsAges: '',
     hotelCategory: '3',
     mealsIncluded: 'yes',
     budget: '',
     package: '',
+    specialRequests: {
+      candlelightDinner: false,
+      anniversaryCelebration: false,
+      birthdayCelebration: false,
+      honeymoonPackage: false,
+      flowerDecoration: false,
+      photographySession: false,
+      spaTreatment: false,
+      cakeArrangement: false,
+      other: ''
+    },
     message: ''
   });
 
@@ -183,6 +194,28 @@ const Kashmir = () => {
     }));
   };
 
+  const handleSpecialRequestChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      specialRequests: {
+        ...prev.specialRequests,
+        [name]: checked
+      }
+    }));
+  };
+
+  const handleOtherRequestChange = (e) => {
+    const { value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      specialRequests: {
+        ...prev.specialRequests,
+        other: value
+      }
+    }));
+  };
+
   const handleDateChange = (date, field) => {
     setFormData(prev => ({
       ...prev,
@@ -190,29 +223,79 @@ const Kashmir = () => {
     }));
   };
 
+  const incrementAdults = () => {
+    setFormData(prev => ({
+      ...prev,
+      adults: prev.adults + 1
+    }));
+  };
+
+  const decrementAdults = () => {
+    if (formData.adults > 1) {
+      setFormData(prev => ({
+        ...prev,
+        adults: prev.adults - 1
+      }));
+    }
+  };
+
+  const incrementKids = () => {
+    setFormData(prev => ({
+      ...prev,
+      kids: prev.kids + 1
+    }));
+  };
+
+  const decrementKids = () => {
+    if (formData.kids > 0) {
+      setFormData(prev => ({
+        ...prev,
+        kids: prev.kids - 1
+      }));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Prepare special requests text
+    const specialRequestsText = Object.entries(formData.specialRequests)
+      .filter(([key, value]) => value && key !== 'other')
+      .map(([key]) => {
+        // Convert camelCase to readable text
+        return key.replace(/([A-Z])/g, ' $1')
+          .replace(/^./, str => str.toUpperCase());
+      })
+      .join(', ');
+    
+    const otherRequest = formData.specialRequests.other 
+      ? `Other: ${formData.specialRequests.other}` 
+      : '';
+    
+    const fullMessage = `${formData.message}\n\nSpecial Requests: ${specialRequestsText}${otherRequest ? '\n' + otherRequest : ''}`;
     
     emailjs.init('37pN2ThzFwwhwk7ai');
     
     emailjs.send(
-       'service_ov629rm',
-        'template_jr1dnto',
+      'service_ov629rm',
+      'template_jr1dnto',
       {
         package_name: selectedPackage.title,
+        destination: "Kashmir",
         package_price: selectedPackage.price,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        arrival_date: formData.arrivalDate ? formData.arrivalDate.toISOString() : '',
-        departure_date: formData.departureDate ? formData.departureDate.toISOString() : '',
+        duration: selectedPackage.duration,
+        from_name: formData.name,
+        from_email: formData.email,
+        phone_number: formData.phone,
+        arrivalDate: formData.arrivalDate ? formData.arrivalDate.toDateString() : '',
+        departureDate: formData.departureDate ? formData.departureDate.toDateString() : '',
         adults: formData.adults,
-        kids: formData.kids,
-        kids_ages: formData.kidsAges,
-        hotel_category: formData.hotelCategory,
-        meals_included: formData.mealsIncluded,
+        kids: formData.kids || '0',
+        kidsAges: formData.kidsAges || 'Not specified',
+        hotelCategory: formData.hotelCategory,
+        mealsIncluded: formData.mealsIncluded,
         budget: formData.budget,
-        message: formData.message
+        message: fullMessage
       }
     )
     .then((response) => {
@@ -228,12 +311,23 @@ const Kashmir = () => {
           arrivalDate: '',
           departureDate: '',
           adults: 1,
-          kids: '',
+          kids: 0,
           kidsAges: '',
           hotelCategory: '3',
           mealsIncluded: 'yes',
           budget: '',
           package: '',
+          specialRequests: {
+            candlelightDinner: false,
+            anniversaryCelebration: false,
+            birthdayCelebration: false,
+            honeymoonPackage: false,
+            flowerDecoration: false,
+            photographySession: false,
+            spaTreatment: false,
+            cakeArrangement: false,
+            other: ''
+          },
           message: ''
         });
       }, 3000);
@@ -725,51 +819,76 @@ const Kashmir = () => {
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="adults">Number of Adults *</label>
-                          <div className="relative">
-                            <FaUsers className="absolute left-3 top-3 text-gray-400" />
-                            <select
+                          <div className="relative flex items-center">
+                            <button
+                              type="button"
+                              onClick={decrementAdults}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-l-lg"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="adults"
                               name="adults"
                               value={formData.adults}
                               onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                              min="1"
+                              max="100"
+                              className="w-full text-center px-4 py-2 border-t border-b border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                               required
+                            />
+                            <button
+                              type="button"
+                              onClick={incrementAdults}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-r-lg"
                             >
-                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                              ))}
-                            </select>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
                         
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="kids">Number of Kids</label>
-                          <div className="relative">
-                            <FaChild className="absolute left-3 top-3 text-gray-400" />
-                            <select
+                          <div className="relative flex items-center">
+                            <button
+                              type="button"
+                              onClick={decrementKids}
+                              disabled={formData.kids === 0}
+                              className={`bg-gray-200 ${formData.kids === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'} text-gray-700 font-bold py-2 px-3 rounded-l-lg`}
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="kids"
                               name="kids"
                               value={formData.kids}
                               onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                              min="0"
+                              max="20"
+                              className="w-full text-center px-4 py-2 border-t border-b border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={incrementKids}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-r-lg"
                             >
-                              <option value="">0 Children</option>
-                              {[1, 2, 3, 4, 5].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
-                              ))}
-                            </select>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
                         
                         {formData.kids > 0 && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="kidsAges">Kids Ages (comma separated)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="kidsAges">Kids Ages (comma separated) *</label>
                             <input
                               type="text"
                               id="kidsAges"
                               name="kidsAges"
                               value={formData.kidsAges}
                               onChange={handleInputChange}
+                              required={formData.kids > 0}
                               placeholder="e.g. 5, 8"
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                             />
@@ -791,6 +910,7 @@ const Kashmir = () => {
                               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                               required
                             >
+                              <option value="basic">Basic</option>
                               <option value="3">3 Star</option>
                               <option value="4">4 Star</option>
                               <option value="5">5 Star</option>
@@ -821,7 +941,7 @@ const Kashmir = () => {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget">Budget Range</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget">Budget Range *</label>
                           <div className="relative">
                             <FaWallet className="absolute left-3 top-3 text-gray-400" />
                             <select
@@ -830,6 +950,7 @@ const Kashmir = () => {
                               value={formData.budget}
                               onChange={handleInputChange}
                               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                              required
                             >
                               <option value="">Select Budget</option>
                               <option value="economy">Economy (₹50,000 - ₹1,00,000)</option>
@@ -842,8 +963,143 @@ const Kashmir = () => {
                       </div>
                     </div>
                     
+                    {/* Special Requests Section */}
                     <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">Special Requests</label>
+                      <h3 className="text-lg font-medium text-gray-800 mb-3">Special Requests (Optional)</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="candlelightDinner"
+                            name="candlelightDinner"
+                            checked={formData.specialRequests.candlelightDinner}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="candlelightDinner" className="ml-2 block text-sm text-gray-700">
+                            Candlelight Dinner
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="anniversaryCelebration"
+                            name="anniversaryCelebration"
+                            checked={formData.specialRequests.anniversaryCelebration}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="anniversaryCelebration" className="ml-2 block text-sm text-gray-700">
+                            Anniversary Celebration
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="birthdayCelebration"
+                            name="birthdayCelebration"
+                            checked={formData.specialRequests.birthdayCelebration}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="birthdayCelebration" className="ml-2 block text-sm text-gray-700">
+                            Birthday Celebration
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="honeymoonPackage"
+                            name="honeymoonPackage"
+                            checked={formData.specialRequests.honeymoonPackage}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="honeymoonPackage" className="ml-2 block text-sm text-gray-700">
+                            Honeymoon Package
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="flowerDecoration"
+                            name="flowerDecoration"
+                            checked={formData.specialRequests.flowerDecoration}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="flowerDecoration" className="ml-2 block text-sm text-gray-700">
+                            Flower Decoration
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="photographySession"
+                            name="photographySession"
+                            checked={formData.specialRequests.photographySession}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="photographySession" className="ml-2 block text-sm text-gray-700">
+                            Photography Session
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="spaTreatment"
+                            name="spaTreatment"
+                            checked={formData.specialRequests.spaTreatment}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="spaTreatment" className="ml-2 block text-sm text-gray-700">
+                            Spa Treatment
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="cakeArrangement"
+                            name="cakeArrangement"
+                            checked={formData.specialRequests.cakeArrangement}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="cakeArrangement" className="ml-2 block text-sm text-gray-700">
+                            Cake Arrangement
+                          </label>
+                        </div>
+                      </div>
+                      
+                      {/* Other Special Requests */}
+                      <div className="mt-4">
+                        <label htmlFor="otherRequests" className="block text-sm font-medium text-gray-700 mb-1">
+                          Other Special Requests
+                        </label>
+                        <textarea
+                          id="otherRequests"
+                          name="other"
+                          value={formData.specialRequests.other}
+                          onChange={handleOtherRequestChange}
+                          rows="2"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                          placeholder="Any other special requirements or preferences"
+                        ></textarea>
+                      </div>
+                    </div>
+                    
+                    {/* Additional Message */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">Additional Message</label>
                       <textarea
                         id="message"
                         name="message"
@@ -851,7 +1107,7 @@ const Kashmir = () => {
                         onChange={handleInputChange}
                         rows="4"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                        placeholder="Any special requirements or preferences (dietary needs, accessibility requirements, special occasions, etc.)"
+                        placeholder="Any other information you'd like to share about your trip"
                       ></textarea>
                     </div>
                     

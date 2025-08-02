@@ -21,12 +21,17 @@ import {
   FaEnvelope,
   FaUser,
   FaTimes,
-  FaCheck
+  FaCheck,
+  FaPlus,
+  FaMinus
 } from 'react-icons/fa';
 import { 
   GiSandsOfTime, 
   GiBoatHorizon, 
-  GiIsland
+  GiIsland,
+  GiCakeSlice,
+  GiCandleLight,
+  GiFlowerPot
 } from 'react-icons/gi';
 import { MdEmojiFoodBeverage, MdOutlinePool } from 'react-icons/md';
 import { IoMdFlower } from 'react-icons/io';
@@ -60,7 +65,6 @@ const Honeymoon = () => {
     "/images/Swissh.jpeg"
   ];
 
-  // Gallery images
   const galleryImages = [
     "/images/balih.jpeg",
     "/images/Santorinih.jpeg",
@@ -79,10 +83,9 @@ const Honeymoon = () => {
       originalPrice: "₹99,999",
       discount: "10% OFF",
       rating: 4.9,
-      images: [
-        "/images/balih.jpeg",
-      ],
+      images: ["/images/balih.jpeg"],
       type: "international",
+      destination: "Bali, Indonesia",
       highlights: [
         "Private pool villa with flower bath",
         "Sunset Uluwatu temple tour",
@@ -110,10 +113,9 @@ const Honeymoon = () => {
       originalPrice: "₹1,35,999",
       discount: "7% OFF",
       rating: 5.0,
-      images: [
-        "/images/Santorinih.jpeg",
-      ],
+      images: ["/images/Santorinih.jpeg"],
       type: "international",
+      destination: "Santorini, Greece",
       highlights: [
         "Caldera-view suite with private jacuzzi",
         "Private yacht sunset cruise",
@@ -141,10 +143,9 @@ const Honeymoon = () => {
       originalPrice: "₹1,05,999",
       discount: "9% OFF",
       rating: 5.0,
-      images: [
-        "/images/maldievesh.jpeg",
-      ],
+      images: ["/images/maldievesh.jpeg"],
       type: "international",
+      destination: "Maldives",
       highlights: [
         "Luxury overwater villa with glass floor",
         "Private sandbank picnic",
@@ -172,10 +173,9 @@ const Honeymoon = () => {
       originalPrice: "₹1,59,999",
       discount: "6% OFF",
       rating: 4.9,
-      images: [
-       "/images/Swissh.jpeg"
-      ],
+      images: ["/images/Swissh.jpeg"],
       type: "international",
+      destination: "Swiss Alps",
       highlights: [
         "Mountain chalet with fireplace",
         "Private fondue dinner in igloo",
@@ -203,10 +203,9 @@ const Honeymoon = () => {
       originalPrice: "₹58,999",
       discount: "10% OFF",
       rating: 4.8,
-      images: [
-        "/images/Andamanh.jpeg"
-      ],
+      images: ["/images/Andamanh.jpeg"],
       type: "beach",
+      destination: "Andaman Islands, India",
       highlights: [
         "Beachfront villa with private pool",
         "Private island hopping tour",
@@ -234,10 +233,9 @@ const Honeymoon = () => {
       originalPrice: "₹68,999",
       discount: "9% OFF",
       rating: 4.9,
-      images: [
-       "/images/Client7.jpeg"
-      ],
+      images: ["/images/Client7.jpeg"],
       type: "mountain",
+      destination: "Kashmir, India",
       highlights: [
         "Premium houseboat stay on Dal Lake",
         "Private shikara ride with flowers",
@@ -283,12 +281,24 @@ const Honeymoon = () => {
     arrivalDate: '',
     departureDate: '',
     adults: 2,
-    kids: '',
+    kids: 0,
     kidsAges: '',
     hotelCategory: '4',
     mealsIncluded: 'yes',
     budget: '',
     package: '',
+    specialRequests: {
+      candlelightDinner: false,
+      anniversaryCelebration: false,
+      birthdayCelebration: false,
+      honeymoonPackage: false,
+      flowerDecoration: false,
+      photographySession: false,
+      spaTreatment: false,
+      cakeSurprise: false,
+      privateDining: false,
+      other: ''
+    },
     message: ''
   });
 
@@ -300,6 +310,28 @@ const Honeymoon = () => {
     }));
   };
 
+  const handleSpecialRequestChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      specialRequests: {
+        ...prev.specialRequests,
+        [name]: checked
+      }
+    }));
+  };
+
+  const handleOtherRequestChange = (e) => {
+    const { value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      specialRequests: {
+        ...prev.specialRequests,
+        other: value
+      }
+    }));
+  };
+
   const handleDateChange = (date, field) => {
     setFormData(prev => ({
       ...prev,
@@ -307,29 +339,112 @@ const Honeymoon = () => {
     }));
   };
 
+  const incrementAdults = () => {
+    setFormData(prev => ({
+      ...prev,
+      adults: Math.min(prev.adults + 1, 100)
+    }));
+  };
+
+  const decrementAdults = () => {
+    setFormData(prev => ({
+      ...prev,
+      adults: Math.max(prev.adults - 1, 1)
+    }));
+  };
+
+  const incrementKids = () => {
+    setFormData(prev => ({
+      ...prev,
+      kids: Math.min(prev.kids + 1, 20)
+    }));
+  };
+
+  const decrementKids = () => {
+    setFormData(prev => ({
+      ...prev,
+      kids: Math.max(prev.kids - 1, 0)
+    }));
+  };
+
+  const handleAdultsChange = (e) => {
+    const value = parseInt(e.target.value) || 1;
+    setFormData(prev => ({
+      ...prev,
+      adults: Math.min(Math.max(value, 1), 100)
+    }));
+  };
+
+  const handleKidsChange = (e) => {
+    const value = parseInt(e.target.value) || 0;
+    setFormData(prev => ({
+      ...prev,
+      kids: Math.min(Math.max(value, 0), 20)
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    const formatDate = (date) => {
+      if (!date) return 'Not specified';
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    };
+
+    // Prepare special requests text
+    const specialRequestsText = Object.entries(formData.specialRequests)
+      .filter(([key, value]) => value && key !== 'other')
+      .map(([key]) => {
+        return key.replace(/([A-Z])/g, ' $1')
+          .replace(/^./, str => str.toUpperCase());
+      })
+      .join(', ');
+    
+    const otherRequest = formData.specialRequests.other 
+      ? `Other: ${formData.specialRequests.other}` 
+      : '';
+    
+    // Create adult ages information
+    const adultAgesInfo = formData.adults > 2 
+      ? `Adult Ages: ${Array(formData.adults - 2).fill('Adult').map((_, i) => `Adult ${i + 3}`).join(', ')}`
+      : 'Adult Ages: Not specified (default couple)';
+    
+    const fullMessage = `${formData.message}\n\nSpecial Requests: ${specialRequestsText}${otherRequest ? '\n' + otherRequest : ''}\n\n${adultAgesInfo}`;
+
     emailjs.init('37pN2ThzFwwhwk7ai');
     
     emailjs.send(
-    'service_ov629rm',
-        'template_jr1dnto',
+      'service_ov629rm',
+      'template_jr1dnto',
       {
-        package_name: selectedPackage.title,
-        package_price: selectedPackage.price,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        arrival_date: formData.arrivalDate ? formData.arrivalDate.toISOString() : '',
-        departure_date: formData.departureDate ? formData.departureDate.toISOString() : '',
+        package_name: selectedPackage ? selectedPackage.title : 'Custom Honeymoon',
+        duration: selectedPackage ? selectedPackage.duration : 'Custom Duration',
+        destination: selectedPackage ? selectedPackage.destination : 'Custom Destination',
+        package_price: selectedPackage ? selectedPackage.price : 'Custom Quote',
+        from_name: formData.name,
+        from_email: formData.email,
+        phone_number: formData.phone,
+        arrivalDate: formData.arrivalDate ? formatDate(formData.arrivalDate) : 'Not specified',
+        departureDate: formData.departureDate ? formatDate(formData.departureDate) : 'Not specified',
         adults: formData.adults,
         kids: formData.kids,
-        kids_ages: formData.kidsAges,
-        hotel_category: formData.hotelCategory,
-        meals_included: formData.mealsIncluded,
-        budget: formData.budget,
-        message: formData.message
+        kidsAges: formData.kidsAges || 'Not specified',
+        adultAges: formData.adults > 2 
+          ? Array(formData.adults - 2).fill('Adult').map((_, i) => `Adult ${i + 3}`).join(', ')
+          : 'Not specified (default couple)',
+        hotelCategory: formData.hotelCategory + ' Star',
+        mealsIncluded: formData.mealsIncluded === 'yes' ? 'Yes' : 
+                      formData.mealsIncluded === 'no' ? 'No' : 
+                      formData.mealsIncluded === 'breakfast' ? 'Breakfast Only' : 
+                      formData.mealsIncluded === 'half-board' ? 'Half Board' : 'Full Board',
+        budget: formData.budget === 'economy' ? 'Economy (₹50,000 - ₹1,00,000)' :
+                formData.budget === 'mid-range' ? 'Mid-Range (₹1,00,000 - ₹2,00,000)' :
+                formData.budget === 'premium' ? 'Premium (₹2,00,000 - ₹4,00,000)' : 'Luxury (₹4,00,000+)',
+        message: fullMessage || 'No special requests'
       }
     )
     .then((response) => {
@@ -345,12 +460,24 @@ const Honeymoon = () => {
           arrivalDate: '',
           departureDate: '',
           adults: 2,
-          kids: '',
+          kids: 0,
           kidsAges: '',
           hotelCategory: '4',
           mealsIncluded: 'yes',
           budget: '',
           package: '',
+          specialRequests: {
+            candlelightDinner: false,
+            anniversaryCelebration: false,
+            birthdayCelebration: false,
+            honeymoonPackage: false,
+            flowerDecoration: false,
+            photographySession: false,
+            spaTreatment: false,
+            cakeSurprise: false,
+            privateDining: false,
+            other: ''
+          },
           message: ''
         });
       }, 3000);
@@ -973,26 +1100,88 @@ const Honeymoon = () => {
                         </div>
                       </div>
                       
-                      {/* Travelers */}
+                      {/* Travelers - Adults with +/- buttons */}
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="adults">Number of Adults *</label>
-                          <div className="relative">
-                            <FaUsers className="absolute left-3 top-3 text-gray-400" />
-                            <select
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={decrementAdults}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-l-lg"
+                              disabled={formData.adults <= 1}
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="adults"
                               name="adults"
                               value={formData.adults}
-                              onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                              onChange={handleAdultsChange}
+                              min="1"
+                              max="100"
+                              className="w-full text-center border-t border-b border-gray-300 py-2 px-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                               required
+                            />
+                            <button
+                              type="button"
+                              onClick={incrementAdults}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-r-lg"
+                              disabled={formData.adults >= 100}
                             >
-                              {[2, 3, 4].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                              ))}
-                            </select>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
+                        
+                        {/* Travelers - Children with +/- buttons */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="kids">Number of Kids</label>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={decrementKids}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-l-lg"
+                              disabled={formData.kids <= 0}
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
+                              id="kids"
+                              name="kids"
+                              value={formData.kids}
+                              onChange={handleKidsChange}
+                              min="0"
+                              max="20"
+                              className="w-full text-center border-t border-b border-gray-300 py-2 px-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={incrementKids}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-r-lg"
+                              disabled={formData.kids >= 20}
+                            >
+                              <FaPlus />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {formData.kids > 0 && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="kidsAges">Kids Ages (comma separated)</label>
+                            <input
+                              type="text"
+                              id="kidsAges"
+                              name="kidsAges"
+                              value={formData.kidsAges}
+                              onChange={handleInputChange}
+                              placeholder="e.g. 5, 8"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                            />
+                          </div>
+                        )}
                       </div>
                       
                       {/* Accommodation */}
@@ -1009,6 +1198,7 @@ const Honeymoon = () => {
                               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                               required
                             >
+                              <option value="3">3 Star</option>
                               <option value="4">4 Star</option>
                               <option value="5">5 Star</option>
                               <option value="luxury">Luxury</option>
@@ -1030,17 +1220,146 @@ const Honeymoon = () => {
                               required
                             >
                               <option value="yes">Yes</option>
+                              <option value="no">No</option>
                               <option value="breakfast">Breakfast Only</option>
                               <option value="half-board">Half Board</option>
                               <option value="full-board">Full Board</option>
                             </select>
                           </div>
                         </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget">Budget Range *</label>
+                          <div className="relative">
+                            <FaWallet className="absolute left-3 top-3 text-gray-400" />
+                            <select
+                              id="budget"
+                              name="budget"
+                              value={formData.budget}
+                              onChange={handleInputChange}
+                              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                              required
+                            >
+                              <option value="">Select Budget</option>
+                              <option value="economy">Economy (₹50,000 - ₹1,00,000)</option>
+                              <option value="mid-range">Mid-Range (₹1,00,000 - ₹2,00,000)</option>
+                              <option value="premium">Premium (₹2,00,000 - ₹4,00,000)</option>
+                              <option value="luxury">Luxury (₹4,00,000+)</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     
+                    {/* Special Requests Section */}
                     <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">Special Requests</label>
+                      <h3 className="text-lg font-medium text-gray-800 mb-3">Special Romantic Requests</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="candlelightDinner"
+                            name="candlelightDinner"
+                            checked={formData.specialRequests.candlelightDinner}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="candlelightDinner" className="ml-2 block text-sm text-gray-700">
+                            Candlelight Dinner
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="cakeSurprise"
+                            name="cakeSurprise"
+                            checked={formData.specialRequests.cakeSurprise}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="cakeSurprise" className="ml-2 block text-sm text-gray-700">
+                            Cake Surprise
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="flowerDecoration"
+                            name="flowerDecoration"
+                            checked={formData.specialRequests.flowerDecoration}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="flowerDecoration" className="ml-2 block text-sm text-gray-700">
+                            Flower Decoration
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="privateDining"
+                            name="privateDining"
+                            checked={formData.specialRequests.privateDining}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="privateDining" className="ml-2 block text-sm text-gray-700">
+                            Private Dining
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="photographySession"
+                            name="photographySession"
+                            checked={formData.specialRequests.photographySession}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="photographySession" className="ml-2 block text-sm text-gray-700">
+                            Photography Session
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="spaTreatment"
+                            name="spaTreatment"
+                            checked={formData.specialRequests.spaTreatment}
+                            onChange={handleSpecialRequestChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="spaTreatment" className="ml-2 block text-sm text-gray-700">
+                            Couple's Spa Treatment
+                          </label>
+                        </div>
+                      </div>
+                      
+                      {/* Other Special Requests */}
+                      <div className="mt-4">
+                        <label htmlFor="otherRequests" className="block text-sm font-medium text-gray-700 mb-1">
+                          Other Special Requests
+                        </label>
+                        <textarea
+                          id="otherRequests"
+                          name="other"
+                          value={formData.specialRequests.other}
+                          onChange={handleOtherRequestChange}
+                          rows="2"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                          placeholder="Any other special requirements or preferences"
+                        ></textarea>
+                      </div>
+                    </div>
+                    
+                    {/* Additional Message */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">Additional Message</label>
                       <textarea
                         id="message"
                         name="message"
@@ -1048,7 +1367,7 @@ const Honeymoon = () => {
                         onChange={handleInputChange}
                         rows="4"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                        placeholder="Any special requirements or preferences (honeymoon surprises, dietary needs, etc.)"
+                        placeholder="Any other information you'd like to share about your honeymoon"
                       ></textarea>
                     </div>
                     

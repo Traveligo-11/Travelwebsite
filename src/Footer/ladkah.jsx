@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaChevronDown, FaTimes, FaCamera, FaUser, FaEnvelope, FaPhone, FaCalendarAlt, FaUsers, FaChild, FaHotel, FaUtensils, FaWallet, FaMapMarkerAlt, FaMotorcycle, FaMountain } from 'react-icons/fa';
+import { FaStar, FaChevronDown, FaTimes, FaCamera, FaUser, FaEnvelope, FaPhone, FaCalendarAlt, FaUsers, FaChild, FaHotel, FaUtensils, FaWallet, FaMapMarkerAlt, FaMotorcycle, FaMountain, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiWoodCabin } from 'react-icons/gi';
 import { BiHappyHeartEyes, BiTrip } from 'react-icons/bi';
 import { IoIosSnow } from 'react-icons/io';
@@ -22,14 +22,27 @@ const Ladakh = () => {
     arrivalDate: '',
     departureDate: '',
     adults: 1,
-    kids: '',
+    kids: 0,
     kidsAges: '',
     hotelCategory: '3',
     mealsIncluded: 'yes',
     budget: '',
     package: '',
-    message: ''
+    message: '',
+    specialRequests: []
   });
+
+  // Special request options
+  const specialRequestOptions = [
+    "Candle Light Dinner",
+    "Birthday/Anniversary Cake",
+    "Honeymoon Decorations",
+    "Vegetarian Meals Only",
+    "Non-Vegetarian Preference",
+    "Adventure Activities",
+    "Cultural Experiences",
+    "Photography Assistance"
+  ];
 
   // Hero image slideshow effect
   useEffect(() => {
@@ -218,29 +231,59 @@ const Ladakh = () => {
     }));
   };
 
+  const handleSpecialRequestToggle = (request) => {
+    setFormData(prev => {
+      const newRequests = prev.specialRequests.includes(request)
+        ? prev.specialRequests.filter(r => r !== request)
+        : [...prev.specialRequests, request];
+      
+      return {
+        ...prev,
+        specialRequests: newRequests,
+        message: newRequests.join(', ') + (prev.message && !newRequests.includes(prev.message) ? ', ' + prev.message : '')
+      };
+    });
+  };
+
+  const incrementCount = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field] + 1
+    }));
+  };
+
+  const decrementCount = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: Math.max(field === 'adults' ? 1 : 0, prev[field] - 1)
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
-     emailjs.init('37pN2ThzFwwhwk7ai');
+    emailjs.init('37pN2ThzFwwhwk7ai');
     
     emailjs.send(
-         'service_ov629rm',
-        'template_jr1dnto',
+      'service_ov629rm',
+      'template_jr1dnto',
       {
         package_name: selectedPackage.title,
+        duration: selectedPackage.duration,
+        destination: "Ladakh",
         package_price: selectedPackage.price,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        arrival_date: formData.arrivalDate ? formData.arrivalDate.toISOString() : '',
-        departure_date: formData.departureDate ? formData.departureDate.toISOString() : '',
+        from_name: formData.name,
+        from_email: formData.email,
+        phone_number: formData.phone,
+        arrivalDate: formData.arrivalDate ? formData.arrivalDate.toDateString() : '',
+        departureDate: formData.departureDate ? formData.departureDate.toDateString() : '',
         adults: formData.adults,
         kids: formData.kids,
-        kids_ages: formData.kidsAges,
-        hotel_category: formData.hotelCategory,
-        meals_included: formData.mealsIncluded,
+        kidsAges: formData.kidsAges,
+        hotelCategory: formData.hotelCategory,
+        mealsIncluded: formData.mealsIncluded,
         budget: formData.budget,
-        message: formData.message
+        message: formData.specialRequests.join(', ') + (formData.message ? ' | ' + formData.message : '')
       }
     )
     .then((response) => {
@@ -256,13 +299,14 @@ const Ladakh = () => {
           arrivalDate: '',
           departureDate: '',
           adults: 1,
-          kids: '',
+          kids: 0,
           kidsAges: '',
           hotelCategory: '3',
           mealsIncluded: 'yes',
           budget: '',
           package: '',
-          message: ''
+          message: '',
+          specialRequests: []
         });
       }, 3000);
     }, (err) => {
@@ -989,39 +1033,60 @@ const Ladakh = () => {
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="adults">Number of Adults *</label>
-                          <div className="relative">
-                            <FaUsers className="absolute left-3 top-3 text-gray-400" />
-                            <select
+                          <div className="relative flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => decrementCount('adults')}
+                              className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="adults"
                               name="adults"
                               value={formData.adults}
                               onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                              required
+                              min="1"
+                              className="w-full text-center px-4 py-2 border-t border-b border-gray-300"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => incrementCount('adults')}
+                              className="bg-gray-200 text-gray-700 px-3 py-1 rounded-r-lg hover:bg-gray-300 transition-colors"
                             >
-                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                              ))}
-                            </select>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
                         
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="kids">Number of Kids</label>
-                          <div className="relative">
-                            <FaChild className="absolute left-3 top-3 text-gray-400" />
-                            <select
+                          <div className="relative flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => decrementCount('kids')}
+                              className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-lg hover:bg-gray-300 transition-colors"
+                              disabled={formData.kids === 0}
+                            >
+                              <FaMinus />
+                            </button>
+                            <input
+                              type="number"
                               id="kids"
                               name="kids"
                               value={formData.kids}
                               onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                              min="0"
+                              className="w-full text-center px-4 py-2 border-t border-b border-gray-300"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => incrementCount('kids')}
+                              className="bg-gray-200 text-gray-700 px-3 py-1 rounded-r-lg hover:bg-gray-300 transition-colors"
                             >
-                              <option value="">0 Children</option>
-                              {[1, 2, 3, 4, 5].map(num => (
-                                <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
-                              ))}
-                            </select>
+                              <FaPlus />
+                            </button>
                           </div>
                         </div>
                         
@@ -1106,8 +1171,28 @@ const Ladakh = () => {
                       </div>
                     </div>
                     
+                    {/* Special Requests */}
                     <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">Special Requests</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Special Requests</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                        {specialRequestOptions.map((option, index) => (
+                          <motion.button
+                            key={index}
+                            type="button"
+                            whileTap={{ scale: 0.95 }}
+                            className={`text-sm px-3 py-2 rounded-lg border ${formData.specialRequests.includes(option) 
+                              ? 'bg-amber-100 border-amber-500 text-amber-800' 
+                              : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                            onClick={() => handleSpecialRequestToggle(option)}
+                          >
+                            {option}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">Additional Notes</label>
                       <textarea
                         id="message"
                         name="message"
@@ -1115,7 +1200,7 @@ const Ladakh = () => {
                         onChange={handleInputChange}
                         rows="4"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                        placeholder="Any special requirements or preferences (dietary needs, accessibility requirements, special occasions, etc.)"
+                        placeholder="Any other special requirements or preferences (dietary needs, accessibility requirements, special occasions, etc.)"
                       ></textarea>
                     </div>
                     

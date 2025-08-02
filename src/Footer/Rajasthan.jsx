@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import emailjs from 'emailjs-com';
-import { FaStar, FaHeart, FaUmbrellaBeach, FaCamera, FaChevronDown, FaCalendarAlt, FaUserFriends, FaUtensils } from 'react-icons/fa';
+import { FaStar, FaHeart, FaUmbrellaBeach, FaCamera, FaChevronDown, FaCalendarAlt, FaUserFriends, FaUtensils, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiElephant, GiDesert, GiCastle, GiCamel, GiMoneyStack } from 'react-icons/gi';
 import { RiHotelFill } from 'react-icons/ri';
 import { IoMdClose } from 'react-icons/io';
+
+// Initialize EmailJS
+emailjs.init('37pN2ThzFwwhwk7ai');
 
 const Rajasthan = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -18,13 +21,14 @@ const Rajasthan = () => {
     arrivalDate: '',
     departureDate: '',
     adults: 1,
-    kids: '0',
+    kids: 0,
     kidsAges: '',
     hotelCategory: '3',
     mealsIncluded: 'yes',
     budget: '',
     package: '',
-    message: ''
+    message: '',
+    specialRequests: []
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
@@ -32,7 +36,16 @@ const Rajasthan = () => {
   // EmailJS configuration
   const SERVICE_ID = 'service_ov629rm';
   const TEMPLATE_ID = 'template_jr1dnto';
-  const USER_ID = '37pN2ThzFwwhwk7ai';
+
+  // Special request options
+  const specialRequestOptions = [
+    { id: 'cake', label: 'Birthday/Anniversary Cake' },
+    { id: 'candlelight', label: 'Candlelight Dinner' },
+    { id: 'honeymoon', label: 'Honeymoon Decorations' },
+    { id: 'photoshoot', label: 'Professional Photoshoot' },
+    { id: 'spa', label: 'Spa Treatment' },
+    { id: 'guide', label: 'Private Guide' }
+  ];
 
   // Gallery images
   const galleryImages = [
@@ -173,13 +186,67 @@ const Rajasthan = () => {
     }));
   };
 
+  const handleSpecialRequestChange = (id) => {
+    setFormData(prev => {
+      if (prev.specialRequests.includes(id)) {
+        return {
+          ...prev,
+          specialRequests: prev.specialRequests.filter(item => item !== id)
+        };
+      } else {
+        return {
+          ...prev,
+          specialRequests: [...prev.specialRequests, id]
+        };
+      }
+    });
+  };
+
+  const incrementCount = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: Math.min(prev[field] + 1, field === 'adults' ? 50 : 20)
+    }));
+  };
+
+  const decrementCount = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: Math.max(prev[field] - 1, field === 'adults' ? 1 : 0)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
 
     try {
-      await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, e.target, USER_ID);
+      // Prepare the template parameters with all required fields
+      const templateParams = {
+        package_name: formData.package,
+        destination: "Rajasthan",
+        package_price: selectedPackage?.price || 'Custom Package',
+        duration: selectedPackage?.duration || 'Custom Duration',
+        from_name: formData.name,
+        from_email: formData.email,
+        phone_number: formData.phone,
+        arrivalDate: formData.arrivalDate,
+        departureDate: formData.departureDate,
+        adults: formData.adults,
+        kids: formData.kids,
+        kidsAges: formData.kidsAges,
+        hotelCategory: formData.hotelCategory,
+        mealsIncluded: formData.mealsIncluded === 'yes' ? 'Included' : 'Excluded',
+        budget: formData.budget || 'Not specified',
+        message: formData.message + 
+          (formData.specialRequests.length > 0 
+            ? `\n\nSpecial Requests: ${formData.specialRequests.map(id => 
+                specialRequestOptions.find(opt => opt.id === id)?.label).join(', ')}` 
+            : '')
+      };
+
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
       
       setSubmitStatus('success');
       setFormData({
@@ -189,13 +256,14 @@ const Rajasthan = () => {
         arrivalDate: '',
         departureDate: '',
         adults: 1,
-        kids: '0',
+        kids: 0,
         kidsAges: '',
         hotelCategory: '3',
         mealsIncluded: 'yes',
         budget: '',
         package: '',
-        message: ''
+        message: '',
+        specialRequests: []
       });
       
       // Auto-close the form after 3 seconds
@@ -345,44 +413,67 @@ const Rajasthan = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="relative">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Adults *</label>
-                        <div className="relative">
-                          <select
+                        <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => decrementCount('adults')}
+                            className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                          >
+                            <FaMinus />
+                          </button>
+                          <input
+                            type="number"
                             name="adults"
                             value={formData.adults}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
+                            className="w-full px-4 py-3 text-center border-0 focus:ring-0"
+                            min="1"
+                            max="50"
                             required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => incrementCount('adults')}
+                            className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                           >
-                            {[1, 2, 3, 4, 5].map(num => (
-                              <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                            ))}
-                          </select>
-                          <FaUserFriends className="absolute right-3 top-3.5 text-gray-400" />
+                            <FaPlus />
+                          </button>
                         </div>
                       </div>
                       
                       <div className="relative">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Children</label>
-                        <div className="relative">
-                          <select
+                        <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => decrementCount('kids')}
+                            className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                          >
+                            <FaMinus />
+                          </button>
+                          <input
+                            type="number"
                             name="kids"
                             value={formData.kids}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
+                            className="w-full px-4 py-3 text-center border-0 focus:ring-0"
+                            min="0"
+                            max="20"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => incrementCount('kids')}
+                            className="px-3 py-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                           >
-                            <option value="0">0 Children</option>
-                            {[1, 2, 3, 4].map(num => (
-                              <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
-                            ))}
-                          </select>
-                          <FaUserFriends className="absolute right-3 top-3.5 text-gray-400" />
+                            <FaPlus />
+                          </button>
                         </div>
                       </div>
                     </div>
                     
                     {formData.kids > 0 && (
                       <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Children Ages</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Children Ages *</label>
                         <input
                           type="text"
                           name="kidsAges"
@@ -390,6 +481,7 @@ const Rajasthan = () => {
                           onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                           placeholder="e.g. 5, 8 (comma separated)"
+                          required
                         />
                       </div>
                     )}
@@ -452,7 +544,7 @@ const Rajasthan = () => {
                     </div>
                     
                     <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range (optional)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range *</label>
                       <div className="relative">
                         <input
                           type="text"
@@ -461,20 +553,45 @@ const Rajasthan = () => {
                           onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                           placeholder="e.g. ₹30,000 - ₹50,000"
+                          required
                         />
                         <GiMoneyStack className="absolute right-3 top-3.5 text-gray-400" />
                       </div>
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Special Requests</label>
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        {specialRequestOptions.map(option => (
+                          <label key={option.id} className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.specialRequests.includes(option.id)}
+                              onChange={() => handleSpecialRequestChange(option.id)}
+                              className="hidden"
+                            />
+                            <div className={`w-5 h-5 rounded border flex items-center justify-center ${formData.specialRequests.includes(option.id) ? 'bg-amber-500 border-amber-500' : 'border-gray-300'}`}>
+                              {formData.specialRequests.includes(option.id) && (
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                              )}
+                            </div>
+                            <span className="text-gray-700 text-sm">{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Additional Requests</label>
                       <textarea
                         name="message"
                         value={formData.message}
                         onChange={handleInputChange}
                         rows="3"
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                        placeholder="Any special requirements or preferences..."
+                        placeholder="Any other special requirements or preferences..."
                       ></textarea>
                     </div>
                   </div>
@@ -519,7 +636,7 @@ const Rajasthan = () => {
       <div className="relative h-screen max-h-[800px] overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src= "/images/Royal.jpeg"
+            src="/images/Royal.jpeg"
             alt="Rajasthan Palace" 
             className="w-full h-full object-cover object-center"
           />

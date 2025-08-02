@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { FaFacebook, FaYoutube, FaInstagram, FaLinkedin, FaArrowRight, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
 import { FaXTwitter, FaHeart } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
-import { init, send } from 'emailjs-com';
-import React from 'react'; 
-// Initialize EmailJS
-init("37pN2ThzFwwhwk7ai");
+import emailjs from '@emailjs/browser';
+import React from 'react';
+
+// Initialize EmailJS with your User ID
+emailjs.init("37pN2ThzFwwhwk7ai");
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -57,20 +58,24 @@ const Footer = () => {
     setError('');
 
     try {
-      await send(
-        'service_bdm6dl3',
-        'template_q7y750i',
+      await emailjs.send(
+        'service_bdm6dl3', // Your EmailJS Service ID
+        'template_q7y750i', // Your EmailJS Template ID
         {
-          to_email: 'websytechnologies@gmail.com',
+          to_email: 'traveligo00@gmail.com',
           from_email: email,
-          website: 'Traveligo'
-        }
+          website: 'Traveligo',
+          reply_to: email
+        },
+        '37pN2ThzFwwhwk7ai' // Your public key
       );
+      
       setSubscribed(true);
       setEmail('');
       setTimeout(() => setSubscribed(false), 5000);
     } catch (err) {
-      setError('Failed to subscribe. Please try again.');
+      console.error('EmailJS Error:', err);
+      setError('Failed to subscribe. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -78,13 +83,24 @@ const Footer = () => {
 
   return (
     <footer className="bg-gradient-to-b from-pink-50 via-white to-white pt-24 pb-16 relative overflow-hidden">
-      {/* WhatsApp Floating Button and Chat Box */}
-      <div className="fixed bottom-25 right-[18px] z-50 flex flex-col items-end">
+      {/* WhatsApp Floating Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowWhatsappChat(!showWhatsappChat)}
+          className="bg-green-500 text-white p-4 rounded-full shadow-xl hover:bg-green-600 transition-colors flex items-center justify-center relative"
+          aria-label="WhatsApp Chat"
+        >
+          <FaWhatsapp className="text-3xl" />
+          <span className="absolute bg-red-500 text-white text-xs rounded-full px-2 py-1 -top-2 -right-2 animate-pulse">1</span>
+        </motion.button>
+
         {showWhatsappChat && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-2xl overflow-hidden w-80 mb-5"
+            className="bg-white rounded-xl shadow-2xl overflow-hidden w-80 mt-4"
           >
             <div className="bg-green-500 p-4 text-white flex justify-between items-center">
               <div className="flex items-center">
@@ -117,17 +133,6 @@ const Footer = () => {
             </div>
           </motion.div>
         )}
-        
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowWhatsappChat(!showWhatsappChat)}
-          className={`bg-green-500 text-white p-4 rounded-full shadow-xl hover:bg-green-600 transition-colors flex items-center justify-center`}
-          aria-label="WhatsApp Chat"
-        >
-          <FaWhatsapp className="text-3xl" />
-          <span className="absolute bg-red-500 text-white text-xs rounded-full px-2 py-1 -top-2 -right-2 animate-pulse">1</span>
-        </motion.button>
       </div>
 
       {/* Decorative elements */}
@@ -218,37 +223,124 @@ const Footer = () => {
               </div>
             </motion.div>
             
+            {/* Enhanced Contact Information Section */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-white p-6 rounded-3xl shadow-xl border border-pink-100"
+              className="bg-white p-6 rounded-3xl shadow-xl border border-pink-100 mb-6"
             >
-              <div className="space-y-4">
+              <h4 className="text-xl font-bold mb-6 text-pink-600 flex items-center">
+                <FaPhone className="mr-3" />
+                <span>Contact Information</span>
+              </h4>
+              
+              <div className="space-y-6">
                 <div className="flex items-center group">
-                  <div className="p-3 bg-pink-100 rounded-full mr-4 group-hover:bg-pink-200 transition-colors">
-                    <FaPhone className="text-pink-500 text-lg" />
-                  </div>
-                  <span className="text-gray-700 group-hover:text-pink-600 transition-colors">+91 9796337997</span>
-                </div>
-                <div className="flex items-center group">
-                  <div className="p-3 bg-pink-100 rounded-full mr-4 group-hover:bg-pink-200 transition-colors">
-                    <FaEnvelope className="text-pink-500 text-lg" />
-                  </div>
-                  <span className="text-gray-700 group-hover:text-pink-600 transition-colors">info@traveligo.in</span>
-                </div>
-                <div className="flex items-start group">
-                  <div className="p-3 bg-pink-100 rounded-full mr-4 mt-1 group-hover:bg-pink-200 transition-colors">
-                    <FaMapMarkerAlt className="text-pink-500 text-lg" />
+                  <div className="p-3 bg-pink-100 rounded-xl mr-4 group-hover:bg-pink-200 transition-colors">
+                    <FaPhone className="text-pink-500 text-xl" />
                   </div>
                   <div>
-                    <p className="text-gray-700 group-hover:text-pink-600 transition-colors">
-                      First Boulevard road lane Dalgate Srinagar 190001
-                    </p>
-                    <p className="text-gray-700 group-hover:text-pink-600 transition-colors mt-2">
-                      Abul Fazal Enclave Part 2, Jamia Nagar, Okhla, New Delhi, 110025
-                    </p>
+                    <p className="text-gray-500 text-sm">Call us anytime</p>
+                    <a href="tel:+919796337997" className="text-gray-700 group-hover:text-pink-600 transition-colors text-lg font-medium">
+                      +91 9796337997
+                    </a>
                   </div>
+                </div>
+                
+                <div className="flex items-center group">
+                  <div className="p-3 bg-pink-100 rounded-xl mr-4 group-hover:bg-pink-200 transition-colors">
+                    <FaEnvelope className="text-pink-500 text-xl" />
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-sm">Email us at</p>
+                    <a href="mailto:info@traveligo.in" className="text-gray-700 group-hover:text-pink-600 transition-colors text-lg font-medium">
+                      info@traveligo.in
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Enhanced Address Section */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white p-6 rounded-3xl shadow-xl border border-pink-100 relative overflow-hidden"
+            >
+              {/* Decorative elements */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-100 rounded-full opacity-20 blur-lg"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-pink-200 rounded-full opacity-10 blur-lg"></div>
+              </div>
+              
+              <div className="relative z-10">
+                <h4 className="text-xl font-bold mb-6 text-pink-600 flex items-center">
+                  <FaMapMarkerAlt className="mr-2" />
+                  <span>Our Offices</span>
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Srinagar Office */}
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-pink-50 to-white p-5 rounded-xl border border-pink-100 shadow-sm hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start mb-3">
+                      <div className="p-2 bg-pink-100 rounded-lg mr-4">
+                        <FaMapMarkerAlt className="text-pink-500 text-xl" />
+                      </div>
+                      <div>
+                        <h5 className="font-bold text-gray-800 text-lg mb-1">Srinagar Office</h5>
+                        <p className="text-gray-600 leading-relaxed">
+                          First Boulevard Road Lane, Dalgate<br />
+                          Srinagar, Jammu & Kashmir<br />
+                          190001, India
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex justify-center mt-4">
+                      <a 
+                        href="https://share.google/D3tHGlyZeHC7nN6xV"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pink-500 hover:text-pink-600 font-medium flex items-center transition-colors"
+                      >
+                        View on Map <FaArrowRight className="ml-2 text-sm" />
+                      </a>
+                    </div>
+                  </motion.div>
+                  
+                  {/* Delhi Office */}
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-pink-50 to-white p-5 rounded-xl border border-pink-100 shadow-sm hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start mb-3">
+                      <div className="p-2 bg-pink-100 rounded-lg mr-4">
+                        <FaMapMarkerAlt className="text-pink-500 text-xl" />
+                      </div>
+                      <div>
+                        <h5 className="font-bold text-gray-800 text-lg mb-1">Delhi Office</h5>
+                        <p className="text-gray-600 leading-relaxed">
+                          Abul Fazal Enclave Part 2<br />
+                          Jamia Nagar, Okhla<br />
+                          New Delhi, 110025, India
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex justify-center mt-4">
+                      <a 
+                        href="https://maps.apple.com/?address=Abul%20Fazal%20Enclave%20Part%202,%20New%20Delhi,%20110025,%20Delhi,%20India&auid=3140475592879641277&ll=28.549413,77.304334&lsp=6489&q=Abul%20Fazal%20Enclave%20Part%202&t=m"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pink-500 hover:text-pink-600 font-medium flex items-center transition-colors"
+                      >
+                        View on Map <FaArrowRight className="ml-2 text-sm" />
+                      </a>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
@@ -292,7 +384,6 @@ const Footer = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="relative mb-20"
-          style={{ marginBottom: showWhatsappChat ? '120px' : '80px' }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-pink-600 rounded-3xl shadow-2xl transform -skew-y-1 -rotate-1"></div>
           <div className="relative bg-white p-10 rounded-3xl shadow-xl border border-pink-100">
@@ -418,7 +509,7 @@ const Footer = () => {
           </div>
           
           <p className="text-gray-500 font-medium text-lg">
-            © {new Date().getFullYear()} Traveligo. Made with <FaHeart className="inline text-pink-400" /> in Kashmir
+            © {new Date().getFullYear()} Websy Technologies. Made with <FaHeart className="inline text-pink-400" /> in Kashmir
           </p>
         </motion.div>
       </div>
