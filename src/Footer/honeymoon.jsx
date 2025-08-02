@@ -37,7 +37,7 @@ import { MdEmojiFoodBeverage, MdOutlinePool } from 'react-icons/md';
 import { IoMdFlower } from 'react-icons/io';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 
 const Honeymoon = () => {
   const [activeTab, setActiveTab] = useState('all');

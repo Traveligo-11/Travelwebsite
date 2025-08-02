@@ -4,7 +4,7 @@ import { FaStar, FaHeart, FaChevronDown, FaUmbrellaBeach, FaTimes, FaPlus, FaMin
 import { GiElephant, GiStonePath, GiIsland } from 'react-icons/gi';
 import { MdSpa, MdFamilyRestroom } from 'react-icons/md';
 import { IoBoat, IoLeaf } from 'react-icons/io5';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 
 const Thailand = () => {
   const [activeTab, setActiveTab] = useState('all');

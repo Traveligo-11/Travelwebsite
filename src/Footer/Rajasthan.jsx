@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 import { FaStar, FaHeart, FaUmbrellaBeach, FaCamera, FaChevronDown, FaCalendarAlt, FaUserFriends, FaUtensils, FaPlus, FaMinus } from 'react-icons/fa';
 import { GiElephant, GiDesert, GiCastle, GiCamel, GiMoneyStack } from 'react-icons/gi';
 import { RiHotelFill } from 'react-icons/ri';

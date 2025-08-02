@@ -4,7 +4,7 @@ import { FaStar, FaChevronDown, FaTimes, FaCamera, FaUser, FaEnvelope, FaPhone, 
 import { GiWoodCabin } from 'react-icons/gi';
 import { BiHappyHeartEyes, BiTrip } from 'react-icons/bi';
 import { IoIosSnow } from 'react-icons/io';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 

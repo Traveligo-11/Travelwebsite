@@ -1,13 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 export default defineConfig({
   plugins: [
     react({
+      jsxRuntime: 'automatic',
       babel: {
         plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
+          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
         ]
       }
     }),
@@ -16,88 +18,52 @@ export default defineConfig({
     })
   ],
 
-  esbuild: {
-    jsx: 'automatic',
-    jsxDev: process.env.NODE_ENV !== 'production',
-    loader: 'jsx',
-    include: /src\/.*\.jsx?$/,
-    exclude: []
+  resolve: {
+    alias: {
+      // Core React paths
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react/jsx-runtime': path.resolve(__dirname, 'node_modules/react/jsx-runtime.js'),
+      'react/jsx-dev-runtime': path.resolve(__dirname, 'node_modules/react/jsx-dev-runtime.js'),
+      
+      // Fix warning package
+      'warning': path.resolve(__dirname, 'node_modules/warning/browser.js'),
+      
+      // React-Popper configuration
+      'react-popper': path.resolve(__dirname, 'node_modules/react-popper/lib'),
+      
+      // React Icons
+      'react-icons': path.resolve(__dirname, 'node_modules/react-icons'),
+      'react-icons/fi': path.resolve(__dirname, 'node_modules/react-icons/fi'),
+      
+      // EmailJS
+      '@emailjs/browser': path.resolve(__dirname, 'node_modules/@emailjs/browser/dist/email.min.js'),
+      
+      // Source directory alias
+      '@': path.resolve(__dirname, './src')
+    }
   },
 
   optimizeDeps: {
     include: [
       'react',
       'react-dom',
+      'react/jsx-runtime',
       'react-router-dom',
-      '@headlessui/react',
-      '@heroicons/react',
-      'leaflet',
-      'react-leaflet'
+      'react-icons',
+      'react-icons/fi',
+      '@emailjs/browser',
+      'warning'
     ],
+    exclude: ['@tailwindcss/vite'],
     esbuildOptions: {
+      jsx: 'automatic',
       loader: {
-        '.js': 'jsx'
+        '.js': 'jsx',
+        '.jsx': 'jsx'
       },
-      plugins: [
-        {
-          name: 'fix-leaflet',
-          setup(build) {
-            build.onResolve({ filter: /^leaflet$/ }, () => {
-              return { path: require.resolve('leaflet') };
-            });
-          }
-        }
+      inject: [
+        path.resolve(__dirname, 'node_modules/react/index.js')
       ]
-    }
-  },
-
-  resolve: {
-    alias: {
-      'react-leaflet': 'react-leaflet/dist/react-leaflet.esm.js',
-      'leaflet': 'leaflet/dist/leaflet-src.esm.js'
-    }
-  },
-
-  server: {
-    port: 3000,
-    open: true,
-    strictPort: true,
-    host: true,
-    
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-        ws: true,
-        configure: (proxy) => {
-          proxy.on('error', (err, req, res) => {
-            console.error('Proxy error:', err);
-            res.writeHead(503, {
-              'Content-Type': 'application/json'
-            });
-            res.end(JSON.stringify({
-              error: 'Backend Unavailable',
-              message: 'API server is not responding'
-            }));
-          });
-        }
-      },
-      
-      '/tripadvisor': {
-        target: 'http://localhost:5000/api',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => `/tripadvisor${path}`
-      }
-    },
-
-    cors: {
-      origin: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true
     }
   },
 
@@ -106,48 +72,51 @@ export default defineConfig({
     assetsDir: 'assets',
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV !== 'production',
+    minify: 'terser',
     
     rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@headlessui/react', '@heroicons/react'],
-          'chart-vendor': ['chart.js', 'react-chartjs-2'],
-          'map-vendor': ['leaflet', 'react-leaflet']
+      plugins: [
+        {
+          name: 'fix-warning-export',
+          transform(code, id) {
+            if (id.includes('warning/warning.js')) {
+              return {
+                code: code.replace('module.exports = warning;', 'export default warning;'),
+                map: null
+              };
+            }
+          }
         },
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
-      },
-      external: [
-        // Add any external dependencies here
-      ]
-    },
-    
-    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      },
-      format: {
-        comments: false
+        {
+          name: 'react-popper-resolver',
+          resolveId(source) {
+            if (source === 'react-popper') {
+              return this.resolve('react-popper/lib/index.js');
+            }
+          }
+        }
+      ],
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/react-icons')) {
+            return 'react-icons';
+          }
+          if (id.includes('node_modules/@emailjs')) {
+            return 'emailjs';
+          }
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'react-vendor';
+          }
+        }
       }
-    },
-    chunkSizeWarningLimit: 1600
-  },
-
-  preview: {
-    port: 4173,
-    strictPort: true,
-    proxy: {
-      '/api': 'http://localhost:5000',
-      '/tripadvisor': 'http://localhost:5000/api/tripadvisor'
     }
   },
 
-  define: {
-    'process.env': {},
-    '__APP_ENV__': JSON.stringify(process.env.NODE_ENV || 'development')
+  server: {
+    port: 3000,
+    open: true,
+    hmr: {
+      overlay: false
+    }
   }
 });

@@ -4,7 +4,8 @@ import { FaStar, FaHeart, FaUmbrellaBeach, FaChevronDown, FaTimes, FaPhone, FaEn
 import { GiWaterfall, GiTempleGate, GiIsland } from 'react-icons/gi';
 import { MdSpa, MdFamilyRestroom, MdOutlineSurfing } from 'react-icons/md';
 import { IoLeaf } from 'react-icons/io5';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
+
 
 const Bali = () => {
   const [activeTab, setActiveTab] = useState('all');

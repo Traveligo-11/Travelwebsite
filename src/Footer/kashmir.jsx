@@ -6,7 +6,7 @@ import { MdFamilyRestroom, MdLocalDining, MdDirectionsBike } from 'react-icons/m
 import { IoLeaf } from 'react-icons/io5';
 import { IoMdSnow } from 'react-icons/io';
 import { BiHappyHeartEyes } from 'react-icons/bi';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
