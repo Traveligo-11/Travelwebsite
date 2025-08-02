@@ -30,12 +30,31 @@ export default defineConfig({
       'react-dom',
       'react-router-dom',
       '@headlessui/react',
-      '@heroicons/react'
+      '@heroicons/react',
+      'leaflet',
+      'react-leaflet'
     ],
     esbuildOptions: {
       loader: {
         '.js': 'jsx'
-      }
+      },
+      plugins: [
+        {
+          name: 'fix-leaflet',
+          setup(build) {
+            build.onResolve({ filter: /^leaflet$/ }, () => {
+              return { path: require.resolve('leaflet') };
+            });
+          }
+        }
+      ]
+    }
+  },
+
+  resolve: {
+    alias: {
+      'react-leaflet': 'react-leaflet/dist/react-leaflet.esm.js',
+      'leaflet': 'leaflet/dist/leaflet-src.esm.js'
     }
   },
 
@@ -99,7 +118,10 @@ export default defineConfig({
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
-      }
+      },
+      external: [
+        // Add any external dependencies here
+      ]
     },
     
     minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
