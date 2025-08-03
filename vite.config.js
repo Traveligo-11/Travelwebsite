@@ -6,7 +6,15 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'classic' // Remove importSource when using classic runtime
+      jsxRuntime: 'automatic',
+      babel: {
+        plugins: [
+          ['@babel/plugin-transform-react-jsx', {
+            runtime: 'automatic',
+            importSource: 'react'
+          }]
+        ]
+      }
     }),
     tailwindcss()
   ],
@@ -22,15 +30,27 @@ export default defineConfig({
     include: [
       'react',
       'react-dom',
+      'react/jsx-runtime',
       'react-icons',
       'leaflet',
       'react-leaflet'
-    ]
+    ],
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx'
+      }
+    }
   },
   build: {
     rollupOptions: {
       output: {
-        interop: 'auto'
+        interop: 'auto',
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@headlessui/react', '@heroicons/react'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2'],
+          'map-vendor': ['leaflet', 'react-leaflet']
+        }
       }
     }
   }
