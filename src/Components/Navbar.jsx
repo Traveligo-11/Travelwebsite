@@ -10,8 +10,8 @@ const Navbar = () => {
     { name: 'flights', label: 'Flights', path: '/flights' },
     { name: 'hotels', label: 'Hotels', path: '/hotels' },
     { name: 'holidays', label: 'Holidays', path: '/holidays' },
-    { name: 'trains', label: 'Trains', path: '' },
-    { name: 'cabs', label: 'Cabs', path: '/' },
+    { name: 'trains', label: 'Trains', path: '/Trains' },
+    { name: 'cabs', label: 'Cabs', path: '/Cabs' },
   ];
 
   const [activeTab, setActiveTab] = useState('flights');

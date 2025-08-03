@@ -42,6 +42,18 @@ const Flight = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [formError, setFormError] = useState('');
   const [isHovered, setIsHovered] = useState(false);
+  const [activeTab, setActiveTab] = useState('flights');
+  const [hotelLocation, setHotelLocation] = useState('Goa');
+  const [checkInDate, setCheckInDate] = useState('');
+  const [checkOutDate, setCheckOutDate] = useState('');
+  const [rooms, setRooms] = useState(1);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [holidayDestination, setHolidayDestination] = useState('Maldives');
+  const [holidayDuration, setHolidayDuration] = useState(7);
+  const [holidayDate, setHolidayDate] = useState('');
+  const [holidayAdults, setHolidayAdults] = useState(2);
+  const [holidayChildren, setHolidayChildren] = useState(0);
   
   const [requestData, setRequestData] = useState({
     name: 'John Doe',
@@ -57,6 +69,9 @@ const Flight = () => {
   });
 
   const cities = ['Delhi', 'Mumbai', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Goa'];
+  const hotelLocations = ['Goa', 'Manali', 'Shimla', 'Jaipur', 'Udaipur', 'Kerala', 'Andaman'];
+  const holidayDestinations = ['Maldives', 'Bali', 'Dubai', 'Singapore', 'Thailand', 'Europe', 'USA'];
+  const durations = [3, 5, 7, 10, 14, 21];
 
   useEffect(() => {
     emailjs.init('37pN2ThzFwwhwk7ai');
@@ -178,6 +193,479 @@ const Flight = () => {
     }
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'flights':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* From City */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
+                <FaMapMarkerAlt className="mr-2 text-pink-500" /> From
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
+                  <FaPlane className="text-pink-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={fromCity}
+                  onChange={(e) => {
+                    setFromCity(e.target.value);
+                    setRequestData(prev => ({...prev, fromCity: e.target.value}));
+                  }}
+                >
+                  {cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Swap Button */}
+            <motion.div 
+              className="flex items-center justify-center"
+              variants={itemVariants}
+            >
+              <motion.button 
+                onClick={handleSwapCities}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 p-5 rounded-full shadow-md transition-all text-pink-600 hover:text-pink-700"
+                aria-label="Swap cities"
+                whileHover={{ rotate: 180, scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <FaExchangeAlt className="text-2xl" />
+              </motion.button>
+            </motion.div>
+
+            {/* To City */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
+                <FaMapMarkerAlt className="mr-2 text-pink-500" /> To
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
+                  <FaPlane className="text-purple-600 text-xl transform rotate-45" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={toCity}
+                  onChange={(e) => {
+                    setToCity(e.target.value);
+                    setRequestData(prev => ({...prev, toCity: e.target.value}));
+                  }}
+                >
+                  {cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Departure Date */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
+                <FaCalendarAlt className="mr-2 text-pink-500" /> Departure Date
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
+                  <FaCalendarAlt className="text-blue-600 text-xl" />
+                </div>
+                <input 
+                  type="date" 
+                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
+                  value={departureDate}
+                  onChange={(e) => {
+                    setDepartureDate(e.target.value);
+                    setRequestData(prev => ({...prev, departure: e.target.value}));
+                  }}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </motion.div>
+
+            {/* Return Date */}
+            {tripType === 'round' && (
+              <motion.div 
+                variants={itemVariants}
+                className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+                whileHover={{ y: -5 }}
+              >
+                <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
+                  <FaCalendarAlt className="mr-2 text-pink-500" /> Return Date
+                </label>
+                <div className="flex items-center">
+                  <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
+                    <FaCalendarAlt className="text-green-600 text-xl" />
+                  </div>
+                  <input 
+                    type="date" 
+                    className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
+                    value={returnDate}
+                    onChange={(e) => {
+                      setReturnDate(e.target.value);
+                      setRequestData(prev => ({...prev, return: e.target.value}));
+                    }}
+                    min={departureDate || new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {/* Passengers */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
+                <FaUsers className="mr-2 text-pink-500" /> Passengers
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
+                  <FaUser className="text-yellow-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={passengers}
+                  onChange={(e) => {
+                    setPassengers(e.target.value);
+                    setRequestData(prev => ({...prev, passengers: e.target.value}));
+                  }}
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Travel Class */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
+                <FaChair className="mr-2 text-pink-500" /> Class
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-3 rounded-lg mr-4 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-colors shadow-sm">
+                  <FaPlane className="text-indigo-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={travelClass}
+                  onChange={(e) => {
+                    setTravelClass(e.target.value);
+                    setRequestData(prev => ({...prev, class: e.target.value}));
+                  }}
+                >
+                  <option value="Economy">Economy</option>
+                  <option value="Premium Economy">Premium Economy</option>
+                  <option value="Business">Business</option>
+                  <option value="First">First Class</option>
+                </select>
+              </div>
+            </motion.div>
+          </div>
+        );
+      case 'hotels':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Hotel Location */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-blue-600 mb-3  items-center">
+                <FaMapMarkerAlt className="mr-2 text-blue-500" /> Destination
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
+                  <FaHotel className="text-blue-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={hotelLocation}
+                  onChange={(e) => setHotelLocation(e.target.value)}
+                >
+                  {hotelLocations.map(location => (
+                    <option key={location} value={location}>{location}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Check-in Date */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
+                <FaCalendarAlt className="mr-2 text-blue-500" /> Check-in
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
+                  <FaCalendarAlt className="text-green-600 text-xl" />
+                </div>
+                <input 
+                  type="date" 
+                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
+                  value={checkInDate}
+                  onChange={(e) => setCheckInDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </motion.div>
+
+            {/* Check-out Date */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
+                <FaCalendarAlt className="mr-2 text-blue-500" /> Check-out
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
+                  <FaCalendarAlt className="text-purple-600 text-xl" />
+                </div>
+                <input 
+                  type="date" 
+                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
+                  value={checkOutDate}
+                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  min={checkInDate || new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </motion.div>
+
+            {/* Rooms */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
+                <FaHotel className="mr-2 text-blue-500" /> Rooms
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
+                  <FaUsers className="text-yellow-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={rooms}
+                  onChange={(e) => setRooms(e.target.value)}
+                >
+                  {[1, 2, 3, 4, 5].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Room' : 'Rooms'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Adults */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
+                <FaUser className="mr-2 text-blue-500" /> Adults
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
+                  <FaUser className="text-pink-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={adults}
+                  onChange={(e) => setAdults(e.target.value)}
+                >
+                  {[1, 2, 3, 4, 5, 6].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Children */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
+                <FaUser className="mr-2 text-blue-500" /> Children
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
+                  <FaUser className="text-green-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={children}
+                  onChange={(e) => setChildren(e.target.value)}
+                >
+                  {[0, 1, 2, 3, 4].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+          </div>
+        );
+      case 'holidays':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Holiday Destination */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-purple-600 mb-3  items-center">
+                <FaGlobeAmericas className="mr-2 text-purple-500" /> Destination
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
+                  <FaUmbrellaBeach className="text-purple-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={holidayDestination}
+                  onChange={(e) => setHolidayDestination(e.target.value)}
+                >
+                  {holidayDestinations.map(destination => (
+                    <option key={destination} value={destination}>{destination}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Duration */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
+                <FaCalendarAlt className="mr-2 text-purple-500" /> Duration
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
+                  <FaSuitcaseRolling className="text-blue-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={holidayDuration}
+                  onChange={(e) => setHolidayDuration(e.target.value)}
+                >
+                  {durations.map(days => (
+                    <option key={days} value={days}>{days} {days === 1 ? 'Day' : 'Days'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Travel Date */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
+                <FaCalendarAlt className="mr-2 text-purple-500" /> Travel Date
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
+                  <FaCalendarAlt className="text-pink-600 text-xl" />
+                </div>
+                <input 
+                  type="date" 
+                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
+                  value={holidayDate}
+                  onChange={(e) => setHolidayDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </motion.div>
+
+            {/* Adults */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
+                <FaUser className="mr-2 text-purple-500" /> Adults
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
+                  <FaUser className="text-yellow-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={holidayAdults}
+                  onChange={(e) => setHolidayAdults(e.target.value)}
+                >
+                  {[1, 2, 3, 4, 5, 6].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Children */}
+            <motion.div 
+              variants={itemVariants}
+              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
+              whileHover={{ y: -5 }}
+            >
+              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
+                <FaUser className="mr-2 text-purple-500" /> Children
+              </label>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
+                  <FaUser className="text-green-600 text-xl" />
+                </div>
+                <select 
+                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
+                  value={holidayChildren}
+                  onChange={(e) => setHolidayChildren(e.target.value)}
+                >
+                  {[0, 1, 2, 3, 4].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Hero Section */}
@@ -216,7 +704,7 @@ const Flight = () => {
             transition={{ delay: 0.3 }}
             className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white"
           >
-            Discover Your Perfect Flight
+            Discover Your Perfect Getaway
           </motion.h1>
           
           <motion.p 
@@ -287,216 +775,57 @@ const Flight = () => {
           <FaGlobeAmericas className="text-blue-300 text-6xl animate-spin-slow" />
         </div>
         
+        {/* Tab Navigation */}
         <div className="flex flex-wrap justify-center gap-4 mb-8 mt-8">
           {[
-            { type: 'round', label: 'Round Trip', icon: <FaExchangeAlt className="mr-2" /> },
-            { type: 'oneWay', label: 'One Way', icon: <FaArrowRight className="mr-2" /> }
-          ].map((option) => (
+            { id: 'flights', label: 'Flights', icon: <FaPlane className="mr-2" /> },
+            { id: 'hotels', label: 'Hotels', icon: <FaHotel className="mr-2" /> },
+            { id: 'holidays', label: 'Holidays', icon: <FaUmbrellaBeach className="mr-2" /> }
+          ].map((tab) => (
             <motion.button
-              key={option.type}
-              className={`flex items-center px-8 py-3 rounded-full transition-all text-lg font-medium ${tripType === option.type ? 
+              key={tab.id}
+              className={`flex items-center px-8 py-3 rounded-full transition-all text-lg font-medium ${activeTab === tab.id ? 
                 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' : 
                 'bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 border border-gray-200'}`}
-              onClick={() => setTripType(option.type)}
+              onClick={() => setActiveTab(tab.id)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {option.icon}
-              <span>{option.label}</span>
+              {tab.icon}
+              <span>{tab.label}</span>
             </motion.button>
           ))}
         </div>
+
+        {/* Trip Type Selector (only for flights) */}
+        {activeTab === 'flights' && (
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            {[
+              { type: 'round', label: 'Round Trip', icon: <FaExchangeAlt className="mr-2" /> },
+              { type: 'oneWay', label: 'One Way', icon: <FaArrowRight className="mr-2" /> }
+            ].map((option) => (
+              <motion.button
+                key={option.type}
+                className={`flex items-center px-8 py-3 rounded-full transition-all text-lg font-medium ${tripType === option.type ? 
+                  'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' : 
+                  'bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 border border-gray-200'}`}
+                onClick={() => setTripType(option.type)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {option.icon}
+                <span>{option.label}</span>
+              </motion.button>
+            ))}
+          </div>
+        )}
 
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
         >
-          {/* From City */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-              <FaMapMarkerAlt className="mr-2 text-pink-500" /> From
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
-                <FaPlane className="text-pink-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={fromCity}
-                onChange={(e) => {
-                  setFromCity(e.target.value);
-                  setRequestData(prev => ({...prev, fromCity: e.target.value}));
-                }}
-              >
-                {cities.map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-
-          {/* Swap Button */}
-          <motion.div 
-            className="flex items-center justify-center"
-            variants={itemVariants}
-          >
-            <motion.button 
-              onClick={handleSwapCities}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className="bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 p-5 rounded-full shadow-md transition-all text-pink-600 hover:text-pink-700"
-              aria-label="Swap cities"
-              whileHover={{ rotate: 180, scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <FaExchangeAlt className="text-2xl" />
-            </motion.button>
-          </motion.div>
-
-          {/* To City */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-              <FaMapMarkerAlt className="mr-2 text-pink-500" /> To
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
-                <FaPlane className="text-purple-600 text-xl transform rotate-45" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={toCity}
-                onChange={(e) => {
-                  setToCity(e.target.value);
-                  setRequestData(prev => ({...prev, toCity: e.target.value}));
-                }}
-              >
-                {cities.map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-
-          {/* Departure Date */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-              <FaCalendarAlt className="mr-2 text-pink-500" /> Departure Date
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
-                <FaCalendarAlt className="text-blue-600 text-xl" />
-              </div>
-              <input 
-                type="date" 
-                className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                value={departureDate}
-                onChange={(e) => {
-                  setDepartureDate(e.target.value);
-                  setRequestData(prev => ({...prev, departure: e.target.value}));
-                }}
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-          </motion.div>
-
-          {/* Return Date */}
-          {tripType === 'round' && (
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-                <FaCalendarAlt className="mr-2 text-pink-500" /> Return Date
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
-                  <FaCalendarAlt className="text-green-600 text-xl" />
-                </div>
-                <input 
-                  type="date" 
-                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                  value={returnDate}
-                  onChange={(e) => {
-                    setReturnDate(e.target.value);
-                    setRequestData(prev => ({...prev, return: e.target.value}));
-                  }}
-                  min={departureDate || new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {/* Passengers */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-              <FaUsers className="mr-2 text-pink-500" /> Passengers
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
-                <FaUser className="text-yellow-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={passengers}
-                onChange={(e) => {
-                  setPassengers(e.target.value);
-                  setRequestData(prev => ({...prev, passengers: e.target.value}));
-                }}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                  <option key={num} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-
-          {/* Travel Class */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-              <FaChair className="mr-2 text-pink-500" /> Class
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-3 rounded-lg mr-4 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-colors shadow-sm">
-                <FaPlane className="text-indigo-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={travelClass}
-                onChange={(e) => {
-                  setTravelClass(e.target.value);
-                  setRequestData(prev => ({...prev, class: e.target.value}));
-                }}
-              >
-                <option value="Economy">Economy</option>
-                <option value="Premium Economy">Premium Economy</option>
-                <option value="Business">Business</option>
-                <option value="First">First Class</option>
-              </select>
-            </div>
-          </motion.div>
+          {renderTabContent()}
         </motion.div>
 
         <motion.button 
@@ -506,7 +835,10 @@ const Flight = () => {
           whileTap={{ scale: 0.98 }}
         >
           <FaSearch className="mr-3 text-xl group-hover:animate-bounce" /> 
-          <span className="text-xl">FIND FLIGHT DEALS</span>
+          <span className="text-xl">
+            {activeTab === 'flights' ? 'FIND FLIGHT DEALS' : 
+             activeTab === 'hotels' ? 'FIND HOTEL DEALS' : 'FIND HOLIDAY PACKAGES'}
+          </span>
         </motion.button>
       </motion.div>
 
@@ -534,13 +866,13 @@ const Flight = () => {
                   <FaCheck className="text-white text-4xl" />
                 </motion.div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">Request Sent Successfully!</h2>
-                <p className="text-lg text-gray-600 mb-8">We'll contact you shortly with the best flight options for your trip.</p>
+                <p className="text-lg text-gray-600 mb-8">We'll contact you shortly with the best options for your trip.</p>
                 <motion.button
                   onClick={() => {
                     setShowRequestForm(false);
                     setSubmitSuccess(false);
                   }}
-                  className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -572,7 +904,10 @@ const Flight = () => {
                         <FaArrowLeft className="text-2xl" />
                       </motion.button>
                       <div>
-                        <h2 className="text-3xl font-bold">Flight Request Details</h2>
+                        <h2 className="text-3xl font-bold">
+                          {activeTab === 'flights' ? 'Flight' : 
+                           activeTab === 'hotels' ? 'Hotel' : 'Holiday Package'} Request Details
+                        </h2>
                         <p className="text-lg opacity-90 mt-2">Complete your information to get the best deals</p>
                       </div>
                     </div>
@@ -647,39 +982,150 @@ const Flight = () => {
                         </div>
                       </div>
 
-                      {/* Flight Details */}
+                      {/* Travel Details */}
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                          <label className="block text-sm font-bold text-blue-600 mb-2">From</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaMapMarkerAlt className="text-blue-400 mr-2" />
-                            {requestData.fromCity}
+                        {activeTab === 'flights' && (
+                          <>
+                            <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                              <label className="block text-sm font-bold text-blue-600 mb-2">From</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaMapMarkerAlt className="text-blue-400 mr-2" />
+                                {requestData.fromCity}
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm">
+                              <label className="block text-sm font-bold text-purple-600 mb-2">To</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaMapMarkerAlt className="text-purple-400 mr-2" />
+                                {requestData.toCity}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {activeTab === 'hotels' && (
+                          <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm col-span-2">
+                            <label className="block text-sm font-bold text-blue-600 mb-2">Destination</label>
+                            <div className="font-medium text-gray-800 flex items-center">
+                              <FaMapMarkerAlt className="text-blue-400 mr-2" />
+                              {hotelLocation}
+                            </div>
                           </div>
-                        </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm">
-                          <label className="block text-sm font-bold text-purple-600 mb-2">To</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaMapMarkerAlt className="text-purple-400 mr-2" />
-                            {requestData.toCity}
+                        )}
+                        {activeTab === 'holidays' && (
+                          <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm col-span-2">
+                            <label className="block text-sm font-bold text-purple-600 mb-2">Destination</label>
+                            <div className="font-medium text-gray-800 flex items-center">
+                              <FaGlobeAmericas className="text-purple-400 mr-2" />
+                              {holidayDestination}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
-                          <label className="block text-sm font-bold text-pink-600 mb-2">Departure</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaCalendarAlt className="text-pink-400 mr-2" />
-                            {requestData.departure || 'Not specified'}
+                        {activeTab === 'flights' && (
+                          <>
+                            <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
+                              <label className="block text-sm font-bold text-pink-600 mb-2">Departure</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaCalendarAlt className="text-pink-400 mr-2" />
+                                {requestData.departure || 'Not specified'}
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-100 shadow-sm">
+                              <label className="block text-sm font-bold text-green-600 mb-2">Return</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaCalendarAlt className="text-green-400 mr-2" />
+                                {requestData.return || tripType === 'oneWay' ? 'One Way' : 'Not specified'}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {activeTab === 'hotels' && (
+                          <>
+                            <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                              <label className="block text-sm font-bold text-blue-600 mb-2">Check-in</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaCalendarAlt className="text-blue-400 mr-2" />
+                                {checkInDate || 'Not specified'}
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm">
+                              <label className="block text-sm font-bold text-purple-600 mb-2">Check-out</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaCalendarAlt className="text-purple-400 mr-2" />
+                                {checkOutDate || 'Not specified'}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {activeTab === 'holidays' && (
+                          <>
+                            <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
+                              <label className="block text-sm font-bold text-pink-600 mb-2">Travel Date</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaCalendarAlt className="text-pink-400 mr-2" />
+                                {holidayDate || 'Not specified'}
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-100 shadow-sm">
+                              <label className="block text-sm font-bold text-green-600 mb-2">Duration</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaSuitcaseRolling className="text-green-400 mr-2" />
+                                {holidayDuration} Days
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Travelers/Rooms Info */}
+                      <div className="grid grid-cols-2 gap-4">
+                        {activeTab === 'flights' && (
+                          <div className="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+                            <label className="block text-sm font-bold text-indigo-600 mb-2">Passengers</label>
+                            <div className="font-medium text-gray-800 flex items-center">
+                              <FaUsers className="text-indigo-400 mr-2" />
+                              {passengers} {passengers === 1 ? 'Passenger' : 'Passengers'}
+                            </div>
                           </div>
-                        </div>
-                        <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-100 shadow-sm">
-                          <label className="block text-sm font-bold text-green-600 mb-2">Return</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaCalendarAlt className="text-green-400 mr-2" />
-                            {requestData.return || tripType === 'oneWay' ? 'One Way' : 'Not specified'}
+                        )}
+                        {activeTab === 'hotels' && (
+                          <>
+                            <div className="bg-gradient-to-br from-yellow-50 to-white p-4 rounded-xl border border-yellow-100 shadow-sm">
+                              <label className="block text-sm font-bold text-yellow-600 mb-2">Rooms</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaHotel className="text-yellow-400 mr-2" />
+                                {rooms} {rooms === 1 ? 'Room' : 'Rooms'}
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
+                              <label className="block text-sm font-bold text-pink-600 mb-2">Guests</label>
+                              <div className="font-medium text-gray-800 flex items-center">
+                                <FaUsers className="text-pink-400 mr-2" />
+                                {adults} Adults, {children} Children
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {activeTab === 'holidays' && (
+                          <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm col-span-2">
+                            <label className="block text-sm font-bold text-purple-600 mb-2">Travelers</label>
+                            <div className="font-medium text-gray-800 flex items-center">
+                              <FaUsers className="text-purple-400 mr-2" />
+                              {holidayAdults} Adults, {holidayChildren} Children
+                            </div>
                           </div>
-                        </div>
+                        )}
+                        {activeTab === 'flights' && (
+                          <div className="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+                            <label className="block text-sm font-bold text-indigo-600 mb-2">Class</label>
+                            <div className="font-medium text-gray-800 flex items-center">
+                              <FaChair className="text-indigo-400 mr-2" />
+                              {travelClass}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Special Requests */}
@@ -831,13 +1277,13 @@ const Flight = () => {
             {
               number: 2,
               title: "We Find The Best Options",
-              description: "Our experts search hundreds of airlines for perfect matches",
+              description: "Our experts search hundreds of options for perfect matches",
               icon: <FaSearch className="text-3xl text-purple-500" />
             },
             {
               number: 3,
               title: "Receive Customized Offers",
-              description: "Get the best flight options delivered to your inbox",
+              description: "Get the best travel options delivered to your inbox",
               icon: <FaEnvelope className="text-3xl text-pink-500" />
             }
           ].map((step, index) => (
@@ -889,7 +1335,7 @@ const Flight = () => {
           <motion.p 
             className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-light"
           >
-            Let us handle the flight details while you focus on the experience
+            Let us handle the travel details while you focus on the experience
           </motion.p>
           <motion.div className="flex flex-wrap justify-center gap-6">
             <motion.button 
@@ -899,7 +1345,7 @@ const Flight = () => {
               whileTap={{ scale: 0.95 }}
             >
               <FaPlane className="mr-3 animate-bounce" />
-              GET FLIGHT QUOTES NOW
+              GET TRAVEL QUOTES NOW
             </motion.button>
             <motion.button 
               className="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-20 text-white font-bold py-4 px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all inline-flex items-center text-lg"
@@ -907,7 +1353,7 @@ const Flight = () => {
               whileTap={{ scale: 0.95 }}
             >
               <FaPhone className="mr-3" />
-              CALL OUR EXPERTS
+             +91 9796337997
             </motion.button>
           </motion.div>
         </motion.div>

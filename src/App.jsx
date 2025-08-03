@@ -5,7 +5,7 @@ import Home from './Pages/Home';
 import Flights from './Pages/Flights';
 import Hotels from './Pages/Hotels';
 import Holidays from './Pages/Holidays';
-import Trains from './Pages/Trains';
+import Trains from './Pages/Trains'
 import Cabs from './Pages/Cabs';
 
 
@@ -60,8 +60,8 @@ function App() {
             <Route path="/flights" element={<Flights />} />
             <Route path="/hotels" element={<Hotels />} />
             <Route path="/holidays" element={<Holidays />} />
-            <Route path="/trains" element={<Trains />} />
-            <Route path="/cabs" element={<Cabs />} />
+            <Route path="/Trains" element={<Trains />} />
+            <Route path="/Cabs" element={<Cabs />} />
          
             {/* Footer Routes */}
             <Route path="/about" element={<About />} />
