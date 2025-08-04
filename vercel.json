@@ -13,7 +13,7 @@
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist",
-        "installCommand": "npm install --legacy-peer-deps && npm install @babel/plugin-transform-react-jsx",
+        "installCommand": "npm install --legacy-peer-deps && npm install @babel/plugin-transform-react-jsx @babel/core",
         "buildCommand": "npm run build"
       }
     }
