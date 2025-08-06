@@ -1,64 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   FaPlane, 
-  FaSearch, 
-  FaCalendarAlt, 
-  FaUser, 
-  FaPhone, 
-  FaEnvelope, 
+  FaExchangeAlt,
+  FaCalendarAlt,
+  FaUser,
+  FaSearch,
+  FaPhone,
+  FaEnvelope,
   FaUserTie,
   FaStar,
-  FaExchangeAlt,
-  FaTimes,
   FaCheck,
-  FaHeart,
   FaMapMarkerAlt,
   FaUsers,
   FaChair,
-  FaUmbrellaBeach,
-  FaHotel,
-  FaSuitcaseRolling,
-  FaGlobeAmericas,
   FaHeadset,
   FaRegSmileWink,
   FaArrowRight,
   FaPaperPlane,
-  FaArrowLeft
+  FaArrowLeft,
+  FaHeart,
+  FaGlobeAmericas,
+  FaUmbrellaBeach,
+  FaCity,
+  FaMountain,
+  FaQuoteRight,
+  FaChevronDown,
+  FaChevronUp
 } from 'react-icons/fa';
-import { IoRocketSharp } from 'react-icons/io5';
-import emailjs from '@emailjs/browser';
+import { IoRocketSharp, IoAirplane } from 'react-icons/io5';
+import { GiCommercialAirplane } from 'react-icons/gi';
 import { motion } from 'framer-motion';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Flight = () => {
-  const [tripType, setTripType] = useState('round');
-  const [fromCity, setFromCity] = useState('Delhi');
-  const [toCity, setToCity] = useState('Mumbai');
-  const [departureDate, setDepartureDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [passengers, setPassengers] = useState(1);
+  const [tripType, setTripType] = useState('ONE WAY');
+  const [fromCity, setFromCity] = useState('Delhi DEL');
+  const [toCity, setToCity] = useState('Mumbai BOM');
+  const [departureDate, setDepartureDate] = useState(new Date());
+  const [returnDate, setReturnDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)));
+  const [passengerCount, setPassengerCount] = useState(1);
   const [travelClass, setTravelClass] = useState('Economy');
+  const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [formError, setFormError] = useState('');
-  const [isHovered, setIsHovered] = useState(false);
-  const [activeTab, setActiveTab] = useState('flights');
-  const [hotelLocation, setHotelLocation] = useState('Goa');
-  const [checkInDate, setCheckInDate] = useState('');
-  const [checkOutDate, setCheckOutDate] = useState('');
-  const [rooms, setRooms] = useState(1);
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
-  const [holidayDestination, setHolidayDestination] = useState('Maldives');
-  const [holidayDuration, setHolidayDuration] = useState(7);
-  const [holidayDate, setHolidayDate] = useState('');
-  const [holidayAdults, setHolidayAdults] = useState(2);
-  const [holidayChildren, setHolidayChildren] = useState(0);
-  
+
   const [requestData, setRequestData] = useState({
-    name: 'John Doe',
-    email: 'your@email.com',
-    phone: '+91 9876543210',
+    name: '',
+    email: '',
+    phone: '',
     fromCity: 'Delhi',
     toCity: 'Mumbai',
     departure: '',
@@ -68,14 +60,51 @@ const Flight = () => {
     specialRequests: ''
   });
 
-  const cities = ['Delhi', 'Mumbai', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Goa'];
-  const hotelLocations = ['Goa', 'Manali', 'Shimla', 'Jaipur', 'Udaipur', 'Kerala', 'Andaman'];
-  const holidayDestinations = ['Maldives', 'Bali', 'Dubai', 'Singapore', 'Thailand', 'Europe', 'USA'];
-  const durations = [3, 5, 7, 10, 14, 21];
+  const cities = [
+    'Delhi DEL - Indira Gandhi International Airport',
+    'Mumbai BOM - Chhatrapati Shivaji Maharaj International Airport',
+    'Bangalore BLR - Kempegowda International Airport',
+    'Hyderabad HYD - Rajiv Gandhi International Airport',
+    'Chennai MAA - Chennai International Airport',
+    'Kolkata CCU - Netaji Subhash Chandra Bose International Airport',
+    'Goa GOI - Manohar International Airport'
+  ];
 
-  useEffect(() => {
-    emailjs.init('37pN2ThzFwwhwk7ai');
-  }, []);
+  const travelClasses = ['Economy', 'Premium Economy', 'Business', 'First Class'];
+
+  const popularDestinations = [
+    { name: 'Bali', icon: <FaUmbrellaBeach className="text-amber-400" />, bg: 'bg-gradient-to-br from-amber-100 to-amber-50' },
+    { name: 'Dubai', icon: <FaCity className="text-blue-400" />, bg: 'bg-gradient-to-br from-blue-100 to-blue-50' },
+    { name: 'Singapore', icon: <FaGlobeAmericas className="text-emerald-400" />, bg: 'bg-gradient-to-br from-emerald-100 to-emerald-50' },
+    { name: 'Switzerland', icon: <FaMountain className="text-sky-400" />, bg: 'bg-gradient-to-br from-sky-100 to-sky-50' },
+  ];
+
+  const formatDate = (date) => {
+    const options = { day: 'numeric', month: 'short', weekday: 'short', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options).replace(',', '');
+  };
+
+  const handleHeroAction = (actionType) => {
+    setShowRequestForm(true);
+    
+    if (actionType === 'bestPrices') {
+      setRequestData(prev => ({
+        ...prev,
+        class: 'Economy',
+        specialRequests: 'Interested in best price deals'
+      }));
+    } else if (actionType === 'expertSupport') {
+      setRequestData(prev => ({
+        ...prev,
+        specialRequests: 'Need expert travel assistance'
+      }));
+    } else if (actionType === 'exclusiveDeals') {
+      setRequestData(prev => ({
+        ...prev,
+        specialRequests: 'Interested in exclusive deals'
+      }));
+    }
+  };
 
   const handleSwapCities = () => {
     const temp = fromCity;
@@ -83,8 +112,8 @@ const Flight = () => {
     setToCity(temp);
     setRequestData(prev => ({
       ...prev,
-      fromCity: toCity,
-      toCity: fromCity
+      fromCity: toCity.split(' ')[0],
+      toCity: fromCity.split(' ')[0]
     }));
   };
 
@@ -93,54 +122,21 @@ const Flight = () => {
     setIsSubmitting(true);
     setFormError('');
 
-    if (!requestData.name || !requestData.email || !requestData.phone || !requestData.departure) {
+    if (!requestData.name || !requestData.email || !requestData.phone) {
       setFormError('Please fill in all required fields');
       setIsSubmitting(false);
       return;
     }
 
     try {
-      const templateParams = {
-        from_name: requestData.name,
-        from_email: requestData.email,
-        phone_number: requestData.phone,
-        from_city: requestData.fromCity,
-        to_city: requestData.toCity,
-        departure_date: requestData.departure,
-        return_date: requestData.return || 'One Way Trip',
-        passengers: requestData.passengers,
-        travel_class: requestData.class,
-        special_requests: requestData.specialRequests || 'None',
-        reply_to: requestData.email
-      };
-
-      await emailjs.send(
-        'service_ov629rm',
-        'template_jr1dnto',
-        templateParams
-      );
-
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setSubmitSuccess(true);
       setTimeout(() => {
         setShowRequestForm(false);
         setSubmitSuccess(false);
       }, 3000);
-
-      setRequestData({
-        name: 'John Doe',
-        email: 'your@email.com',
-        phone: '+91 9876543210',
-        fromCity: 'Delhi',
-        toCity: 'Mumbai',
-        departure: '',
-        return: '',
-        passengers: 1,
-        class: 'Economy',
-        specialRequests: ''
-      });
-
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error('Failed to submit request:', error);
       setFormError('Failed to submit request. Please try again later.');
     } finally {
       setIsSubmitting(false);
@@ -153,6 +149,39 @@ const Flight = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handlePassengerCountChange = (count) => {
+    setPassengerCount(Math.max(1, count));
+    setRequestData(prev => ({
+      ...prev,
+      passengers: Math.max(1, count)
+    }));
+  };
+
+  const handleClassChange = (travelClass) => {
+    setTravelClass(travelClass);
+    setRequestData(prev => ({
+      ...prev,
+      class: travelClass
+    }));
+    setShowPassengerDropdown(false);
+  };
+
+  const handleDateChange = (date, isReturn = false) => {
+    if (isReturn) {
+      setReturnDate(date);
+      setRequestData(prev => ({
+        ...prev,
+        return: formatDate(date)
+      }));
+    } else {
+      setDepartureDate(date);
+      setRequestData(prev => ({
+        ...prev,
+        departure: formatDate(date)
+      }));
+    }
   };
 
   // Animation variants
@@ -193,656 +222,630 @@ const Flight = () => {
     }
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'flights':
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* From City */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-100 rounded-full opacity-10 animate-float-delay"></div>
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-purple-100 rounded-full opacity-10 animate-float"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-56 h-56 bg-pink-100 rounded-full opacity-10 animate-float-delay-2"></div>
+      </div>
+     
+      {/* Search Section - Top */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-2xl shadow-xl p-8 mb-12 border border-gray-100"
+      >
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+            <IoAirplane className="text-blue-500 mr-3 rotate-45" />
+            Find Your Perfect Flight
+          </h2>
+        </div>
+        
+        {/* Trip Type Tabs */}
+        <div className="flex border-b-2 border-gray-200 mb-8">
+          {['ONE WAY', 'ROUNDTRIP', 'MULTICITY'].map((type) => (
+            <motion.button
+              key={type}
+              whileTap={{ scale: 0.95 }}
+              className={`pb-3 px-6 font-medium text-lg relative ${tripType === type ? 'text-blue-600' : 'text-gray-500 hover:text-blue-500'}`}
+              onClick={() => setTripType(type)}
             >
-              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-                <FaMapMarkerAlt className="mr-2 text-pink-500" /> From
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
-                  <FaPlane className="text-pink-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={fromCity}
-                  onChange={(e) => {
-                    setFromCity(e.target.value);
-                    setRequestData(prev => ({...prev, fromCity: e.target.value}));
-                  }}
-                >
-                  {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
+              {type}
+              {tripType === type && (
+                <motion.div 
+                  layoutId="underline"
+                  className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"
+                  initial={false}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+            </motion.button>
+          ))}
+        </div>
 
-            {/* Swap Button */}
-            <motion.div 
-              className="flex items-center justify-center"
-              variants={itemVariants}
-            >
-              <motion.button 
-                onClick={handleSwapCities}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                className="bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 p-5 rounded-full shadow-md transition-all text-pink-600 hover:text-pink-700"
-                aria-label="Swap cities"
-                whileHover={{ rotate: 180, scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+        {/* Search Form */}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          {/* From City */}
+          <motion.div 
+            variants={itemVariants}
+            className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
+          >
+            <label className="block text-sm font-bold text-gray-600 mb-2  items-center">
+              <FaMapMarkerAlt className="text-blue-400 mr-2" />
+              FROM
+            </label>
+            <div className="flex items-center">
+              <select 
+                className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg"
+                value={fromCity}
+                onChange={(e) => {
+                  setFromCity(e.target.value);
+                  setRequestData(prev => ({...prev, fromCity: e.target.value.split(' ')[0]}));
+                }}
               >
-                <FaExchangeAlt className="text-2xl" />
-              </motion.button>
-            </motion.div>
+                {cities.map(city => (
+                  <option key={city} value={city.split(' - ')[0]}>{city}</option>
+                ))}
+              </select>
+            </div>
+          </motion.div>
 
-            {/* To City */}
+          {/* Swap Button */}
+          <motion.div 
+            className="flex items-center justify-center md:justify-start md:mt-10"
+            variants={itemVariants}
+          >
+            <motion.button 
+              onClick={handleSwapCities}
+              className="bg-white p-3 rounded-full hover:bg-gray-100 transition-colors shadow-md border border-gray-200"
+              aria-label="Swap cities"
+              whileHover={{ rotate: 180, scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <FaExchangeAlt className="text-blue-500 text-lg" />
+            </motion.button>
+          </motion.div>
+
+          {/* To City */}
+          <motion.div 
+            variants={itemVariants}
+            className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
+          >
+            <label className="block text-sm font-bold text-gray-600 mb-2  items-center">
+              <FaMapMarkerAlt className="text-blue-400 mr-2" />
+              TO
+            </label>
+            <div className="flex items-center">
+              <select 
+                className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg"
+                value={toCity}
+                onChange={(e) => {
+                  setToCity(e.target.value);
+                  setRequestData(prev => ({...prev, toCity: e.target.value.split(' ')[0]}));
+                }}
+              >
+                {cities.map(city => (
+                  <option key={city} value={city.split(' - ')[0]}>{city}</option>
+                ))}
+              </select>
+            </div>
+          </motion.div>
+
+          {/* Departure Date */}
+          <motion.div 
+            variants={itemVariants}
+            className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
+          >
+            <label className="block text-sm font-bold text-gray-600 mb-2 items-center">
+              <FaCalendarAlt className="text-blue-400 mr-2" />
+              DEPARTURE DATE
+            </label>
+            <div className="flex items-center">
+              <DatePicker
+                selected={departureDate}
+                onChange={(date) => handleDateChange(date)}
+                minDate={new Date()}
+                className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg cursor-pointer"
+                dateFormat="d MMM EEE, yyyy"
+                customInput={
+                  <div className="w-full cursor-pointer">
+                    {formatDate(departureDate)}
+                  </div>
+                }
+              />
+            </div>
+          </motion.div>
+
+          {/* Return Date (conditional) */}
+          {tripType === 'ROUNDTRIP' && (
             <motion.div 
               variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
+              className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
             >
-              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-                <FaMapMarkerAlt className="mr-2 text-pink-500" /> To
+              <label className="block text-sm font-bold text-gray-600 mb-2  items-center">
+                <FaCalendarAlt className="text-blue-400 mr-2" />
+                RETURN DATE
               </label>
               <div className="flex items-center">
-                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
-                  <FaPlane className="text-purple-600 text-xl transform rotate-45" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={toCity}
-                  onChange={(e) => {
-                    setToCity(e.target.value);
-                    setRequestData(prev => ({...prev, toCity: e.target.value}));
-                  }}
-                >
-                  {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Departure Date */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-                <FaCalendarAlt className="mr-2 text-pink-500" /> Departure Date
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
-                  <FaCalendarAlt className="text-blue-600 text-xl" />
-                </div>
-                <input 
-                  type="date" 
-                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                  value={departureDate}
-                  onChange={(e) => {
-                    setDepartureDate(e.target.value);
-                    setRequestData(prev => ({...prev, departure: e.target.value}));
-                  }}
-                  min={new Date().toISOString().split('T')[0]}
+                <DatePicker
+                  selected={returnDate}
+                  onChange={(date) => handleDateChange(date, true)}
+                  minDate={departureDate}
+                  className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg cursor-pointer"
+                  dateFormat="d MMM EEE, yyyy"
+                  customInput={
+                    <div className="w-full cursor-pointer">
+                      {formatDate(returnDate)}
+                    </div>
+                  }
                 />
               </div>
             </motion.div>
+          )}
 
-            {/* Return Date */}
-            {tripType === 'round' && (
-              <motion.div 
-                variants={itemVariants}
-                className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-                whileHover={{ y: -5 }}
+          {/* Add Return Date for ONE WAY */}
+          {tripType !== 'ROUNDTRIP' && (
+            <motion.div 
+              variants={itemVariants}
+              className="flex items-center col-span-1 md:col-span-2"
+            >
+              <button 
+                className="text-blue-600 font-medium flex items-center hover:text-blue-800 transition-colors text-lg"
+                onClick={() => setTripType('ROUNDTRIP')}
               >
-                <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-                  <FaCalendarAlt className="mr-2 text-pink-500" /> Return Date
-                </label>
-                <div className="flex items-center">
-                  <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
-                    <FaCalendarAlt className="text-green-600 text-xl" />
+                + ADD RETURN DATE
+              </button>
+              <span className="ml-3 text-base text-gray-500">Save more on round trips!</span>
+            </motion.div>
+          )}
+
+          {/* Traveller & Class */}
+          <motion.div 
+            variants={itemVariants}
+            className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50 relative"
+          >
+            <label className="block text-sm font-bold text-gray-600 mb-2  items-center">
+              <FaUsers className="text-blue-400 mr-2" />
+              TRAVELLER & CLASS
+            </label>
+            <div 
+              className="flex items-center justify-between cursor-pointer"
+              onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
+            >
+              <span className="font-bold text-gray-900 text-lg">
+                {passengerCount} {passengerCount > 1 ? 'Travelers' : 'Traveler'}, {travelClass}
+              </span>
+              {showPassengerDropdown ? (
+                <FaChevronUp className="text-gray-500" />
+              ) : (
+                <FaChevronDown className="text-gray-500" />
+              )}
+            </div>
+
+            {/* Passenger Dropdown */}
+            {showPassengerDropdown && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-10 p-4"
+              >
+                <div className="mb-4">
+                  <label className="block text-sm font-bold text-gray-600 mb-2">Passengers</label>
+                  <div className="flex items-center justify-between">
+                    <button 
+                      className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"
+                      onClick={() => handlePassengerCountChange(passengerCount - 1)}
+                      disabled={passengerCount <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="font-bold">{passengerCount}</span>
+                    <button 
+                      className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"
+                      onClick={() => handlePassengerCountChange(passengerCount + 1)}
+                    >
+                      +
+                    </button>
                   </div>
-                  <input 
-                    type="date" 
-                    className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                    value={returnDate}
-                    onChange={(e) => {
-                      setReturnDate(e.target.value);
-                      setRequestData(prev => ({...prev, return: e.target.value}));
-                    }}
-                    min={departureDate || new Date().toISOString().split('T')[0]}
-                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-2">Travel Class</label>
+                  <div className="space-y-2">
+                    {travelClasses.map((cls) => (
+                      <div 
+                        key={cls}
+                        className={`p-3 rounded-lg cursor-pointer ${travelClass === cls ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
+                        onClick={() => handleClassChange(cls)}
+                      >
+                        {cls}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
+          </motion.div>
 
-            {/* Passengers */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-                <FaUsers className="mr-2 text-pink-500" /> Passengers
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
-                  <FaUser className="text-yellow-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={passengers}
-                  onChange={(e) => {
-                    setPassengers(e.target.value);
-                    setRequestData(prev => ({...prev, passengers: e.target.value}));
-                  }}
+          {/* Special Fare Options */}
+          <motion.div 
+            variants={itemVariants}
+            className="col-span-1 md:col-span-2"
+          >
+            <label className="block text-sm font-bold text-gray-600 mb-3">SELECT A SPECIAL FARE</label>
+            <div className="text-sm text-blue-500 mb-4 font-medium">EXTRA SAVINGS</div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[
+                { title: "Student", desc: "Extra discounts/baggage", icon: <FaUser className="text-blue-400" /> },
+                { title: "Senior Citizen", desc: "Up to ₹ 600 off", icon: <FaUserTie className="text-purple-400" /> },
+                { title: "Armed Force", desc: "Up to ₹ 600 off", icon: <FaStar className="text-amber-400" /> },
+                { title: "Add FlexiFly", desc: "100% refund on cancellation", icon: <FaCheck className="text-green-400" /> }
+              ].map((fare, index) => (
+                <motion.div
+                  key={index}
+                  whileHover={{ y: -5, scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="border-2 rounded-xl p-4 hover:border-blue-400 cursor-pointer transition-all bg-white hover:shadow-md group"
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
+                  <div className="flex items-center mb-2">
+                    <div className="p-2 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors mr-3">
+                      {fare.icon}
+                    </div>
+                    <div className="font-bold text-gray-800">{fare.title}</div>
+                  </div>
+                  <div className="text-sm text-gray-600 pl-11">{fare.desc}</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
 
-            {/* Travel Class */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-                <FaChair className="mr-2 text-pink-500" /> Class
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-3 rounded-lg mr-4 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-colors shadow-sm">
-                  <FaPlane className="text-indigo-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={travelClass}
-                  onChange={(e) => {
-                    setTravelClass(e.target.value);
-                    setRequestData(prev => ({...prev, class: e.target.value}));
-                  }}
-                >
-                  <option value="Economy">Economy</option>
-                  <option value="Premium Economy">Premium Economy</option>
-                  <option value="Business">Business</option>
-                  <option value="First">First Class</option>
-                </select>
-              </div>
-            </motion.div>
+        {/* Search Button */}
+        <motion.div 
+          className="mt-10 flex flex-col md:flex-row items-center justify-between gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <motion.button 
+            onClick={() => {
+              setShowRequestForm(true);
+              setRequestData(prev => ({
+                ...prev,
+                fromCity: fromCity.split(' ')[0],
+                toCity: toCity.split(' ')[0],
+                departure: formatDate(departureDate),
+                return: tripType === 'ROUNDTRIP' ? formatDate(returnDate) : '',
+                passengers: passengerCount,
+                class: travelClass
+              }));
+            }}
+            className="w-full md:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-5 px-10 rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center text-lg"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <FaSearch className="mr-3" />
+            SEARCH FLIGHTS
+          </motion.button>
+          
+          <div className="text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start">
+              <FaCheck className="text-green-500 mr-2" />
+              <span className="text-gray-600 font-medium">Best Price Guarantee</span>
+            </div>
+            <div className="flex items-center justify-center md:justify-start">
+              <FaCheck className="text-green-500 mr-2" />
+              <span className="text-gray-600 font-medium">No Booking Fees</span>
+            </div>
           </div>
-        );
-      case 'hotels':
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Hotel Location */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-blue-600 mb-3  items-center">
-                <FaMapMarkerAlt className="mr-2 text-blue-500" /> Destination
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
-                  <FaHotel className="text-blue-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={hotelLocation}
-                  onChange={(e) => setHotelLocation(e.target.value)}
-                >
-                  {hotelLocations.map(location => (
-                    <option key={location} value={location}>{location}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
+        </motion.div>
+      </motion.div>
 
-            {/* Check-in Date */}
-            <motion.div 
+      {/* Popular Destinations Section */}
+      <motion.section 
+        initial="offscreen"
+        whileInView="onscreen"
+        viewport={{ once: true, amount: 0.2 }}
+        className="mb-16"
+      >
+        <motion.h2 
+          variants={cardVariants}
+          className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800"
+        >
+          Trending <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Destinations</span>
+        </motion.h2>
+        
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {popularDestinations.map((destination, index) => (
+            <motion.div
+              key={index}
               variants={itemVariants}
-              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
+              className={`${destination.bg} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-gray-100 overflow-hidden relative group`}
+              whileHover={{ y: -10 }}
             >
-              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
-                <FaCalendarAlt className="mr-2 text-blue-500" /> Check-in
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
-                  <FaCalendarAlt className="text-green-600 text-xl" />
-                </div>
-                <input 
-                  type="date" 
-                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                  value={checkInDate}
-                  onChange={(e) => setCheckInDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                />
+              <div className="absolute -right-6 -top-6 opacity-20 group-hover:opacity-30 transition-opacity">
+                <GiCommercialAirplane className="text-gray-400 text-6xl rotate-45" />
               </div>
+              <div className="flex items-center mb-4">
+                <div className="p-3 rounded-full bg-white shadow-sm mr-4">
+                  {destination.icon}
+                </div>
+                <h3 className="font-bold text-xl text-gray-800">{destination.name}</h3>
+              </div>
+              <div className="text-gray-600 mb-6">Starting from ₹25,999</div>
+              <button 
+                className="text-blue-600 font-medium flex items-center group-hover:text-blue-800 transition-colors"
+                onClick={() => {
+                  setShowRequestForm(true);
+                  setRequestData(prev => ({
+                    ...prev,
+                    toCity: destination.name,
+                    specialRequests: `Interested in flights to ${destination.name}`
+                  }));
+                }}
+              >
+                Explore flights
+                <FaArrowRight className="ml-2 transition-transform group-hover:translate-x-1" />
+              </button>
             </motion.div>
+          ))}
+        </motion.div>
+      </motion.section>
 
-            {/* Check-out Date */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
-                <FaCalendarAlt className="mr-2 text-blue-500" /> Check-out
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
-                  <FaCalendarAlt className="text-purple-600 text-xl" />
-                </div>
-                <input 
-                  type="date" 
-                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                  value={checkOutDate}
-                  onChange={(e) => setCheckOutDate(e.target.value)}
-                  min={checkInDate || new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </motion.div>
-
-            {/* Rooms */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
-                <FaHotel className="mr-2 text-blue-500" /> Rooms
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
-                  <FaUsers className="text-yellow-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={rooms}
-                  onChange={(e) => setRooms(e.target.value)}
-                >
-                  {[1, 2, 3, 4, 5].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'Room' : 'Rooms'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Adults */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
-                <FaUser className="mr-2 text-blue-500" /> Adults
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
-                  <FaUser className="text-pink-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={adults}
-                  onChange={(e) => setAdults(e.target.value)}
-                >
-                  {[1, 2, 3, 4, 5, 6].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Children */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-blue-100 rounded-xl p-5 hover:border-blue-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-blue-600 mb-3 items-center">
-                <FaUser className="mr-2 text-blue-500" /> Children
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
-                  <FaUser className="text-green-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={children}
-                  onChange={(e) => setChildren(e.target.value)}
-                >
-                  {[0, 1, 2, 3, 4].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-          </div>
-        );
-      case 'holidays':
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Holiday Destination */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-purple-600 mb-3  items-center">
-                <FaGlobeAmericas className="mr-2 text-purple-500" /> Destination
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
-                  <FaUmbrellaBeach className="text-purple-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={holidayDestination}
-                  onChange={(e) => setHolidayDestination(e.target.value)}
-                >
-                  {holidayDestinations.map(destination => (
-                    <option key={destination} value={destination}>{destination}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Duration */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
-                <FaCalendarAlt className="mr-2 text-purple-500" /> Duration
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
-                  <FaSuitcaseRolling className="text-blue-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={holidayDuration}
-                  onChange={(e) => setHolidayDuration(e.target.value)}
-                >
-                  {durations.map(days => (
-                    <option key={days} value={days}>{days} {days === 1 ? 'Day' : 'Days'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Travel Date */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
-                <FaCalendarAlt className="mr-2 text-purple-500" /> Travel Date
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
-                  <FaCalendarAlt className="text-pink-600 text-xl" />
-                </div>
-                <input 
-                  type="date" 
-                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                  value={holidayDate}
-                  onChange={(e) => setHolidayDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </motion.div>
-
-            {/* Adults */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
-                <FaUser className="mr-2 text-purple-500" /> Adults
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
-                  <FaUser className="text-yellow-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={holidayAdults}
-                  onChange={(e) => setHolidayAdults(e.target.value)}
-                >
-                  {[1, 2, 3, 4, 5, 6].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'Adult' : 'Adults'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Children */}
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-purple-100 rounded-xl p-5 hover:border-purple-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-purple-600 mb-3 items-center">
-                <FaUser className="mr-2 text-purple-500" /> Children
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
-                  <FaUser className="text-green-600 text-xl" />
-                </div>
-                <select 
-                  className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                  value={holidayChildren}
-                  onChange={(e) => setHolidayChildren(e.target.value)}
-                >
-                  {[0, 1, 2, 3, 4].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'Child' : 'Children'}</option>
-                  ))}
-                </select>
-              </div>
-            </motion.div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Hero Section */}
+      {/* Hero Section - Below Search */}
       <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 rounded-3xl p-8 md:p-12 mb-12 text-white overflow-hidden shadow-2xl"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 rounded-3xl p-8 md:p-12 mb-16 text-white overflow-hidden shadow-2xl"
       >
         <div className="absolute inset-0 bg-white opacity-10"></div>
         <div className="absolute -right-20 -top-20 w-96 h-96 bg-blue-400 rounded-full opacity-20"></div>
         <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-purple-300 rounded-full opacity-20"></div>
         
-        {/* Floating elements */}
-        <div className="absolute top-1/4 left-10 opacity-10">
-          <FaPlane className="text-white text-6xl transform rotate-45 animate-float" />
-        </div>
-        <div className="absolute bottom-1/3 right-20 opacity-10">
-          <FaSuitcaseRolling className="text-white text-5xl animate-float-delay" />
-        </div>
-        
-        <div className="relative z-10 text-center">
+        <div className="relative z-10">
           <motion.div 
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center bg-white bg-opacity-30 px-6 py-2 rounded-full mb-6 shadow-lg"
+            className="inline-flex items-center bg-white bg-opacity-30 px-6 py-2 rounded-full mb-8 shadow-lg"
           >
             <FaHeart className="mr-2 text-pink-300 animate-pulse" />
             <span className="text-sm font-bold text-white">Most Popular Travel Service</span>
           </motion.div>
           
-          <motion.h1 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white"
-          >
-            Discover Your Perfect Getaway
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-light"
-          >
-            Let us create a <span className="font-semibold">seamless travel experience</span> tailored just for you
-          </motion.p>
-          
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-wrap justify-center gap-6"
-          >
-            {[
-              { 
-                icon: <IoRocketSharp className="mr-2 text-2xl animate-bounce text-yellow-300" />, 
-                text: "Best Prices Guaranteed",
-                bg: "bg-gradient-to-r from-yellow-500 to-yellow-600"
-              },
-              { 
-                icon: <FaUserTie className="mr-2 text-2xl text-blue-200" />, 
-                text: "24/7 Expert Support",
-                bg: "bg-gradient-to-r from-blue-500 to-blue-600"
-              },
-              { 
-                icon: <FaStar className="mr-2 text-2xl text-purple-200" />, 
-                text: "Exclusive Deals",
-                bg: "bg-gradient-to-r from-purple-500 to-purple-600"
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className={`flex items-center ${item.bg} px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer group`}
-                whileHover={{ y: -5, scale: 1.05 }}
+          <div className="flex flex-col lg:flex-row items-center">
+            <div className="lg:w-1/2 mb-10 lg:mb-0">
+              <motion.h1 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white leading-tight"
               >
-                <div className="group-hover:animate-pulse">
-                  {item.icon}
-                </div>
-                <span className="font-bold text-white text-lg">{item.text}</span>
+                Your Journey Begins Here
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-xl md:text-2xl mb-8 font-light max-w-lg"
+              >
+                Experience <span className="font-semibold">seamless travel</span> with our exclusive flight deals and personalized service
+              </motion.p>
+              
+              <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-wrap gap-4"
+              >
+                {[
+                  { 
+                    icon: <IoRocketSharp className="mr-2 text-2xl animate-bounce text-yellow-300" />, 
+                    text: "Best Prices Guaranteed",
+                    bg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+                    action: "bestPrices"
+                  },
+                  { 
+                    icon: <FaUserTie className="mr-2 text-2xl text-blue-200" />, 
+                    text: "24/7 Expert Support",
+                    bg: "bg-gradient-to-r from-blue-500 to-blue-600",
+                    action: "expertSupport"
+                  },
+                  { 
+                    icon: <FaStar className="mr-2 text-2xl text-purple-200" />, 
+                    text: "Exclusive Deals",
+                    bg: "bg-gradient-to-r from-purple-500 to-purple-600",
+                    action: "exclusiveDeals"
+                  }
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className={`flex items-center ${item.bg} px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer group`}
+                    whileHover={{ y: -5, scale: 1.05 }}
+                    onClick={() => handleHeroAction(item.action)}
+                  >
+                    <div className="group-hover:animate-pulse">
+                      {item.icon}
+                    </div>
+                    <span className="font-bold text-white text-lg">{item.text}</span>
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
+            </div>
+            
+            <div className="lg:w-1/2 lg:pl-12">
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+                className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-8 border-2 border-white border-opacity-20"
+              >
+                <h3 className="text-2xl font-bold mb-6">Why Book With Us?</h3>
+                
+                <div className="space-y-6">
+                  {[
+                    {
+                      icon: <FaPlane className="text-blue-300 text-xl" />,
+                      title: "5000+ Daily Flights",
+                      description: "Access to the widest selection of flights across all major airlines"
+                    },
+                    {
+                      icon: <FaChair className="text-purple-300 text-xl" />,
+                      title: "Preferred Seating",
+                      description: "Get the best seats with our advanced seat selection options"
+                    },
+                    {
+                      icon: <FaHeadset className="text-pink-300 text-xl" />,
+                      title: "Dedicated Support",
+                      description: "Personal travel assistant available throughout your journey"
+                    }
+                  ].map((feature, index) => (
+                    <motion.div 
+                      key={index}
+                      className="flex items-start"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className="p-3 rounded-lg bg-white bg-opacity-20 mr-4">
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg mb-1">{feature.title}</h4>
+                        <p className="text-pink-600 text-opacity-80">{feature.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-4 px-6 rounded-xl mt-8 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                  onClick={() => setShowRequestForm(true)}
+                >
+                  <FaPaperPlane className="mr-3" />
+                  Request Custom Itinerary
+                </motion.button>
+              </motion.div>
+            </div>
+          </div>
         </div>
       </motion.div>
 
-      {/* Search Section */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-16 relative overflow-hidden border-2 border-pink-100 hover:shadow-3xl transition-all duration-300"
+      {/* Benefits Section */}
+      <motion.section 
+        initial="offscreen"
+        whileInView="onscreen"
+        viewport={{ once: true, amount: 0.2 }}
+        className="mb-20"
       >
-        <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full shadow-lg z-10 flex items-center">
-          <FaPlane className="mr-3 animate-bounce" />
-          <span className="text-lg">Plan Your Dream Trip</span>
-        </div>
+        <motion.h2 
+          variants={cardVariants}
+          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
+        >
+          Why Choose <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Our Service</span>
+        </motion.h2>
         
-        {/* Decorative elements */}
-        <div className="absolute top-10 right-10 opacity-10">
-          <FaPlane className="text-purple-300 text-6xl transform rotate-45 animate-float" />
-        </div>
-        <div className="absolute bottom-10 left-10 opacity-10">
-          <FaGlobeAmericas className="text-blue-300 text-6xl animate-spin-slow" />
-        </div>
-        
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { id: 'flights', label: 'Flights', icon: <FaPlane className="mr-2" /> },
-            { id: 'hotels', label: 'Hotels', icon: <FaHotel className="mr-2" /> },
-            { id: 'holidays', label: 'Holidays', icon: <FaUmbrellaBeach className="mr-2" /> }
-          ].map((tab) => (
-            <motion.button
-              key={tab.id}
-              className={`flex items-center px-8 py-3 rounded-full transition-all text-lg font-medium ${activeTab === tab.id ? 
-                'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' : 
-                'bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 border border-gray-200'}`}
-              onClick={() => setActiveTab(tab.id)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            {
+              icon: <FaPlane className="text-4xl text-blue-500" />,
+              title: "Exclusive Flight Deals",
+              description: "Access to special discounts and offers not available to the general public",
+              bg: "bg-gradient-to-br from-blue-50 to-white",
+              border: "border-blue-200",
+              features: [
+                "Up to 40% off on select routes",
+                "Early bird specials",
+                "Last-minute deals"
+              ]
+            },
+            {
+              icon: <FaUserTie className="text-4xl text-purple-500" />,
+              title: "Personal Travel Expert",
+              description: "Dedicated professional to handle all your travel arrangements",
+              bg: "bg-gradient-to-br from-purple-50 to-white",
+              border: "border-purple-200",
+              features: [
+                "24/7 availability",
+                "Custom itinerary planning",
+                "VIP treatment"
+              ]
+            },
+            {
+              icon: <FaHeadset className="text-4xl text-pink-500" />,
+              title: "24/7 Travel Support",
+              description: "Assistance available anytime, anywhere during your journey",
+              bg: "bg-gradient-to-br from-pink-50 to-white",
+              border: "border-pink-200",
+              features: [
+                "Flight changes & cancellations",
+                "Emergency assistance",
+                "Real-time updates"
+              ]
+            }
+          ].map((benefit, index) => (
+            <motion.div 
+              key={index}
+              variants={cardVariants}
+              className={`${benefit.bg} rounded-3xl shadow-xl p-8 flex flex-col items-center text-center border-2 ${benefit.border} hover:shadow-2xl transition-all h-full relative overflow-hidden group`}
+              whileHover={{ y: -10 }}
             >
-              {tab.icon}
-              <span>{tab.label}</span>
-            </motion.button>
-          ))}
-        </div>
-
-        {/* Trip Type Selector (only for flights) */}
-        {activeTab === 'flights' && (
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {[
-              { type: 'round', label: 'Round Trip', icon: <FaExchangeAlt className="mr-2" /> },
-              { type: 'oneWay', label: 'One Way', icon: <FaArrowRight className="mr-2" /> }
-            ].map((option) => (
+              <div className="absolute -right-10 -top-10 opacity-10 group-hover:opacity-20 transition-opacity">
+                <GiCommercialAirplane className="text-gray-800 text-6xl rotate-45" />
+              </div>
+              <div className={`p-5 rounded-full mb-6 ${benefit.bg} border-2 ${benefit.border} group-hover:scale-110 transition-transform`}>
+                {benefit.icon}
+              </div>
+              <h3 className="font-bold text-2xl mb-4 text-gray-800">{benefit.title}</h3>
+              <p className="text-gray-600 mb-6">{benefit.description}</p>
+              
+              <div className="w-full mb-6">
+                {benefit.features.map((feature, i) => (
+                  <div key={i} className="flex items-center mb-2 text-left">
+                    <FaCheck className="text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              
               <motion.button
-                key={option.type}
-                className={`flex items-center px-8 py-3 rounded-full transition-all text-lg font-medium ${tripType === option.type ? 
-                  'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' : 
-                  'bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 border border-gray-200'}`}
-                onClick={() => setTripType(option.type)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-3 px-8 rounded-xl shadow hover:shadow-md transition-all"
+                onClick={() => {
+                  setShowRequestForm(true);
+                  if (index === 0) handleHeroAction('bestPrices');
+                  else if (index === 1) handleHeroAction('expertSupport');
+                  else handleHeroAction('exclusiveDeals');
+                }}
               >
-                {option.icon}
-                <span>{option.label}</span>
+                Experience Now
               </motion.button>
-            ))}
-          </div>
-        )}
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
 
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {renderTabContent()}
-        </motion.div>
-
-        <motion.button 
-          onClick={() => setShowRequestForm(true)}
-          className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white font-bold py-5 px-6 rounded-xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-all group"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <FaSearch className="mr-3 text-xl group-hover:animate-bounce" /> 
-          <span className="text-xl">
-            {activeTab === 'flights' ? 'FIND FLIGHT DEALS' : 
-             activeTab === 'hotels' ? 'FIND HOTEL DEALS' : 'FIND HOLIDAY PACKAGES'}
-          </span>
-        </motion.button>
-      </motion.div>
-
-      {/* Enhanced Request Form Modal */}
+      {/* Request Form Modal */}
       {showRequestForm && (
         <motion.div 
           initial={{ opacity: 0 }}
@@ -854,10 +857,10 @@ const Flight = () => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-3xl shadow-3xl max-w-md w-full overflow-hidden relative border-4 border-pink-100"
+            className="bg-white rounded-3xl shadow-3xl max-w-md w-full overflow-hidden relative border-4 border-blue-100"
           >
             {submitSuccess ? (
-              <div className="p-8 text-center bg-gradient-to-b from-white to-pink-50">
+              <div className="p-8 text-center bg-gradient-to-b from-white to-blue-50">
                 <motion.div 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -866,13 +869,13 @@ const Flight = () => {
                   <FaCheck className="text-white text-4xl" />
                 </motion.div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">Request Sent Successfully!</h2>
-                <p className="text-lg text-gray-600 mb-8">We'll contact you shortly with the best options for your trip.</p>
+                <p className="text-lg text-gray-600 mb-8">We'll contact you shortly with the best flight options for your trip.</p>
                 <motion.button
                   onClick={() => {
                     setShowRequestForm(false);
                     setSubmitSuccess(false);
                   }}
-                  className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -882,283 +885,184 @@ const Flight = () => {
             ) : (
               <>
                 <div className="relative overflow-hidden">
-                  {/* Beautiful Animated Background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 opacity-90">
                     <div className="absolute top-0 left-0 w-full h-full">
                       <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-float-delay"></div>
                       <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-purple-200 rounded-full opacity-20 animate-float"></div>
                       <div className="absolute bottom-1/4 left-1/3 w-28 h-28 bg-pink-200 rounded-full opacity-20 animate-float-delay-2"></div>
-                      <div className="absolute bottom-1/3 right-1/4 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-float"></div>
                     </div>
                   </div>
                   
-                  {/* Header with Back Button */}
                   <div className="relative bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-8 text-white">
                     <div className="absolute inset-0 bg-white opacity-10"></div>
                     <div className="relative z-10 flex items-center">
                       <motion.button 
                         onClick={() => setShowRequestForm(false)}
-                        className="mr-4 text-white hover:text-pink-200 transition-colors"
+                        className="mr-4 text-white hover:text-blue-200 transition-colors"
                         whileHover={{ x: -5 }}
                       >
                         <FaArrowLeft className="text-2xl" />
                       </motion.button>
                       <div>
-                        <h2 className="text-3xl font-bold">
-                          {activeTab === 'flights' ? 'Flight' : 
-                           activeTab === 'hotels' ? 'Hotel' : 'Holiday Package'} Request Details
+                        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white">
+                          Flight Request Details
                         </h2>
                         <p className="text-lg opacity-90 mt-2">Complete your information to get the best deals</p>
                       </div>
                     </div>
                   </div>
                   
-                  <form onSubmit={handleRequestSubmit} className="relative p-8 bg-white bg-opacity-90 backdrop-blur-sm">
-                    {formError && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg"
-                      >
-                        <p className="font-medium">{formError}</p>
-                      </motion.div>
-                    )}
-                    
-                    <div className="space-y-6">
-                      {/* Name Field */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Full Name*</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaUser className="text-pink-400 text-lg group-hover:text-pink-500 transition-colors" />
-                          </div>
-                          <input
-                            type="text"
-                            name="name"
-                            value={requestData.name}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                            required
-                            placeholder="John Doe"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Email Field */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Email*</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaEnvelope className="text-pink-400 text-lg group-hover:text-pink-500 transition-colors" />
-                          </div>
-                          <input
-                            type="email"
-                            name="email"
-                            value={requestData.email}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                            required
-                            placeholder="your@email.com"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Phone Field */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Phone Number*</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaPhone className="text-pink-400 text-lg group-hover:text-pink-500 transition-colors" />
-                          </div>
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={requestData.phone}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                            required
-                            placeholder="+91 9876543210"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Travel Details */}
-                      <div className="grid grid-cols-2 gap-4">
-                        {activeTab === 'flights' && (
-                          <>
-                            <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                              <label className="block text-sm font-bold text-blue-600 mb-2">From</label>
+                  <form onSubmit={handleRequestSubmit} className="relative">
+                    <div className="max-h-[70vh] overflow-y-auto p-8 bg-white bg-opacity-90 backdrop-blur-sm">
+                      {formError && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg"
+                        >
+                          <p className="font-medium">{formError}</p>
+                        </motion.div>
+                      )}
+                      
+                      <div className="space-y-6">
+                        {/* Flight Summary */}
+                        <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl border-2 border-blue-100 shadow-sm mb-6">
+                          <h3 className="text-xl font-bold text-blue-600 mb-4">Your Flight Details</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-bold text-blue-600 mb-1">From</label>
                               <div className="font-medium text-gray-800 flex items-center">
                                 <FaMapMarkerAlt className="text-blue-400 mr-2" />
-                                {requestData.fromCity}
+                                {requestData.fromCity || fromCity.split(' ')[0]}
                               </div>
                             </div>
-                            <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm">
-                              <label className="block text-sm font-bold text-purple-600 mb-2">To</label>
+                            <div>
+                              <label className="block text-sm font-bold text-purple-600 mb-1">To</label>
                               <div className="font-medium text-gray-800 flex items-center">
                                 <FaMapMarkerAlt className="text-purple-400 mr-2" />
-                                {requestData.toCity}
+                                {requestData.toCity || toCity.split(' ')[0]}
                               </div>
                             </div>
-                          </>
-                        )}
-                        {activeTab === 'hotels' && (
-                          <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm col-span-2">
-                            <label className="block text-sm font-bold text-blue-600 mb-2">Destination</label>
-                            <div className="font-medium text-gray-800 flex items-center">
-                              <FaMapMarkerAlt className="text-blue-400 mr-2" />
-                              {hotelLocation}
-                            </div>
-                          </div>
-                        )}
-                        {activeTab === 'holidays' && (
-                          <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm col-span-2">
-                            <label className="block text-sm font-bold text-purple-600 mb-2">Destination</label>
-                            <div className="font-medium text-gray-800 flex items-center">
-                              <FaGlobeAmericas className="text-purple-400 mr-2" />
-                              {holidayDestination}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        {activeTab === 'flights' && (
-                          <>
-                            <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
-                              <label className="block text-sm font-bold text-pink-600 mb-2">Departure</label>
+                            <div>
+                              <label className="block text-sm font-bold text-pink-600 mb-1">Departure</label>
                               <div className="font-medium text-gray-800 flex items-center">
                                 <FaCalendarAlt className="text-pink-400 mr-2" />
-                                {requestData.departure || 'Not specified'}
+                                {requestData.departure || formatDate(departureDate)}
                               </div>
                             </div>
-                            <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-100 shadow-sm">
-                              <label className="block text-sm font-bold text-green-600 mb-2">Return</label>
+                            <div>
+                              <label className="block text-sm font-bold text-green-600 mb-1">{tripType === 'ROUNDTRIP' ? 'Return' : 'Trip Type'}</label>
                               <div className="font-medium text-gray-800 flex items-center">
                                 <FaCalendarAlt className="text-green-400 mr-2" />
-                                {requestData.return || tripType === 'oneWay' ? 'One Way' : 'Not specified'}
+                                {tripType === 'ROUNDTRIP' ? (requestData.return || formatDate(returnDate)) : 'One Way'}
                               </div>
                             </div>
-                          </>
-                        )}
-                        {activeTab === 'hotels' && (
-                          <>
-                            <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                              <label className="block text-sm font-bold text-blue-600 mb-2">Check-in</label>
+                            <div>
+                              <label className="block text-sm font-bold text-amber-600 mb-1">Passengers</label>
                               <div className="font-medium text-gray-800 flex items-center">
-                                <FaCalendarAlt className="text-blue-400 mr-2" />
-                                {checkInDate || 'Not specified'}
+                                <FaUsers className="text-amber-400 mr-2" />
+                                {requestData.passengers || passengerCount}
                               </div>
                             </div>
-                            <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm">
-                              <label className="block text-sm font-bold text-purple-600 mb-2">Check-out</label>
+                            <div>
+                              <label className="block text-sm font-bold text-indigo-600 mb-1">Class</label>
                               <div className="font-medium text-gray-800 flex items-center">
-                                <FaCalendarAlt className="text-purple-400 mr-2" />
-                                {checkOutDate || 'Not specified'}
+                                <FaChair className="text-indigo-400 mr-2" />
+                                {requestData.class || travelClass}
                               </div>
                             </div>
-                          </>
-                        )}
-                        {activeTab === 'holidays' && (
-                          <>
-                            <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
-                              <label className="block text-sm font-bold text-pink-600 mb-2">Travel Date</label>
-                              <div className="font-medium text-gray-800 flex items-center">
-                                <FaCalendarAlt className="text-pink-400 mr-2" />
-                                {holidayDate || 'Not specified'}
-                              </div>
-                            </div>
-                            <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-100 shadow-sm">
-                              <label className="block text-sm font-bold text-green-600 mb-2">Duration</label>
-                              <div className="font-medium text-gray-800 flex items-center">
-                                <FaSuitcaseRolling className="text-green-400 mr-2" />
-                                {holidayDuration} Days
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                          </div>
+                        </div>
 
-                      {/* Travelers/Rooms Info */}
-                      <div className="grid grid-cols-2 gap-4">
-                        {activeTab === 'flights' && (
-                          <div className="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-xl border border-indigo-100 shadow-sm">
-                            <label className="block text-sm font-bold text-indigo-600 mb-2">Passengers</label>
-                            <div className="font-medium text-gray-800 flex items-center">
-                              <FaUsers className="text-indigo-400 mr-2" />
-                              {passengers} {passengers === 1 ? 'Passenger' : 'Passengers'}
+                        {/* Name Field */}
+                        <div className="relative group">
+                          <label className="block text-sm font-bold text-blue-600 mb-2">Full Name*</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <FaUser className="text-blue-400 text-lg group-hover:text-blue-500 transition-colors" />
                             </div>
+                            <input
+                              type="text"
+                              name="name"
+                              value={requestData.name}
+                              onChange={handleInputChange}
+                              className="w-full pl-12 border-2 border-blue-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                              required
+                              placeholder="John Doe"
+                            />
                           </div>
-                        )}
-                        {activeTab === 'hotels' && (
-                          <>
-                            <div className="bg-gradient-to-br from-yellow-50 to-white p-4 rounded-xl border border-yellow-100 shadow-sm">
-                              <label className="block text-sm font-bold text-yellow-600 mb-2">Rooms</label>
-                              <div className="font-medium text-gray-800 flex items-center">
-                                <FaHotel className="text-yellow-400 mr-2" />
-                                {rooms} {rooms === 1 ? 'Room' : 'Rooms'}
-                              </div>
-                            </div>
-                            <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
-                              <label className="block text-sm font-bold text-pink-600 mb-2">Guests</label>
-                              <div className="font-medium text-gray-800 flex items-center">
-                                <FaUsers className="text-pink-400 mr-2" />
-                                {adults} Adults, {children} Children
-                              </div>
-                            </div>
-                          </>
-                        )}
-                        {activeTab === 'holidays' && (
-                          <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm col-span-2">
-                            <label className="block text-sm font-bold text-purple-600 mb-2">Travelers</label>
-                            <div className="font-medium text-gray-800 flex items-center">
-                              <FaUsers className="text-purple-400 mr-2" />
-                              {holidayAdults} Adults, {holidayChildren} Children
-                            </div>
-                          </div>
-                        )}
-                        {activeTab === 'flights' && (
-                          <div className="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-xl border border-indigo-100 shadow-sm">
-                            <label className="block text-sm font-bold text-indigo-600 mb-2">Class</label>
-                            <div className="font-medium text-gray-800 flex items-center">
-                              <FaChair className="text-indigo-400 mr-2" />
-                              {travelClass}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                        </div>
 
-                      {/* Special Requests */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Special Requests</label>
-                        <textarea
-                          name="specialRequests"
-                          value={requestData.specialRequests}
-                          onChange={handleInputChange}
-                          className="w-full border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                          rows="4"
-                          placeholder="Any special requirements (dietary needs, seating preferences, etc.)"
-                        ></textarea>
-                        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <FaRegSmileWink className="text-pink-400 text-xl" />
+                        {/* Email Field */}
+                        <div className="relative group">
+                          <label className="block text-sm font-bold text-blue-600 mb-2">Email*</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <FaEnvelope className="text-blue-400 text-lg group-hover:text-blue-500 transition-colors" />
+                            </div>
+                            <input
+                              type="email"
+                              name="email"
+                              value={requestData.email}
+                              onChange={handleInputChange}
+                              className="w-full pl-12 border-2 border-blue-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                              required
+                              placeholder="your@email.com"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Phone Field */}
+                        <div className="relative group">
+                          <label className="block text-sm font-bold text-blue-600 mb-2">Phone Number*</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <FaPhone className="text-blue-400 text-lg group-hover:text-blue-500 transition-colors" />
+                            </div>
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={requestData.phone}
+                              onChange={handleInputChange}
+                              className="w-full pl-12 border-2 border-blue-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                              required
+                              placeholder="+91 9876543210"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Special Requests */}
+                        <div className="relative group">
+                          <label className="block text-sm font-bold text-blue-600 mb-2">Special Requests</label>
+                          <textarea
+                            name="specialRequests"
+                            value={requestData.specialRequests}
+                            onChange={handleInputChange}
+                            className="w-full border-2 border-blue-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                            rows="4"
+                            placeholder="Any special requirements (dietary needs, seating preferences, etc.)"
+                          ></textarea>
+                          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <FaRegSmileWink className="text-blue-400 text-xl" />
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center mt-8">
+                    <div className="flex justify-between items-center p-6 bg-gray-50 border-t border-gray-200">
                       <motion.button
                         type="button"
                         onClick={() => setShowRequestForm(false)}
-                        className="text-pink-600 hover:text-pink-800 font-bold px-6 py-3 rounded-lg hover:bg-pink-50 transition-colors flex items-center"
+                        className="text-blue-600 hover:text-blue-800 font-bold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center"
                         whileHover={{ x: -5 }}
                       >
                         <FaArrowLeft className="mr-2" />
-                        Back to Page
+                        Back
                       </motion.button>
                       <motion.button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center ${
+                        className={`bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center ${
                           isSubmitting ? 'opacity-80 cursor-not-allowed' : ''
                         }`}
                         whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
@@ -1186,270 +1090,8 @@ const Flight = () => {
           </motion.div>
         </motion.div>
       )}
-
-      {/* Benefits Section */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mb-20"
-      >
-        <motion.h2 
-          variants={cardVariants}
-          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
-        >
-          Why Choose <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Our Service</span>
-        </motion.h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: <FaPlane className="text-4xl text-pink-500" />,
-              title: "Exclusive Flight Deals",
-              description: "Access to special discounts and offers not available to the general public",
-              bg: "bg-gradient-to-br from-pink-50 to-white",
-              border: "border-pink-200"
-            },
-            {
-              icon: <FaUserTie className="text-4xl text-purple-500" />,
-              title: "Personal Travel Expert",
-              description: "Dedicated professional to handle all your travel arrangements",
-              bg: "bg-gradient-to-br from-purple-50 to-white",
-              border: "border-purple-200"
-            },
-            {
-              icon: <FaHeadset className="text-4xl text-blue-500" />,
-              title: "24/7 Travel Support",
-              description: "Assistance available anytime, anywhere during your journey",
-              bg: "bg-gradient-to-br from-blue-50 to-white",
-              border: "border-blue-200"
-            }
-          ].map((benefit, index) => (
-            <motion.div 
-              key={index}
-              variants={cardVariants}
-              className={`${benefit.bg} rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border-2 ${benefit.border} hover:shadow-xl transition-all h-full`}
-              whileHover={{ y: -10 }}
-            >
-              <div className={`p-5 rounded-full mb-6 ${benefit.bg}`}>
-                {benefit.icon}
-              </div>
-              <h3 className="font-bold text-xl mb-4 text-gray-800">{benefit.title}</h3>
-              <p className="text-gray-600 mb-6">{benefit.description}</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-auto bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium py-2 px-6 rounded-full shadow hover:shadow-md transition-all"
-                onClick={() => setShowRequestForm(true)}
-              >
-                Learn More
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* How It Works Section */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-12 mb-20 relative overflow-hidden"
-      >
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-200 rounded-full opacity-20"></div>
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-purple-200 rounded-full opacity-20"></div>
-        
-        <motion.h2 
-          variants={cardVariants}
-          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
-        >
-          How Our <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Service Works</span>
-        </motion.h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
-          {[
-            {
-              number: 1,
-              title: "Share Your Travel Plans",
-              description: "Tell us your destination, dates, and preferences",
-              icon: <FaRegSmileWink className="text-3xl text-blue-500" />
-            },
-            {
-              number: 2,
-              title: "We Find The Best Options",
-              description: "Our experts search hundreds of options for perfect matches",
-              icon: <FaSearch className="text-3xl text-purple-500" />
-            },
-            {
-              number: 3,
-              title: "Receive Customized Offers",
-              description: "Get the best travel options delivered to your inbox",
-              icon: <FaEnvelope className="text-3xl text-pink-500" />
-            }
-          ].map((step, index) => (
-            <motion.div 
-              key={step.number}
-              variants={cardVariants}
-              transition={{ delay: index * 0.1 }}
-              className="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-shadow border-2 border-white hover:border-pink-200 relative overflow-hidden"
-              whileHover={{ y: -5 }}
-            >
-              <div className="absolute -top-10 -right-10 w-20 h-20 bg-blue-100 rounded-full opacity-20"></div>
-              <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-purple-100 rounded-full opacity-20"></div>
-              
-              <div className="bg-gradient-to-r from-blue-500 to-purple-500 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-3xl font-bold shadow-lg relative z-10">
-                {step.icon}
-              </div>
-              <div className="relative z-10">
-                <h3 className="font-bold text-xl mb-4 text-gray-800">{step.title}</h3>
-                <p className="text-gray-600 mb-6">{step.description}</p>
-              </div>
-              <div className="absolute top-0 left-0 bg-blue-500 text-white font-bold px-4 py-1 rounded-br-lg text-sm">
-                Step {step.number}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Final CTA */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-12 text-white text-center relative overflow-hidden shadow-2xl mb-10"
-      >
-        <div className="absolute inset-0 bg-white opacity-10"></div>
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-white rounded-full opacity-5"></div>
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-white rounded-full opacity-5"></div>
-        
-        <motion.div 
-          variants={cardVariants}
-          className="relative"
-        >
-          <motion.h2 
-            className="text-3xl md:text-5xl font-bold mb-6"
-          >
-            Ready for Your Next <span className="bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">Adventure?</span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-light"
-          >
-            Let us handle the travel details while you focus on the experience
-          </motion.p>
-          <motion.div className="flex flex-wrap justify-center gap-6">
-            <motion.button 
-              onClick={() => setShowRequestForm(true)}
-              className="bg-white hover:bg-gray-100 text-pink-600 font-bold py-4 px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all inline-flex items-center text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaPlane className="mr-3 animate-bounce" />
-              GET TRAVEL QUOTES NOW
-            </motion.button>
-            <motion.button 
-              className="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-20 text-white font-bold py-4 px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all inline-flex items-center text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaPhone className="mr-3" />
-             +91 9796337997
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      </motion.section>
     </div>
   );
 };
 
 export default Flight;
-
-// Add these styles to your global CSS or style component
-const globalStyles = `
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes modal-enter {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(5deg); }
-  }
-  
-  @keyframes float-delay {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-12px) rotate(-3deg); }
-  }
-
-  @keyframes float-delay-2 {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(2deg); }
-  }
-  
-  @keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
-  }
-  
-  .animate-modal-enter {
-    animation: modal-enter 0.3s ease-out forwards;
-  }
-  
-  .animate-bounce {
-    animation: bounce 1.5s infinite;
-  }
-  
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
-  
-  .animate-float-delay {
-    animation: float-delay 4s ease-in-out infinite 0.5s;
-  }
-
-  .animate-float-delay-2 {
-    animation: float-delay-2 4s ease-in-out infinite 0.8s;
-  }
-  
-  .animate-spin-slow {
-    animation: spin-slow 20s linear infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-  
-  .shadow-3xl {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  }
-
-  .backdrop-blur-sm {
-    backdrop-filter: blur(4px);
-  }
-`;
-
-// Add the global styles to your document head
-if (typeof document !== 'undefined') {
-  const styleElement = document.createElement('style');
-  styleElement.innerHTML = globalStyles;
-  document.head.appendChild(styleElement);
-}

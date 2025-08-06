@@ -59,8 +59,8 @@ const Footer = () => {
 
     try {
       await emailjs.send(
-        'service_bdm6dl3', // Your EmailJS Service ID
-        'template_q7y750i', // Your EmailJS Template ID
+        'service_ov629rm', // Your EmailJS Service ID
+        'template_lwqkh1f', // Your EmailJS Template ID
         {
           to_email: 'traveligo00@gmail.com',
           from_email: email,

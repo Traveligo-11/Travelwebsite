@@ -460,13 +460,14 @@ const FlightBooking = () => {
             : 'bg-white border-pink-100 hover:shadow-3xl'
         } transition-all duration-300`}
       >
-        <div className={`absolute -top-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full shadow-lg z-10 flex items-center ${
+        <div className={`absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full shadow-lg z-10 flex items-center ${
           theme === 'dark' ? 'shadow-lg' : 'shadow-xl'
         }`}>
           <FaPlane className="mr-3 animate-bounce" />
           <span className="text-lg">Plan Your Dream Trip</span>
         </div>
-        
+        <br />
+          <br />
         {/* Decorative elements */}
         <div className="absolute top-10 right-10 opacity-10">
           <FaPlane className={`text-6xl transform rotate-45 animate-float ${theme === 'dark' ? 'text-purple-300' : 'text-purple-300'}`} />
@@ -515,7 +516,7 @@ const FlightBooking = () => {
             }`}
             whileHover={{ y: -5 }}
           >
-            <label className={`block text-sm font-bold mb-3 flex items-center ${
+            <label className={`block text-sm font-bold mb-3 items-center ${
               theme === 'dark' ? 'text-pink-400' : 'text-pink-600'
             }`}>
               <FaMapMarkerAlt className="mr-2" /> From
@@ -577,7 +578,7 @@ const FlightBooking = () => {
             }`}
             whileHover={{ y: -5 }}
           >
-            <label className={`block text-sm font-bold mb-3 flex items-center ${
+            <label className={`block text-sm font-bold mb-3 items-center ${
               theme === 'dark' ? 'text-purple-400' : 'text-pink-600'
             }`}>
               <FaMapMarkerAlt className="mr-2" /> To
@@ -617,7 +618,7 @@ const FlightBooking = () => {
             }`}
             whileHover={{ y: -5 }}
           >
-            <label className={`block text-sm font-bold mb-3 flex items-center ${
+            <label className={`block text-sm font-bold mb-3 items-center ${
               theme === 'dark' ? 'text-blue-400' : 'text-pink-600'
             }`}>
               <FaCalendarAlt className="mr-2" /> Departure Date
@@ -680,7 +681,7 @@ const FlightBooking = () => {
               }`}
               whileHover={{ y: -5 }}
             >
-              <label className={`block text-sm font-bold mb-3 flex items-center ${
+              <label className={`block text-sm font-bold mb-3 items-center ${
                 theme === 'dark' ? 'text-green-400' : 'text-pink-600'
               }`}>
                 <FaCalendarAlt className="mr-2" /> Return Date
@@ -743,7 +744,7 @@ const FlightBooking = () => {
             }`}
             whileHover={{ y: -5 }}
           >
-            <label className={`block text-sm font-bold mb-3 flex items-center ${
+            <label className={`block text-sm font-bold mb-3  items-center ${
               theme === 'dark' ? 'text-yellow-400' : 'text-pink-600'
             }`}>
               <FaUsers className="mr-2" /> Passengers
@@ -783,7 +784,7 @@ const FlightBooking = () => {
             }`}
             whileHover={{ y: -5 }}
           >
-            <label className={`block text-sm font-bold mb-3 flex items-center ${
+            <label className={`block text-sm font-bold mb-3  items-center ${
               theme === 'dark' ? 'text-indigo-400' : 'text-pink-600'
             }`}>
               <FaChair className="mr-2" /> Travel Class

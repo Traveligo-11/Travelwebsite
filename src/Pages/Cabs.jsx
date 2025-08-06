@@ -345,7 +345,7 @@ const CabBooking = () => {
             className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
             whileHover={{ y: -5 }}
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
               <FaMapMarkerAlt className="mr-2 text-pink-500" /> Pickup From
             </label>
             <div className="flex items-center">
@@ -391,7 +391,7 @@ const CabBooking = () => {
             className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
             whileHover={{ y: -5 }}
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
               <FaMapMarkerAlt className="mr-2 text-pink-500" /> Drop At
             </label>
             <div className="flex items-center">
@@ -419,7 +419,7 @@ const CabBooking = () => {
             className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
             whileHover={{ y: -5 }}
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
               <FaCalendarAlt className="mr-2 text-pink-500" /> Pickup Date
             </label>
             <div className="flex items-center">
@@ -445,7 +445,7 @@ const CabBooking = () => {
             className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
             whileHover={{ y: -5 }}
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
               <FaClock className="mr-2 text-pink-500" /> Pickup Time
             </label>
             <div className="flex items-center">
@@ -471,7 +471,7 @@ const CabBooking = () => {
               className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
               whileHover={{ y: -5 }}
             >
-              <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
                 <FaCalendarAlt className="mr-2 text-pink-500" /> Return Date
               </label>
               <div className="flex items-center">
@@ -498,7 +498,7 @@ const CabBooking = () => {
             className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
             whileHover={{ y: -5 }}
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
               <FaUsers className="mr-2 text-pink-500" /> Passengers
             </label>
             <div className="flex items-center">
@@ -526,7 +526,7 @@ const CabBooking = () => {
             className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
             whileHover={{ y: -5 }}
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3 flex items-center">
+            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
               <FaCar className="mr-2 text-pink-500" /> Cab Type
             </label>
             <div className="flex items-center">
@@ -1026,7 +1026,7 @@ const CabBooking = () => {
               whileTap={{ scale: 0.95 }}
             >
               <FaPhone className="mr-3" />
-              CALL FOR HELP
+              +91 9796337997
             </motion.button>
           </motion.div>
         </motion.div>

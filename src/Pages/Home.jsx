@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  FaPlane, FaHotel, FaUmbrellaBeach, FaStar, FaRegStar, 
+  FaPlane, FaHotel, FaRegStar, 
   FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, 
   FaCalendarAlt, FaUserFriends, FaTimes, FaSearch, FaQuoteLeft,
   FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaHeart
 } from 'react-icons/fa';
+import { FaUser, FaEnvelope,FaPhone,FaComment} from 'react-icons/fa';
+import { FaGlobe,  FaUmbrellaBeach, FaStar } from 'react-icons/fa';
 import { FiMessageSquare } from 'react-icons/fi';
 import { IoIosFlash, IoMdHeart } from 'react-icons/io';
 import { GiSuitcase } from 'react-icons/gi';
@@ -108,6 +110,7 @@ const Home = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showQuotesForm, setShowQuotesForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -123,7 +126,15 @@ const Home = () => {
     package: '',
     message: ''
   });
+  const [quotesFormData, setQuotesFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    interest: 'General Inquiry'
+  });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [quotesFormSubmitted, setQuotesFormSubmitted] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -140,6 +151,7 @@ const Home = () => {
     { isPlaying: false, isMuted: false, progress: 0 }
   ]);
   const videoRefs = useRef([]);
+  const quotesFormRef = useRef();
 
   // Categories for filtering
   const categories = [
@@ -739,6 +751,14 @@ const Home = () => {
     }));
   };
 
+  const handleQuotesInputChange = (e) => {
+    const { name, value } = e.target;
+    setQuotesFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   // Handle search
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -811,6 +831,43 @@ const Home = () => {
     } catch (error) {
       console.error('FAILED...', error);
       alert(`Failed to send booking request. Error: ${error.text || 'Please try again later.'}`);
+    }
+  };
+
+  // Submit quotes form
+  const handleQuotesSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await emailjs.send(
+        'service_9jzlq6q',
+        'template_fkm3hio',
+        {
+          name: quotesFormData.name,
+          email: quotesFormData.email,
+          phone: quotesFormData.phone,
+          message: quotesFormData.message || 'No additional message'
+        },
+        '127OFHb2IQq0zSiFJ'
+      );
+
+      console.log('SUCCESS!', response.status, response.text);
+      setQuotesFormSubmitted(true);
+      
+      // Reset form after successful submission
+      setTimeout(() => {
+        setQuotesFormSubmitted(false);
+        setShowQuotesForm(false);
+        setQuotesFormData({
+          name: '',
+          email: '',
+          phone: '',
+          interest: 'General Inquiry'
+        });
+      }, 3000);
+    } catch (error) {
+      console.error('FAILED...', error);
+      alert(`Failed to send enquiry. Error: ${error.text || 'Please try again later.'}`);
     }
   };
 
@@ -955,12 +1012,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
+
       {/* Trending Cities Section with Links */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -999,6 +1051,135 @@ const Home = () => {
                 </Link>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Premium Travel Quote Section */}
+      <section className="py-20 relative overflow-hidden min-h-[600px]">
+        {/* Background Image with Gradient Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{ 
+            backgroundImage: "url('https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')",
+            filter: "brightness(0.8)"
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 to-pink-700/40"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 h-full">
+          <div className="flex flex-col lg:flex-row items-center h-full">
+            {/* Content Section - Left Side */}
+            <div className="text-white p-8 lg:w-1/2 lg:pr-16">
+              <h1 className="text-5xl font-bold mb-8 leading-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-300 to-purple-300">
+                  World Tour Packages
+                </span>
+              </h1>
+              
+              <div className="space-y-8">
+                <div className="flex items-start transform hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex-shrink-0 bg-white/30 p-3 rounded-full mr-4 backdrop-blur-sm">
+                    <FaGlobe className="h-7 w-7 text-pink-200" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white drop-shadow-lg">200+ International Destinations</h3>
+                    <p className="text-pink-100 mt-2 text-lg">Explore the world's most breathtaking locations</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start transform hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex-shrink-0 bg-white/30 p-3 rounded-full mr-4 backdrop-blur-sm">
+                    <FaHotel className="h-7 w-7 text-pink-200" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white drop-shadow-lg">Luxury Accommodations</h3>
+                    <p className="text-pink-100 mt-2 text-lg">Stay at the finest hotels and resorts worldwide</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start transform hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex-shrink-0 bg-white/30 p-3 rounded-full mr-4 backdrop-blur-sm">
+                    <FaUmbrellaBeach className="h-7 w-7 text-pink-200" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white drop-shadow-lg">Custom Experiences</h3>
+                    <p className="text-pink-100 mt-2 text-lg">Tailored itineraries for your dream vacation</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating Form - Right Side (Shifted Right) */}
+            <div className="w-full lg:w-[480px] px-4 mt-8 lg:mt-0 lg:ml-20">
+              <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/20 p-8 transform hover:shadow-3xl transition-all duration-500">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                    Get Free Quotes
+                  </h2>
+                  <p className="text-gray-600 mt-3 text-base">Let our travel experts craft your perfect vacation</p>
+                </div>
+                
+                <form ref={quotesFormRef} onSubmit={handleQuotesSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                    <input 
+                      type="text" 
+                      name="name"
+                      value={quotesFormData.name}
+                      onChange={handleQuotesInputChange}
+                      className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                      placeholder="Your name"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                    <input 
+                      type="email" 
+                      name="email"
+                      value={quotesFormData.email}
+                      onChange={handleQuotesInputChange}
+                      className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                      placeholder="Your email"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                    <input 
+                      type="tel" 
+                      name="phone"
+                      value={quotesFormData.phone}
+                      onChange={handleQuotesInputChange}
+                      className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                      placeholder="Your phone"
+                      required
+                    />
+                  </div>
+
+                
+                  
+                  
+                  
+                  {quotesFormSubmitted ? (
+                    <div className="bg-green-100 text-green-700 p-3 rounded-lg text-center">
+                      Thank you! We've received your inquiry and will contact you shortly.
+                    </div>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+                    >
+                      GET FREE QUOTE →
+                    </button>
+                  )}
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </section>
