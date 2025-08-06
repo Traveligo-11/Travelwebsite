@@ -1,99 +1,133 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  FaTaxi, 
-  FaSearch, 
-  FaCalendarAlt, 
-  FaUser, 
-  FaPhone, 
-  FaEnvelope, 
+  FaCar, 
+  FaExchangeAlt,
+  FaCalendarAlt,
+  FaUser,
+  FaSearch,
+  FaPhone,
+  FaEnvelope,
   FaUserTie,
   FaStar,
-  FaExchangeAlt,
-  FaTimes,
   FaCheck,
-  FaHeart,
   FaMapMarkerAlt,
   FaUsers,
-  FaCar,
-  FaUmbrellaBeach,
-  FaHotel,
-  FaSuitcaseRolling,
-  FaGlobeAmericas,
   FaHeadset,
   FaRegSmileWink,
   FaArrowRight,
   FaPaperPlane,
   FaArrowLeft,
-  FaRoad,
-  FaTicketAlt,
-  FaWifi,
-  FaSnowflake,
-  FaTv,
-  FaCoffee,
-  FaShieldAlt,
-  FaClock,
-  FaMoneyBillWave
+  FaHeart,
+  FaGlobeAmericas,
+  FaUmbrellaBeach,
+  FaCity,
+  FaMountain,
+  FaChevronDown,
+  FaChevronUp,
+  FaPlus,
+  FaMinus,
+  FaTrash,
+  FaTaxi,
+  FaSuitcase
 } from 'react-icons/fa';
-import { IoRocketSharp } from 'react-icons/io5';
-import emailjs from '@emailjs/browser';
 import { motion } from 'framer-motion';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import emailjs from '@emailjs/browser';
 
-const CabBooking = () => {
-  const [tripType, setTripType] = useState('oneWay');
-  const [fromLocation, setFromLocation] = useState('Delhi Airport');
-  const [toLocation, setToLocation] = useState('Connaught Place');
-  const [pickupDate, setPickupDate] = useState('');
-  const [pickupTime, setPickupTime] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [passengers, setPassengers] = useState(1);
+const Cab = () => {
+  // Initialize EmailJS
+  useEffect(() => {
+    emailjs.init('127OFHb2IQq0zSiFJ');
+  }, []);
+
+  const [tripType, setTripType] = useState('ONE WAY');
+  const [pickupLocation, setPickupLocation] = useState('Delhi Airport (DEL)');
+  const [dropLocation, setDropLocation] = useState('Connaught Place, Delhi');
+  const [pickupDate, setPickupDate] = useState(new Date());
+  const [returnDate, setReturnDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
+  const [passengerCount, setPassengerCount] = useState(1);
+  const [luggageCount, setLuggageCount] = useState(1);
   const [cabType, setCabType] = useState('Sedan');
+  const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [formError, setFormError] = useState('');
-  const [isHovered, setIsHovered] = useState(false);
-  
+  const [multiCityTrips, setMultiCityTrips] = useState([
+    { pickup: 'Delhi Airport (DEL)', drop: 'Connaught Place, Delhi', date: new Date() },
+    { pickup: 'Connaught Place, Delhi', drop: 'Aerocity, Delhi', date: new Date(new Date().setDate(new Date().getDate() + 1)) }
+  ]);
+
   const [requestData, setRequestData] = useState({
-    name: 'John Doe',
-    email: 'your@email.com',
-    phone: '+91 9876543210',
-    fromLocation: 'Delhi Airport',
-    toLocation: 'Connaught Place',
-    pickupDate: '',
-    pickupTime: '',
-    returnDate: '',
+    name: '',
+    email: '',
+    phone: '',
+    tripType: 'ONE WAY',
+    trips: [],
     passengers: 1,
+    luggage: 1,
     cabType: 'Sedan',
     specialRequests: ''
   });
 
   const locations = [
-    'Delhi Airport', 'Connaught Place', 'New Delhi Railway Station', 
-    'Aerocity', 'Gurgaon', 'Noida', 'Greater Noida', 
-    'Dwarka', 'Paharganj', 'Karol Bagh'
+    'Delhi Airport (DEL) - Indira Gandhi International Airport',
+    'Connaught Place, Delhi - Central Business District',
+    'Aerocity, Delhi - Hotel District near Airport',
+    'Gurugram, Haryana - Cyber City',
+    'Noida, Uttar Pradesh - Sector 18',
+    'Chandni Chowk, Delhi - Old Delhi Market',
+    'India Gate, Delhi - War Memorial'
   ];
 
   const cabTypes = [
-    { type: 'Sedan', icon: <FaCar className="text-blue-500" />, capacity: '3-4 passengers' },
-    { type: 'SUV', icon: <FaCar className="text-green-500" />, capacity: '5-7 passengers' },
-    { type: 'Luxury', icon: <FaCar className="text-purple-500" />, capacity: '3-4 passengers' },
-    { type: 'Mini', icon: <FaCar className="text-yellow-500" />, capacity: '3 passengers' },
-    { type: 'Tempo Traveller', icon: <FaCar className="text-red-500" />, capacity: '9-12 passengers' }
+    { type: 'Hatchback', capacity: '3 passengers, 2 suitcases', price: '₹12/km' },
+    { type: 'Sedan', capacity: '4 passengers, 3 suitcases', price: '₹15/km' },
+    { type: 'SUV', capacity: '6 passengers, 4 suitcases', price: '₹20/km' },
+    { type: 'Premium', capacity: '4 passengers, 3 suitcases', price: '₹25/km' },
+    { type: 'Luxury', capacity: '4 passengers, 3 suitcases', price: '₹35/km' },
+    { type: 'Tempo Traveller', capacity: '12 passengers, 10 suitcases', price: '₹40/km' }
   ];
 
-  useEffect(() => {
-    emailjs.init('37pN2ThzFwwhwk7ai');
-  }, []);
+  const popularDestinations = [
+    { name: 'Airport Transfers', icon: <FaTaxi className="text-amber-400" />, bg: 'bg-gradient-to-br from-amber-100 to-amber-50' },
+    { name: 'City Tours', icon: <FaCity className="text-blue-400" />, bg: 'bg-gradient-to-br from-blue-100 to-blue-50' },
+    { name: 'Outstation Trips', icon: <FaGlobeAmericas className="text-emerald-400" />, bg: 'bg-gradient-to-br from-emerald-100 to-emerald-50' },
+    { name: 'Wedding Events', icon: <FaHeart className="text-pink-400" />, bg: 'bg-gradient-to-br from-pink-100 to-pink-50' },
+  ];
+
+  const formatDate = (date) => {
+    const options = { day: 'numeric', month: 'short', weekday: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleDateString('en-US', options).replace(',', '');
+  };
+
+  const handleHeroAction = (actionType) => {
+    setShowRequestForm(true);
+    
+    if (actionType === 'bestPrices') {
+      setRequestData(prev => ({
+        ...prev,
+        cabType: 'Sedan',
+        specialRequests: 'Interested in best price deals'
+      }));
+    } else if (actionType === 'expertSupport') {
+      setRequestData(prev => ({
+        ...prev,
+        specialRequests: 'Need expert travel assistance'
+      }));
+    } else if (actionType === 'exclusiveDeals') {
+      setRequestData(prev => ({
+        ...prev,
+        specialRequests: 'Interested in exclusive deals'
+      }));
+    }
+  };
 
   const handleSwapLocations = () => {
-    const temp = fromLocation;
-    setFromLocation(toLocation);
-    setToLocation(temp);
-    setRequestData(prev => ({
-      ...prev,
-      fromLocation: toLocation,
-      toLocation: fromLocation
-    }));
+    const temp = pickupLocation;
+    setPickupLocation(dropLocation);
+    setDropLocation(temp);
   };
 
   const handleRequestSubmit = async (e) => {
@@ -101,57 +135,88 @@ const CabBooking = () => {
     setIsSubmitting(true);
     setFormError('');
 
-    if (!requestData.name || !requestData.email || !requestData.phone || !requestData.pickupDate || !requestData.pickupTime) {
+    if (!requestData.name || !requestData.email || !requestData.phone) {
       setFormError('Please fill in all required fields');
       setIsSubmitting(false);
       return;
     }
 
-    try {
-      const templateParams = {
-        from_name: requestData.name,
-        from_email: requestData.email,
-        phone_number: requestData.phone,
-        from_location: requestData.fromLocation,
-        to_location: requestData.toLocation,
-        pickup_date: requestData.pickupDate,
-        pickup_time: requestData.pickupTime,
-        return_date: requestData.returnDate || 'One Way Trip',
-        passengers: requestData.passengers,
-        cab_type: requestData.cabType,
-        special_requests: requestData.specialRequests || 'None',
-        reply_to: requestData.email
-      };
+    // Prepare trip data based on trip type
+    let tripsData = [];
+    if (tripType === 'MULTICITY') {
+      tripsData = multiCityTrips.map(trip => ({
+        pickup: trip.pickup.split(' - ')[0],
+        drop: trip.drop.split(' - ')[0],
+        date: formatDate(trip.date)
+      }));
+    } else {
+      tripsData = [{
+        pickup: pickupLocation.split(' - ')[0],
+        drop: dropLocation.split(' - ')[0],
+        date: formatDate(pickupDate)
+      }];
+      if (tripType === 'ROUNDTRIP') {
+        tripsData.push({
+          pickup: dropLocation.split(' - ')[0],
+          drop: pickupLocation.split(' - ')[0],
+          date: formatDate(returnDate)
+        });
+      }
+    }
 
-      await emailjs.send(
-        'service_ov629rm',
-        'template_jr1dnto',
-        templateParams
+    // Generate a unique request ID
+    const requestId = `CAB-${Date.now().toString().slice(-6)}`;
+
+    // Prepare email template parameters
+    const emailParams = {
+      from_name: requestData.name,
+      from_email: requestData.email,
+      phone_number: requestData.phone,
+      trip_type: tripType,
+      passenger_count: passengerCount,
+      luggage_count: luggageCount,
+      cab_type: cabType,
+      special_requests: requestData.specialRequests || 'No special requests provided',
+      trip_details: tripType === 'MULTICITY' ? 
+        tripsData.map((trip, index) => `• Trip ${index + 1}: ${trip.pickup} → ${trip.drop} on ${trip.date}`) :
+        tripsData.map(trip => `• ${trip.pickup} → ${trip.drop} on ${trip.date}`),
+      trips: tripsData,
+      submission_date: new Date().toLocaleString(),
+      request_id: requestId
+    };
+
+    try {
+      // Send email using EmailJS
+      const response = await emailjs.send(
+        'service_9jzlq6q', // Your service ID
+        'template_mwwf2lg', // Your template ID
+        emailParams
       );
 
-      setSubmitSuccess(true);
-      setTimeout(() => {
-        setShowRequestForm(false);
-        setSubmitSuccess(false);
-      }, 3000);
-
-      setRequestData({
-        name: 'John Doe',
-        email: 'your@email.com',
-        phone: '+91 9876543210',
-        fromLocation: 'Delhi Airport',
-        toLocation: 'Connaught Place',
-        pickupDate: '',
-        pickupTime: '',
-        returnDate: '',
-        passengers: 1,
-        cabType: 'Sedan',
-        specialRequests: ''
-      });
-
+      if (response.status === 200) {
+        setSubmitSuccess(true);
+        setTimeout(() => {
+          setShowRequestForm(false);
+          setSubmitSuccess(false);
+          // Reset form
+          setRequestData({
+            name: '',
+            email: '',
+            phone: '',
+            tripType: 'ONE WAY',
+            trips: [],
+            passengers: 1,
+            luggage: 1,
+            cabType: 'Sedan',
+            specialRequests: ''
+          });
+        }, 3000);
+      } else {
+        throw new Error('Email sending failed');
+      }
     } catch (error) {
-      console.error('Failed to send email:', error);
-      setFormError('Failed to submit request. Please try again later.');
+      console.error('Failed to submit request:', error);
+      setFormError('Failed to submit request. Please try again later or contact support.');
     } finally {
       setIsSubmitting(false);
     }
@@ -163,6 +228,56 @@ const CabBooking = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handlePassengerCountChange = (count) => {
+    setPassengerCount(Math.max(1, count));
+  };
+
+  const handleLuggageCountChange = (count) => {
+    setLuggageCount(Math.max(0, count));
+  };
+
+  const handleCabTypeChange = (selectedCabType) => {
+    setCabType(selectedCabType);
+    setShowPassengerDropdown(false);
+  };
+
+  const handleDateChange = (date, isReturn = false) => {
+    if (isReturn) {
+      setReturnDate(date);
+    } else {
+      setPickupDate(date);
+    }
+  };
+
+  // Multi-city functions
+  const addMultiCityTrip = () => {
+    setMultiCityTrips([...multiCityTrips, { 
+      pickup: '', 
+      drop: '', 
+      date: new Date(new Date().setDate(new Date().getDate() + multiCityTrips.length)) 
+    }]);
+  };
+
+  const removeMultiCityTrip = (index) => {
+    if (multiCityTrips.length > 1) {
+      const updatedTrips = [...multiCityTrips];
+      updatedTrips.splice(index, 1);
+      setMultiCityTrips(updatedTrips);
+    }
+  };
+
+  const handleMultiCityChange = (index, field, value) => {
+    const updatedTrips = [...multiCityTrips];
+    updatedTrips[index][field] = value;
+    setMultiCityTrips(updatedTrips);
+  };
+
+  const handleMultiCityDateChange = (date, index) => {
+    const updatedTrips = [...multiCityTrips];
+    updatedTrips[index].date = date;
+    setMultiCityTrips(updatedTrips);
   };
 
   // Animation variants
@@ -204,378 +319,752 @@ const CabBooking = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Hero Section */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-8 md:p-12 mb-12 text-white overflow-hidden shadow-2xl"
-      >
-        <div className="absolute inset-0 bg-white opacity-10"></div>
-        <div className="absolute -right-20 -top-20 w-96 h-96 bg-blue-400 rounded-full opacity-20"></div>
-        <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-purple-300 rounded-full opacity-20"></div>
-        
-        {/* Floating elements */}
-        <div className="absolute top-1/4 left-10 opacity-10">
-          <FaTaxi className="text-white text-6xl animate-float" />
-        </div>
-        <div className="absolute bottom-1/3 right-20 opacity-10">
-          <FaCar className="text-white text-5xl animate-float-delay" />
-        </div>
-        
-        <div className="relative z-10 text-center">
-          <motion.div 
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center bg-white bg-opacity-30 px-6 py-2 rounded-full mb-6 shadow-lg"
-          >
-            <FaHeart className="mr-2 text-pink-300 animate-pulse" />
-            <span className="text-sm font-bold text-white">Most Popular Cab Service</span>
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white"
-          >
-            Book Your Premium Cab
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-light"
-          >
-            Experience <span className="font-semibold">hassle-free rides</span> with our professional cab services
-          </motion.p>
-          
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-wrap justify-center gap-6"
-          >
-            {[
-              { 
-                icon: <FaShieldAlt className="mr-2 text-2xl text-yellow-300" />, 
-                text: "Safe & Secure",
-                bg: "bg-gradient-to-r from-yellow-500 to-yellow-600"
-              },
-              { 
-                icon: <FaClock className="mr-2 text-2xl text-blue-200" />, 
-                text: "On-Time Service",
-                bg: "bg-gradient-to-r from-blue-500 to-blue-600"
-              },
-              { 
-                icon: <FaMoneyBillWave className="mr-2 text-2xl text-purple-200" />, 
-                text: "Best Prices",
-                bg: "bg-gradient-to-r from-purple-500 to-purple-600"
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className={`flex items-center ${item.bg} px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer group`}
-                whileHover={{ y: -5, scale: 1.05 }}
-              >
-                <div className="group-hover:animate-pulse">
-                  {item.icon}
-                </div>
-                <span className="font-bold text-white text-lg">{item.text}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Search Section */}
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-100 rounded-full opacity-10 animate-float-delay"></div>
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-purple-100 rounded-full opacity-10 animate-float"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-56 h-56 bg-pink-100 rounded-full opacity-10 animate-float-delay-2"></div>
+      </div>
+     
+      {/* Search Section - Top */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-16 relative overflow-hidden border-2 border-pink-100 hover:shadow-3xl transition-all duration-300"
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-2xl shadow-xl p-8 mb-12 border border-gray-100"
       >
-        <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold px-8 py-3 rounded-full shadow-lg z-10 flex items-center">
-          <FaTaxi className="mr-3" />
-          <span className="text-lg">Find Your Perfect Cab</span>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+            <FaCar className="text-blue-500 mr-3" />
+            Book Your Perfect Cab Journey
+          </h2>
         </div>
         
-        {/* Decorative elements */}
-        <div className="absolute top-10 right-10 opacity-10">
-          <FaTaxi className="text-pink-300 text-6xl animate-float" />
-        </div>
-        <div className="absolute bottom-10 left-10 opacity-10">
-          <FaRoad className="text-blue-300 text-6xl" />
-        </div>
-        
-        <div className="flex flex-wrap justify-center gap-4 mb-8 mt-8">
-          {[
-            { type: 'oneWay', label: 'One Way', icon: <FaArrowRight className="mr-2" /> },
-            { type: 'round', label: 'Round Trip', icon: <FaExchangeAlt className="mr-2" /> },
-            { type: 'hourly', label: 'Hourly Rental', icon: <FaClock className="mr-2" /> }
-          ].map((option) => (
+        {/* Trip Type Tabs */}
+        <div className="flex border-b-2 border-gray-200 mb-8">
+          {['ONE WAY', 'ROUNDTRIP', 'MULTICITY'].map((type) => (
             <motion.button
-              key={option.type}
-              className={`flex items-center px-8 py-3 rounded-full transition-all text-lg font-medium ${tripType === option.type ? 
-                'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg' : 
-                'bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 border border-gray-200'}`}
-              onClick={() => setTripType(option.type)}
-              whileHover={{ scale: 1.05 }}
+              key={type}
               whileTap={{ scale: 0.95 }}
+              className={`pb-3 px-6 font-medium text-lg relative ${tripType === type ? 'text-blue-600' : 'text-gray-500 hover:text-blue-500'}`}
+              onClick={() => setTripType(type)}
             >
-              {option.icon}
-              <span>{option.label}</span>
+              {type}
+              {tripType === type && (
+                <motion.div 
+                  layoutId="underline"
+                  className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"
+                  initial={false}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
             </motion.button>
           ))}
         </div>
 
+        {/* Search Form */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          {/* From Location */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-              <FaMapMarkerAlt className="mr-2 text-pink-500" /> Pickup From
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-3 rounded-lg mr-4 group-hover:from-pink-200 group-hover:to-pink-300 transition-colors shadow-sm">
-                <FaTaxi className="text-pink-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={fromLocation}
-                onChange={(e) => {
-                  setFromLocation(e.target.value);
-                  setRequestData(prev => ({...prev, fromLocation: e.target.value}));
-                }}
+          {tripType !== 'MULTICITY' ? (
+            <>
+              {/* Pickup Location */}
+              <motion.div 
+                variants={itemVariants}
+                className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
               >
-                {locations.map(location => (
-                  <option key={location} value={location}>{location}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-
-          {/* Swap Button */}
-          <motion.div 
-            className="flex items-center justify-center"
-            variants={itemVariants}
-          >
-            <motion.button 
-              onClick={handleSwapLocations}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className="bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 p-5 rounded-full shadow-md transition-all text-pink-600 hover:text-pink-700"
-              aria-label="Swap locations"
-              whileHover={{ rotate: 180, scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <FaExchangeAlt className="text-2xl" />
-            </motion.button>
-          </motion.div>
-
-          {/* To Location */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-              <FaMapMarkerAlt className="mr-2 text-pink-500" /> Drop At
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-lg mr-4 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors shadow-sm">
-                <FaCar className="text-purple-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={toLocation}
-                onChange={(e) => {
-                  setToLocation(e.target.value);
-                  setRequestData(prev => ({...prev, toLocation: e.target.value}));
-                }}
-              >
-                {locations.map(location => (
-                  <option key={location} value={location}>{location}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-
-          {/* Pickup Date */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-              <FaCalendarAlt className="mr-2 text-pink-500" /> Pickup Date
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg mr-4 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors shadow-sm">
-                <FaCalendarAlt className="text-blue-600 text-xl" />
-              </div>
-              <input 
-                type="date" 
-                className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                value={pickupDate}
-                onChange={(e) => {
-                  setPickupDate(e.target.value);
-                  setRequestData(prev => ({...prev, pickupDate: e.target.value}));
-                }}
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-          </motion.div>
-
-          {/* Pickup Time */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-              <FaClock className="mr-2 text-pink-500" /> Pickup Time
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-lg mr-4 group-hover:from-green-200 group-hover:to-green-300 transition-colors shadow-sm">
-                <FaClock className="text-green-600 text-xl" />
-              </div>
-              <input 
-                type="time" 
-                className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                value={pickupTime}
-                onChange={(e) => {
-                  setPickupTime(e.target.value);
-                  setRequestData(prev => ({...prev, pickupTime: e.target.value}));
-                }}
-              />
-            </div>
-          </motion.div>
-
-          {/* Return Date */}
-          {tripType === 'round' && (
-            <motion.div 
-              variants={itemVariants}
-              className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-              whileHover={{ y: -5 }}
-            >
-              <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-                <FaCalendarAlt className="mr-2 text-pink-500" /> Return Date
-              </label>
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 p-3 rounded-lg mr-4 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-colors shadow-sm">
-                  <FaCalendarAlt className="text-yellow-600 text-xl" />
+                <label className="block text-sm font-bold text-blue-600 mb-2 items-center">
+                  <FaMapMarkerAlt className="text-blue-400 mr-2" />
+                  PICKUP LOCATION
+                </label>
+                <div className="flex items-center">
+                  <select 
+                    className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg"
+                    value={pickupLocation}
+                    onChange={(e) => setPickupLocation(e.target.value)}
+                  >
+                    {locations.map(location => (
+                      <option key={location} value={location.split(' - ')[0]}>{location}</option>
+                    ))}
+                  </select>
                 </div>
-                <input 
-                  type="date" 
-                  className="w-full outline-none bg-transparent font-bold text-gray-800 text-lg" 
-                  value={returnDate}
-                  onChange={(e) => {
-                    setReturnDate(e.target.value);
-                    setRequestData(prev => ({...prev, returnDate: e.target.value}));
-                  }}
-                  min={pickupDate || new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </motion.div>
+              </motion.div>
+
+              {/* Swap Button */}
+              <motion.div 
+                className="flex items-center justify-center md:justify-start md:mt-10"
+                variants={itemVariants}
+              >
+                <motion.button 
+                  onClick={handleSwapLocations}
+                  className="bg-white p-3 rounded-full hover:bg-gray-100 transition-colors shadow-md border border-gray-200"
+                  aria-label="Swap locations"
+                  whileHover={{ rotate: 180, scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <FaExchangeAlt className="text-blue-500 text-lg" />
+                </motion.button>
+              </motion.div>
+
+              {/* Drop Location */}
+              <motion.div 
+                variants={itemVariants}
+                className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
+              >
+                <label className="block text-sm font-bold text-blue-600 mb-2 items-center">
+                  <FaMapMarkerAlt className="text-blue-400 mr-2" />
+                  DROP LOCATION
+                </label>
+                <div className="flex items-center">
+                  <select 
+                    className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg"
+                    value={dropLocation}
+                    onChange={(e) => setDropLocation(e.target.value)}
+                  >
+                    {locations.map(location => (
+                      <option key={location} value={location.split(' - ')[0]}>{location}</option>
+                    ))}
+                  </select>
+                </div>
+              </motion.div>
+
+              {/* Pickup Date */}
+              <motion.div 
+                variants={itemVariants}
+                className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
+              >
+                <label className="block text-sm font-bold text-blue-600 mb-2 items-center">
+                  <FaCalendarAlt className="text-blue-400 mr-2" />
+                  PICKUP DATE & TIME
+                </label>
+                <div className="flex items-center">
+                  <DatePicker
+                    selected={pickupDate}
+                    onChange={(date) => handleDateChange(date)}
+                    minDate={new Date()}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={15}
+                    dateFormat="d MMM EEE, yyyy h:mm aa"
+                    className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg cursor-pointer"
+                    customInput={
+                      <div className="w-full cursor-pointer">
+                        {formatDate(pickupDate)}
+                      </div>
+                    }
+                  />
+                </div>
+              </motion.div>
+
+              {/* Return Date (conditional) */}
+              {tripType === 'ROUNDTRIP' && (
+                <motion.div 
+                  variants={itemVariants}
+                  className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50"
+                >
+                  <label className="block text-sm font-bold text-blue-600 mb-2 items-center">
+                    <FaCalendarAlt className="text-blue-400 mr-2" />
+                    RETURN DATE & TIME
+                  </label>
+                  <div className="flex items-center">
+                    <DatePicker
+                      selected={returnDate}
+                      onChange={(date) => handleDateChange(date, true)}
+                      minDate={pickupDate}
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      timeIntervals={15}
+                      dateFormat="d MMM EEE, yyyy h:mm aa"
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-lg cursor-pointer"
+                      customInput={
+                        <div className="w-full cursor-pointer">
+                          {formatDate(returnDate)}
+                        </div>
+                      }
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Add Return Date for ONE WAY */}
+              {tripType !== 'ROUNDTRIP' && (
+                <motion.div 
+                  variants={itemVariants}
+                  className="flex items-center col-span-1 md:col-span-2"
+                >
+                  <button 
+                    className="text-blue-600 font-medium flex items-center hover:text-blue-800 transition-colors text-lg"
+                    onClick={() => setTripType('ROUNDTRIP')}
+                  >
+                    + ADD RETURN TRIP
+                  </button>
+                  <span className="ml-3 text-base text-gray-500">Save more on round trips!</span>
+                </motion.div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Multi-city trips */}
+              <motion.div 
+                variants={itemVariants}
+                className="col-span-1 md:col-span-2 space-y-4"
+              >
+                {multiCityTrips.map((trip, index) => (
+                  <motion.div 
+                    key={index}
+                    variants={itemVariants}
+                    className="border-2 border-blue-100 rounded-xl p-5 bg-gradient-to-br from-white to-blue-50"
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-bold text-blue-600">Trip {index + 1}</h3>
+                      {multiCityTrips.length > 1 && (
+                        <button 
+                          onClick={() => removeMultiCityTrip(index)}
+                          className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors"
+                        >
+                          <FaTrash />
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Pickup Location */}
+                      <div>
+                        <label className="block text-sm font-bold text-blue-600 mb-2">Pickup</label>
+                        <select 
+                          className="w-full border-2 border-blue-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                          value={trip.pickup}
+                          onChange={(e) => handleMultiCityChange(index, 'pickup', e.target.value)}
+                        >
+                          <option value="">Select Location</option>
+                          {locations.map(location => (
+                            <option key={location} value={location.split(' - ')[0]}>{location}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Drop Location */}
+                      <div>
+                        <label className="block text-sm font-bold text-blue-600 mb-2">Drop</label>
+                        <select 
+                          className="w-full border-2 border-blue-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                          value={trip.drop}
+                          onChange={(e) => handleMultiCityChange(index, 'drop', e.target.value)}
+                        >
+                          <option value="">Select Location</option>
+                          {locations.map(location => (
+                            <option key={location} value={location.split(' - ')[0]}>{location}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Date */}
+                      <div>
+                        <label className="block text-sm font-bold text-blue-600 mb-2">Pickup Date & Time</label>
+                        <DatePicker
+                          selected={trip.date}
+                          onChange={(date) => handleMultiCityDateChange(date, index)}
+                          minDate={index === 0 ? new Date() : multiCityTrips[index-1]?.date}
+                          showTimeSelect
+                          timeFormat="HH:mm"
+                          timeIntervals={15}
+                          dateFormat="d MMM EEE, yyyy h:mm aa"
+                          className="w-full border-2 border-blue-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-300 focus:border-blue-300 font-medium text-gray-800 bg-white hover:bg-blue-50 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                <motion.button
+                  onClick={addMultiCityTrip}
+                  className="flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <FaPlus className="mr-2" />
+                  Add Another Trip
+                </motion.button>
+              </motion.div>
+            </>
           )}
 
-          {/* Passengers */}
+          {/* Traveller & Cab Type */}
           <motion.div 
             variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
+            className="border-2 rounded-xl p-5 hover:border-blue-400 transition-colors bg-gradient-to-br from-white to-blue-50 relative"
           >
-            <label className="block text-sm font-bold text-pink-600 mb-3  items-center">
-              <FaUsers className="mr-2 text-pink-500" /> Passengers
+            <label className="block text-sm font-bold text-blue-600 mb-2 items-center">
+              <FaUsers className="text-blue-400 mr-2" />
+              PASSENGERS & CAB TYPE
             </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-3 rounded-lg mr-4 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-colors shadow-sm">
-                <FaUser className="text-indigo-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={passengers}
-                onChange={(e) => {
-                  setPassengers(e.target.value);
-                  setRequestData(prev => ({...prev, passengers: e.target.value}));
-                }}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                  <option key={num} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
-                ))}
-              </select>
+            <div 
+              className="flex items-center justify-between cursor-pointer"
+              onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
+            >
+              <span className="font-bold text-gray-900 text-lg">
+                {passengerCount} {passengerCount > 1 ? 'Passengers' : 'Passenger'}, {luggageCount} {luggageCount !== 1 ? 'Luggage' : 'Luggage'}, {cabType}
+              </span>
+              {showPassengerDropdown ? (
+                <FaChevronUp className="text-gray-500" />
+              ) : (
+                <FaChevronDown className="text-gray-500" />
+              )}
             </div>
-          </motion.div>
 
-          {/* Cab Type */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-2 border-pink-100 rounded-xl p-5 hover:border-pink-300 transition-colors bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 group shadow-sm"
-            whileHover={{ y: -5 }}
-          >
-            <label className="block text-sm font-bold text-pink-600 mb-3 items-center">
-              <FaCar className="mr-2 text-pink-500" /> Cab Type
-            </label>
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-red-100 to-red-200 p-3 rounded-lg mr-4 group-hover:from-red-200 group-hover:to-red-300 transition-colors shadow-sm">
-                <FaTaxi className="text-red-600 text-xl" />
-              </div>
-              <select 
-                className="w-full outline-none bg-transparent appearance-none font-bold text-gray-800 text-lg"
-                value={cabType}
-                onChange={(e) => {
-                  setCabType(e.target.value);
-                  setRequestData(prev => ({...prev, cabType: e.target.value}));
-                }}
+            {/* Passenger Dropdown */}
+            {showPassengerDropdown && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-10 p-4"
               >
-                {cabTypes.map(cab => (
-                  <option key={cab.type} value={cab.type}>{cab.type}</option>
-                ))}
-              </select>
-            </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-blue-600 mb-2">Passengers</label>
+                  <div className="flex items-center justify-between">
+                    <button 
+                      className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors"
+                      onClick={() => handlePassengerCountChange(passengerCount - 1)}
+                      disabled={passengerCount <= 1}
+                    >
+                      <FaMinus />
+                    </button>
+                    <span className="font-bold">{passengerCount}</span>
+                    <button 
+                      className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors"
+                      onClick={() => handlePassengerCountChange(passengerCount + 1)}
+                      disabled={passengerCount >= 12}
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-blue-600 mb-2">Luggage</label>
+                  <div className="flex items-center justify-between">
+                    <button 
+                      className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors"
+                      onClick={() => handleLuggageCountChange(luggageCount - 1)}
+                      disabled={luggageCount <= 0}
+                    >
+                      <FaMinus />
+                    </button>
+                    <span className="font-bold">{luggageCount}</span>
+                    <button 
+                      className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors"
+                      onClick={() => handleLuggageCountChange(luggageCount + 1)}
+                      disabled={luggageCount >= 10}
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-blue-600 mb-2">Cab Type</label>
+                  <div className="space-y-2">
+                    {cabTypes.map((cab) => (
+                      <div 
+                        key={cab.type}
+                        className={`p-3 rounded-lg cursor-pointer ${cabType === cab.type ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
+                        onClick={() => handleCabTypeChange(cab.type)}
+                      >
+                        <div className="font-medium">{cab.type}</div>
+                        <div className="text-sm text-gray-600">{cab.capacity} • {cab.price}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </motion.div>
 
-        <motion.button 
-          onClick={() => setShowRequestForm(true)}
-          className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold py-5 px-6 rounded-xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-all group"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        {/* Search Button */}
+        <motion.div 
+          className="mt-10 flex flex-col md:flex-row items-center justify-between gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
         >
-          <FaSearch className="mr-3 text-xl group-hover:animate-bounce" /> 
-          <span className="text-xl">FIND CABS</span>
-        </motion.button>
+          <motion.button 
+            onClick={() => {
+              setShowRequestForm(true);
+              setRequestData(prev => ({
+                ...prev,
+                passengers: passengerCount,
+                luggage: luggageCount,
+                cabType: cabType
+              }));
+            }}
+            className="w-full md:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-5 px-10 rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center text-lg"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <FaSearch className="mr-3" />
+            SEARCH CABS
+          </motion.button>
+          
+          <div className="text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start">
+              <FaCheck className="text-green-500 mr-2" />
+              <span className="text-gray-600 font-medium">Best Price Guarantee</span>
+            </div>
+            <div className="flex items-center justify-center md:justify-start">
+              <FaCheck className="text-green-500 mr-2" />
+              <span className="text-gray-600 font-medium">24/7 Customer Support</span>
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
 
-      {/* Enhanced Request Form Modal */}
+      {/* Popular Destinations Section */}
+      <motion.section 
+        initial="offscreen"
+        whileInView="onscreen"
+        viewport={{ once: true, amount: 0.2 }}
+        className="mb-16"
+      >
+        <motion.h2 
+          variants={cardVariants}
+          className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800"
+        >
+          Popular <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Cab Services</span>
+        </motion.h2>
+        
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {popularDestinations.map((destination, index) => (
+            <motion.div
+              key={index}
+              variants={itemVariants}
+              className={`${destination.bg} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-gray-100 overflow-hidden relative group`}
+              whileHover={{ y: -10 }}
+            >
+              <div className="absolute -right-6 -top-6 opacity-20 group-hover:opacity-30 transition-opacity">
+                <FaCar className="text-gray-400 text-6xl rotate-45" />
+              </div>
+              <div className="flex items-center mb-4">
+                <div className="p-3 rounded-full bg-white shadow-sm mr-4">
+                  {destination.icon}
+                </div>
+                <h3 className="font-bold text-xl text-gray-800">{destination.name}</h3>
+              </div>
+              <div className="text-gray-600 mb-6">Starting from ₹999</div>
+              <button 
+                className="text-blue-600 font-medium flex items-center group-hover:text-blue-800 transition-colors"
+                onClick={() => {
+                  setShowRequestForm(true);
+                  setRequestData(prev => ({
+                    ...prev,
+                    specialRequests: `Interested in ${destination.name} service`
+                  }));
+                }}
+              >
+                Book now
+                <FaArrowRight className="ml-2 transition-transform group-hover:translate-x-1" />
+              </button>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.section>
+
+      {/* Hero Section - Below Search */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="relative rounded-3xl p-8 md:p-12 mb-16 overflow-hidden shadow-2xl"
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff758c 100%)'
+        }}
+      >
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10"></div>
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white rounded-full opacity-10 animate-float-delay"></div>
+          <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-white rounded-full opacity-10 animate-float"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-56 h-56 bg-white rounded-full opacity-10 animate-float-delay-2"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <motion.div 
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full mb-8 shadow-lg border border-white/20"
+          >
+            <FaHeart className="mr-2 text-pink-300 animate-pulse" />
+            <span className="text-sm font-bold text-white drop-shadow-md">MOST POPULAR CAB SERVICE</span>
+          </motion.div>
+          
+          <div className="flex flex-col lg:flex-row items-center">
+            <div className="lg:w-1/2 mb-10 lg:mb-0">
+              <motion.h1 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+                style={{
+                  background: 'linear-gradient(to right, #f9d423, #ff4e50)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }}
+              >
+                Your Comfortable Ride Awaits
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-xl md:text-2xl mb-8 font-medium max-w-lg"
+                style={{
+                  color: 'rgba(255,255,255,0.9)',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                }}
+              >
+                Experience <span className="font-bold text-white">hassle-free travel</span> with our premium cab services and personalized support
+              </motion.p>
+              
+              <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-wrap gap-4"
+              >
+                {[
+                  { 
+                    icon: <FaCar className="mr-2 text-2xl animate-bounce" style={{ color: '#f9d423' }} />, 
+                    text: "Best Prices Guaranteed",
+                    bg: "bg-gradient-to-r from-yellow-400 to-yellow-500",
+                    action: "bestPrices"
+                  },
+                  { 
+                    icon: <FaUserTie className="mr-2 text-2xl" style={{ color: '#a5b4fc' }} />, 
+                    text: "24/7 Expert Support",
+                    bg: "bg-gradient-to-r from-indigo-400 to-indigo-500",
+                    action: "expertSupport"
+                  },
+                  { 
+                    icon: <FaStar className="mr-2 text-2xl" style={{ color: '#f472b6' }} />, 
+                    text: "Exclusive Deals",
+                    bg: "bg-gradient-to-r from-pink-400 to-pink-500",
+                    action: "exclusiveDeals"
+                  }
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className={`flex items-center ${item.bg} px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer group`}
+                    whileHover={{ y: -5, scale: 1.05 }}
+                    onClick={() => handleHeroAction(item.action)}
+                    style={{
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.2)'
+                    }}
+                  >
+                    <div className="group-hover:animate-pulse">
+                      {item.icon}
+                    </div>
+                    <span className="font-bold text-white text-lg">{item.text}</span>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+            
+            <div className="lg:w-1/2 lg:pl-12">
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+                className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border-2 border-white/20"
+              >
+                <h3 className="text-2xl font-bold mb-6 text-white">Why Choose Our Cab Service?</h3>
+                
+                <div className="space-y-6">
+                  {[
+                    {
+                      icon: <FaCar className="text-xl" style={{ color: '#93c5fd' }} />,
+                      title: "500+ Vehicles",
+                      description: "Wide selection of well-maintained cabs for all your needs",
+                      color: "text-blue-300"
+                    },
+                    {
+                      icon: <FaSuitcase className="text-xl" style={{ color: '#c4b5fd' }} />,
+                      title: "Luggage Assistance",
+                      description: "Our drivers will help with your luggage for a stress-free experience",
+                      color: "text-purple-300"
+                    },
+                    {
+                      icon: <FaHeadset className="text-xl" style={{ color: '#f9a8d4' }} />,
+                      title: "Dedicated Support",
+                      description: "Personal travel assistant available throughout your journey",
+                      color: "text-pink-300"
+                    }
+                  ].map((feature, index) => (
+                    <motion.div 
+                      key={index}
+                      className="flex items-start"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className={`p-3 rounded-lg bg-white/20 mr-4 ${feature.color}`}>
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h4 className={`font-bold text-lg mb-1 ${feature.color}`}>{feature.title}</h4>
+                        <p className="text-white/80">{feature.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-pink-500 text-white font-bold py-4 px-6 rounded-xl mt-8 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                  onClick={() => setShowRequestForm(true)}
+                  style={{
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.3)'
+                  }}
+                >
+                  <FaPaperPlane className="mr-3" />
+                  Request Custom Itinerary
+                </motion.button>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Benefits Section */}
+      <motion.section 
+        initial="offscreen"
+        whileInView="onscreen"
+        viewport={{ once: true, amount: 0.2 }}
+        className="mb-20"
+      >
+        <motion.h2 
+          variants={cardVariants}
+          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
+        >
+          Why Choose <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Our Cab Service</span>
+        </motion.h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <FaCar className="text-4xl text-blue-500" />,
+              title: "Affordable Pricing",
+              description: "Competitive rates with no hidden charges for all types of cabs",
+              bg: "bg-gradient-to-br from-blue-50 to-white",
+              border: "border-blue-200",
+              features: [
+                "Transparent pricing",
+                "No surge pricing",
+                "Multiple payment options"
+              ],
+              color: "text-blue-500"
+            },
+            {
+              icon: <FaUserTie className="text-4xl text-purple-500" />,
+              title: "Professional Drivers",
+              description: "Experienced, verified drivers with excellent local knowledge",
+              bg: "bg-gradient-to-br from-purple-50 to-white",
+              border: "border-purple-200",
+              features: [
+                "Well-trained professionals",
+                "Punctual and courteous",
+                "Verified background checks"
+              ],
+              color: "text-purple-500"
+            },
+            {
+              icon: <FaHeadset className="text-4xl text-pink-500" />,
+              title: "24/7 Customer Support",
+              description: "Assistance available anytime, anywhere during your journey",
+              bg: "bg-gradient-to-br from-pink-50 to-white",
+              border: "border-pink-200",
+              features: [
+                "Instant booking modifications",
+                "Emergency assistance",
+                "Real-time tracking"
+              ],
+              color: "text-pink-500"
+            }
+          ].map((benefit, index) => (
+            <motion.div 
+              key={index}
+              variants={cardVariants}
+              className={`${benefit.bg} rounded-3xl shadow-xl p-8 flex flex-col items-center text-center border-2 ${benefit.border} hover:shadow-2xl transition-all h-full relative overflow-hidden group`}
+              whileHover={{ y: -10 }}
+            >
+              <div className="absolute -right-10 -top-10 opacity-10 group-hover:opacity-20 transition-opacity">
+                <FaCar className="text-gray-800 text-6xl rotate-45" />
+              </div>
+              <div className={`p-5 rounded-full mb-6 ${benefit.bg} border-2 ${benefit.border} group-hover:scale-110 transition-transform`}>
+                {benefit.icon}
+              </div>
+              <h3 className={`font-bold text-2xl mb-4 ${benefit.color}`}>{benefit.title}</h3>
+              <p className="text-gray-600 mb-6">{benefit.description}</p>
+              
+              <div className="w-full mb-6">
+                {benefit.features.map((feature, i) => (
+                  <div key={i} className="flex items-center mb-2 text-left">
+                    <FaCheck className="text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-3 px-8 rounded-xl shadow hover:shadow-md transition-all"
+                onClick={() => {
+                  setShowRequestForm(true);
+                  if (index === 0) handleHeroAction('bestPrices');
+                  else if (index === 1) handleHeroAction('expertSupport');
+                  else handleHeroAction('exclusiveDeals');
+                }}
+              >
+                Book Now
+              </motion.button>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Request Form Modal */}
       {showRequestForm && (
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 backdrop-blur-md"
+          className="fixed inset-0 flex items-center justify-center p-4 z-50"
         >
+          {/* Background overlay with attractive gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 opacity-90 backdrop-blur-sm"></div>
+          
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-3xl shadow-3xl max-w-md w-full overflow-hidden relative border-4 border-pink-100"
+            className="relative bg-white rounded-3xl shadow-3xl max-w-2xl w-full overflow-hidden border-4 border-white border-opacity-30 z-10"
           >
             {submitSuccess ? (
-              <div className="p-8 text-center bg-gradient-to-b from-white to-pink-50">
+              <div className="p-8 text-center bg-gradient-to-b from-white to-blue-50">
                 <motion.div 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -590,7 +1079,7 @@ const CabBooking = () => {
                     setShowRequestForm(false);
                     setSubmitSuccess(false);
                   }}
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -600,188 +1089,223 @@ const CabBooking = () => {
             ) : (
               <>
                 <div className="relative overflow-hidden">
-                  {/* Beautiful Animated Background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 opacity-90">
-                    <div className="absolute top-0 left-0 w-full h-full">
-                      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-float-delay"></div>
-                      <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-purple-200 rounded-full opacity-20 animate-float"></div>
-                      <div className="absolute bottom-1/4 left-1/3 w-28 h-28 bg-pink-200 rounded-full opacity-20 animate-float-delay-2"></div>
-                      <div className="absolute bottom-1/3 right-1/4 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-float"></div>
-                    </div>
-                  </div>
-                  
-                  {/* Header with Back Button */}
+                  {/* Form header with attractive gradient */}
                   <div className="relative bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-8 text-white">
                     <div className="absolute inset-0 bg-white opacity-10"></div>
                     <div className="relative z-10 flex items-center">
                       <motion.button 
                         onClick={() => setShowRequestForm(false)}
-                        className="mr-4 text-white hover:text-pink-200 transition-colors"
+                        className="mr-4 text-white hover:text-blue-200 transition-colors"
                         whileHover={{ x: -5 }}
                       >
                         <FaArrowLeft className="text-2xl" />
                       </motion.button>
                       <div>
-                        <h2 className="text-3xl font-bold">Cab Request Details</h2>
+                        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white">
+                          Cab Request Details
+                        </h2>
                         <p className="text-lg opacity-90 mt-2">Complete your information to get the best deals</p>
                       </div>
                     </div>
                   </div>
                   
-                  <form onSubmit={handleRequestSubmit} className="relative p-8 bg-white bg-opacity-90 backdrop-blur-sm">
-                    {formError && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg"
-                      >
-                        <p className="font-medium">{formError}</p>
-                      </motion.div>
-                    )}
-                    
-                    <div className="space-y-6">
-                      {/* Name Field */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Full Name*</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaUser className="text-pink-400 text-lg group-hover:text-pink-500 transition-colors" />
-                          </div>
-                          <input
-                            type="text"
-                            name="name"
-                            value={requestData.name}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                            required
-                            placeholder="John Doe"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Email Field */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Email*</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaEnvelope className="text-pink-400 text-lg group-hover:text-pink-500 transition-colors" />
-                          </div>
-                          <input
-                            type="email"
-                            name="email"
-                            value={requestData.email}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                            required
-                            placeholder="your@email.com"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Phone Field */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Phone Number*</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaPhone className="text-pink-400 text-lg group-hover:text-pink-500 transition-colors" />
-                          </div>
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={requestData.phone}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                            required
-                            placeholder="+91 9876543210"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Cab Details */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                          <label className="block text-sm font-bold text-blue-600 mb-2">Pickup From</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaMapMarkerAlt className="text-blue-400 mr-2" />
-                            {requestData.fromLocation}
-                          </div>
-                        </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl border border-purple-100 shadow-sm">
-                          <label className="block text-sm font-bold text-purple-600 mb-2">Drop At</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaMapMarkerAlt className="text-purple-400 mr-2" />
-                            {requestData.toLocation}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-xl border border-pink-100 shadow-sm">
-                          <label className="block text-sm font-bold text-pink-600 mb-2">Pickup Date</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaCalendarAlt className="text-pink-400 mr-2" />
-                            {requestData.pickupDate || 'Not specified'}
-                          </div>
-                        </div>
-                        <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-100 shadow-sm">
-                          <label className="block text-sm font-bold text-green-600 mb-2">Pickup Time</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaClock className="text-green-400 mr-2" />
-                            {requestData.pickupTime || 'Not specified'}
-                          </div>
-                        </div>
-                      </div>
-
-                      {tripType === 'round' && (
-                        <div className="bg-gradient-to-br from-yellow-50 to-white p-4 rounded-xl border border-yellow-100 shadow-sm">
-                          <label className="block text-sm font-bold text-yellow-600 mb-2">Return Date</label>
-                          <div className="font-medium text-gray-800 flex items-center">
-                            <FaCalendarAlt className="text-yellow-400 mr-2" />
-                            {requestData.returnDate || 'Not specified'}
-                          </div>
-                        </div>
+                  <form onSubmit={handleRequestSubmit} className="relative">
+                    <div className="max-h-[70vh] overflow-y-auto p-8">
+                      {formError && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg"
+                        >
+                          <p className="font-medium">{formError}</p>
+                        </motion.div>
                       )}
+                      
+                      <div className="space-y-6">
+                        {/* Trip Summary */}
+                        <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl border-2 border-blue-100 shadow-sm mb-6">
+                          <h3 className="text-xl font-bold text-blue-600 mb-4">Your Trip Details</h3>
+                          
+                          {tripType === 'MULTICITY' ? (
+                            <div className="space-y-4">
+                              {multiCityTrips.map((trip, index) => (
+                                <div key={index} className="border-2 border-blue-100 rounded-lg p-4 bg-white">
+                                  <div className="flex justify-between items-center mb-3">
+                                    <h4 className="font-bold text-blue-600">Trip {index + 1}</h4>
+                                    {multiCityTrips.length > 1 && (
+                                      <button 
+                                        type="button"
+                                        onClick={() => removeMultiCityTrip(index)}
+                                        className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div>
+                                      <div className="text-sm font-medium text-gray-500 mb-1">Pickup</div>
+                                      <div className="font-medium text-gray-800">
+                                        {trip.pickup || 'Not selected'}
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div className="text-sm font-medium text-gray-500 mb-1">Drop</div>
+                                      <div className="font-medium text-gray-800">
+                                        {trip.drop || 'Not selected'}
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div className="text-sm font-medium text-gray-500 mb-1">Date</div>
+                                      <div className="font-medium text-gray-800">
+                                        {trip.date ? formatDate(trip.date) : 'Not selected'}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-sm font-medium text-gray-500 mb-1">Pickup</div>
+                                <div className="font-medium text-gray-800 flex items-center">
+                                  <FaMapMarkerAlt className="text-blue-400 mr-2" />
+                                  {pickupLocation.split(' - ')[0]}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-500 mb-1">Drop</div>
+                                <div className="font-medium text-gray-800 flex items-center">
+                                  <FaMapMarkerAlt className="text-purple-400 mr-2" />
+                                  {dropLocation.split(' - ')[0]}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-500 mb-1">Pickup Time</div>
+                                <div className="font-medium text-gray-800 flex items-center">
+                                  <FaCalendarAlt className="text-pink-400 mr-2" />
+                                  {formatDate(pickupDate)}
+                                </div>
+                              </div>
+                              {tripType === 'ROUNDTRIP' && (
+                                <div>
+                                  <div className="text-sm font-medium text-gray-500 mb-1">Return Time</div>
+                                  <div className="font-medium text-gray-800 flex items-center">
+                                    <FaCalendarAlt className="text-green-400 mr-2" />
+                                    {formatDate(returnDate)}
+                                  </div>
+                                </div>
+                              )}
+                              <div>
+                                <div className="text-sm font-medium text-gray-500 mb-1">Passengers</div>
+                                <div className="font-medium text-gray-800 flex items-center">
+                                  <FaUsers className="text-amber-400 mr-2" />
+                                  {passengerCount}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-500 mb-1">Cab Type</div>
+                                <div className="font-medium text-gray-800 flex items-center">
+                                  <FaCar className="text-indigo-400 mr-2" />
+                                  {cabType}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
-                      {/* Cab Type Preview */}
-                      <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <label className="block text-sm font-bold text-gray-600 mb-2">Selected Cab Type</label>
-                        <div className="flex items-center">
-                          {cabTypes.find(cab => cab.type === requestData.cabType)?.icon}
-                          <div className="ml-3">
-                            <div className="font-medium text-gray-800">{requestData.cabType}</div>
-                            <div className="text-sm text-gray-600">
-                              {cabTypes.find(cab => cab.type === requestData.cabType)?.capacity}
+                        {/* Personal Information */}
+                        <div className="bg-gradient-to-br from-purple-50 to-white p-6 rounded-xl border-2 border-purple-100 shadow-sm">
+                          <h3 className="text-xl font-bold text-purple-600 mb-4">Your Information</h3>
+                          
+                          {/* Name Field */}
+                          <div className="relative group mb-4">
+                            <label className="block text-sm font-bold text-purple-600 mb-2">Full Name*</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <FaUser className="text-purple-400 text-lg group-hover:text-purple-500 transition-colors" />
+                              </div>
+                              <input
+                                type="text"
+                                name="name"
+                                value={requestData.name}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 border-2 border-purple-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-purple-300 focus:border-purple-300 font-medium text-gray-800 bg-white hover:bg-purple-50 transition-colors"
+                                required
+                                placeholder="John Doe"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Email Field */}
+                          <div className="relative group mb-4">
+                            <label className="block text-sm font-bold text-purple-600 mb-2">Email*</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <FaEnvelope className="text-purple-400 text-lg group-hover:text-purple-500 transition-colors" />
+                              </div>
+                              <input
+                                type="email"
+                                name="email"
+                                value={requestData.email}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 border-2 border-purple-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-purple-300 focus:border-purple-300 font-medium text-gray-800 bg-white hover:bg-purple-50 transition-colors"
+                                required
+                                placeholder="your@email.com"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Phone Field */}
+                          <div className="relative group">
+                            <label className="block text-sm font-bold text-purple-600 mb-2">Phone Number*</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <FaPhone className="text-purple-400 text-lg group-hover:text-purple-500 transition-colors" />
+                              </div>
+                              <input
+                                type="tel"
+                                name="phone"
+                                value={requestData.phone}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 border-2 border-purple-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-purple-300 focus:border-purple-300 font-medium text-gray-800 bg-white hover:bg-purple-50 transition-colors"
+                                required
+                                placeholder="+91 9876543210"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Special Requests */}
+                        <div className="bg-gradient-to-br from-pink-50 to-white p-6 rounded-xl border-2 border-pink-100 shadow-sm">
+                          <h3 className="text-xl font-bold text-pink-600 mb-4">Special Requests</h3>
+                          <div className="relative group">
+                            <textarea
+                              name="specialRequests"
+                              value={requestData.specialRequests}
+                              onChange={handleInputChange}
+                              className="w-full border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
+                              rows="4"
+                              placeholder="Any special requirements (child seat, wheelchair access, etc.)"
+                            ></textarea>
+                            <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <FaRegSmileWink className="text-pink-400 text-xl" />
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      {/* Special Requests */}
-                      <div className="relative group">
-                        <label className="block text-sm font-bold text-pink-600 mb-2">Special Requests</label>
-                        <textarea
-                          name="specialRequests"
-                          value={requestData.specialRequests}
-                          onChange={handleInputChange}
-                          className="w-full border-2 border-pink-100 rounded-xl px-4 py-4 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 font-medium text-gray-800 bg-white hover:bg-pink-50 transition-colors"
-                          rows="4"
-                          placeholder="Any special requirements (child seat, extra luggage, etc.)"
-                        ></textarea>
-                        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <FaRegSmileWink className="text-pink-400 text-xl" />
-                        </div>
-                      </div>
                     </div>
 
-                    <div className="flex justify-between items-center mt-8">
+                    <div className="flex justify-between items-center p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-t border-gray-200">
                       <motion.button
                         type="button"
                         onClick={() => setShowRequestForm(false)}
-                        className="text-pink-600 hover:text-pink-800 font-bold px-6 py-3 rounded-lg hover:bg-pink-50 transition-colors flex items-center"
+                        className="text-blue-600 hover:text-blue-800 font-bold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center"
                         whileHover={{ x: -5 }}
                       >
                         <FaArrowLeft className="mr-2" />
-                        Back to Page
+                        Back
                       </motion.button>
                       <motion.button
                         type="submit"
@@ -814,315 +1338,8 @@ const CabBooking = () => {
           </motion.div>
         </motion.div>
       )}
-
-      {/* Benefits Section */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mb-20"
-      >
-        <motion.h2 
-          variants={cardVariants}
-          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
-        >
-          Why Choose <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Our Cab Service</span>
-        </motion.h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: <FaShieldAlt className="text-4xl text-blue-500" />,
-              title: "Safe & Secure",
-              description: "Verified drivers and GPS tracking for your safety",
-              bg: "bg-gradient-to-br from-blue-50 to-white",
-              border: "border-blue-200"
-            },
-            {
-              icon: <FaClock className="text-4xl text-purple-500" />,
-              title: "On-Time Service",
-              description: "Punctual pickups with real-time tracking",
-              bg: "bg-gradient-to-br from-purple-50 to-white",
-              border: "border-purple-200"
-            },
-            {
-              icon: <FaMoneyBillWave className="text-4xl text-pink-500" />,
-              title: "Transparent Pricing",
-              description: "No hidden charges with upfront pricing",
-              bg: "bg-gradient-to-br from-pink-50 to-white",
-              border: "border-pink-200"
-            }
-          ].map((benefit, index) => (
-            <motion.div 
-              key={index}
-              variants={cardVariants}
-              className={`${benefit.bg} rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border-2 ${benefit.border} hover:shadow-xl transition-all h-full`}
-              whileHover={{ y: -10 }}
-            >
-              <div className={`p-5 rounded-full mb-6 ${benefit.bg}`}>
-                {benefit.icon}
-              </div>
-              <h3 className="font-bold text-xl mb-4 text-gray-800">{benefit.title}</h3>
-              <p className="text-gray-600 mb-6">{benefit.description}</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-2 px-6 rounded-full shadow hover:shadow-md transition-all"
-                onClick={() => setShowRequestForm(true)}
-              >
-                Book Now
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Cab Types Section */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mb-20"
-      >
-        <motion.h2 
-          variants={cardVariants}
-          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
-        >
-          Our <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Cab Fleet</span>
-        </motion.h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {cabTypes.map((cab, index) => (
-            <motion.div
-              key={index}
-              variants={cardVariants}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl shadow-md hover:shadow-lg border-2 border-gray-100 hover:border-blue-200 p-6 text-center transition-all"
-              whileHover={{ y: -5 }}
-            >
-              <div className="bg-gradient-to-br from-gray-50 to-white p-5 rounded-full inline-flex items-center justify-center mb-4">
-                {cab.icon}
-              </div>
-              <h3 className="font-bold text-lg mb-2 text-gray-800">{cab.type}</h3>
-              <p className="text-gray-600 text-sm mb-4">{cab.capacity}</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-2 px-4 rounded-full shadow hover:shadow-md transition-all text-sm"
-                onClick={() => {
-                  setCabType(cab.type);
-                  setRequestData(prev => ({...prev, cabType: cab.type}));
-                  setShowRequestForm(true);
-                }}
-              >
-                Book {cab.type}
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* How It Works Section */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-12 mb-20 relative overflow-hidden"
-      >
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-200 rounded-full opacity-20"></div>
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-purple-200 rounded-full opacity-20"></div>
-        
-        <motion.h2 
-          variants={cardVariants}
-          className="text-3xl md:text-4xl font-bold mb-12 text-center text-gray-800"
-        >
-          How Our <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Service Works</span>
-        </motion.h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
-          {[
-            {
-              number: 1,
-              title: "Book Your Cab",
-              description: "Enter your pickup, drop locations and travel details",
-              icon: <FaTaxi className="text-3xl text-blue-500" />
-            },
-            {
-              number: 2,
-              title: "Get Matched",
-              description: "Our system finds the best cab for your requirements",
-              icon: <FaSearch className="text-3xl text-purple-500" />
-            },
-            {
-              number: 3,
-              title: "Enjoy Your Ride",
-              description: "Track your cab and enjoy a comfortable journey",
-              icon: <FaRegSmileWink className="text-3xl text-pink-500" />
-            }
-          ].map((step, index) => (
-            <motion.div 
-              key={step.number}
-              variants={cardVariants}
-              transition={{ delay: index * 0.1 }}
-              className="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-shadow border-2 border-white hover:border-blue-200 relative overflow-hidden"
-              whileHover={{ y: -5 }}
-            >
-              <div className="absolute -top-10 -right-10 w-20 h-20 bg-blue-100 rounded-full opacity-20"></div>
-              <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-purple-100 rounded-full opacity-20"></div>
-              
-              <div className="bg-gradient-to-r from-blue-500 to-purple-500 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-3xl font-bold shadow-lg relative z-10">
-                {step.icon}
-              </div>
-              <div className="relative z-10">
-                <h3 className="font-bold text-xl mb-4 text-gray-800">{step.title}</h3>
-                <p className="text-gray-600 mb-6">{step.description}</p>
-              </div>
-              <div className="absolute top-0 left-0 bg-blue-500 text-white font-bold px-4 py-1 rounded-br-lg text-sm">
-                Step {step.number}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Final CTA */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-12 text-white text-center relative overflow-hidden shadow-2xl mb-10"
-      >
-        <div className="absolute inset-0 bg-white opacity-10"></div>
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-white rounded-full opacity-5"></div>
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-white rounded-full opacity-5"></div>
-        
-        <motion.div 
-          variants={cardVariants}
-          className="relative"
-        >
-          <motion.h2 
-            className="text-3xl md:text-5xl font-bold mb-6"
-          >
-            Ready for Your Next <span className="bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">Ride?</span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-light"
-          >
-            Book your cab now and enjoy a comfortable journey
-          </motion.p>
-          <motion.div className="flex flex-wrap justify-center gap-6">
-            <motion.button 
-              onClick={() => setShowRequestForm(true)}
-              className="bg-white hover:bg-gray-100 text-pink-600 font-bold py-4 px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all inline-flex items-center text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaTaxi className="mr-3" />
-              BOOK CAB NOW
-            </motion.button>
-            <motion.button 
-              className="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-20 text-white font-bold py-4 px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all inline-flex items-center text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaPhone className="mr-3" />
-              +91 9796337997
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      </motion.section>
     </div>
   );
 };
 
-export default CabBooking;
-
-// Add these styles to your global CSS or style component
-const globalStyles = `
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes modal-enter {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(5deg); }
-  }
-  
-  @keyframes float-delay {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-12px) rotate(-3deg); }
-  }
-
-  @keyframes float-delay-2 {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(2deg); }
-  }
-  
-  @keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
-  }
-  
-  .animate-modal-enter {
-    animation: modal-enter 0.3s ease-out forwards;
-  }
-  
-  .animate-bounce {
-    animation: bounce 1.5s infinite;
-  }
-  
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
-  
-  .animate-float-delay {
-    animation: float-delay 4s ease-in-out infinite 0.5s;
-  }
-
-  .animate-float-delay-2 {
-    animation: float-delay-2 4s ease-in-out infinite 0.8s;
-  }
-  
-  .animate-spin-slow {
-    animation: spin-slow 20s linear infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-  
-  .shadow-3xl {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  }
-
-  .backdrop-blur-sm {
-    backdrop-filter: blur(4px);
-  }
-`;
-
-// Add the global styles to your document head
-if (typeof document !== 'undefined') {
-  const styleElement = document.createElement('style');
-  styleElement.innerHTML = globalStyles;
-  document.head.appendChild(styleElement);
-}
+export default Cab;
