@@ -2694,8 +2694,7 @@ const Home = () => {
         <ContactPopup onClose={() => setShowContactPopup(false)} />
       )}
 
-      {/* Chat Boat Component */}
-      <ChatBoat />
+   
     </div>
   );
 };
