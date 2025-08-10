@@ -18,12 +18,14 @@ const Section = () => {
   const trips = [
     {
       id: 1,
-      title: "Himalayan Explorer",
-      location: "Himachal Pradesh, India",
+      title: "Mountain Explorer",
+      location: "Kashmir, India",
       duration: "8 days",
       groupSize: "12-15 women",
+      description: "An adventurous group trek through the Himalayas, perfect for women seeking challenge and connection.",
       image: "https://risingkashmir.blr1.digitaloceanspaces.com/wp-content/uploads/2024/08/Image-OP-1-1.png",
-      type: "adventure"
+      type: "adventure",
+    
     },
     {
       id: 2,
@@ -31,12 +33,10 @@ const Section = () => {
       location: "Kerala, India",
       duration: "7 days",
       groupSize: "8-12 women",
-  
-  
       description: "A serene group journey through Kerala's backwaters, combining relaxation with cultural immersion.",
-  
       image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae",
-      type: "wellness"
+      type: "wellness",
+     
     }
   ];
 
@@ -194,87 +194,44 @@ const Section = () => {
 
                 <p className="text-gray-600 mb-6">{trip.description}</p>
 
-                <div className="space-y-3">
-                  <h4 className="font-bold text-gray-800">Trip Highlights:</h4>
-                  <ul className="space-y-2">
-                    {trip.highlights.map((highlight, index) => (
-                      <li key={index} className="flex items-start">
-                        <div className="bg-purple-100 text-purple-600 rounded-full p-1 mr-3 mt-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                        <span className="text-gray-600">{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-6">
-                  <h4 className="font-bold text-gray-800 mb-2">Available Dates:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {trip.dates.map((date, index) => (
-                      <span key={index} className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-sm">
-                        {date}
-                      </span>
-                    ))}
+                {trip.highlights && trip.highlights.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-bold text-gray-800">Trip Highlights:</h4>
+                    <ul className="space-y-2">
+                      {trip.highlights.map((highlight, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="bg-purple-100 text-purple-600 rounded-full p-1 mr-3 mt-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <span className="text-gray-600">{highlight}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
+                )}
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-600 transition-all shadow-md hover:shadow-lg"
-                >
-                  Book This Group Trip
-                </motion.button>
+                {trip.dates && trip.dates.length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="font-bold text-gray-800 mb-2">Available Dates:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {trip.dates.map((date, index) => (
+                        <span key={index} className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-sm">
+                          {date}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Testimonials */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-white rounded-2xl shadow-lg p-8 mb-20"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">What Our Group Members Say</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Hear from women who've traveled with our groups
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial) => (
-              <motion.div
-                key={testimonial.id}
-                whileHover={{ y: -8 }}
-                className="bg-gray-50 rounded-xl p-6 border border-gray-100 hover:border-purple-200 transition-all"
-              >
-                <div className="flex items-center mb-4">
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 mr-4"
-                  />
-                  <div>
-                    <h4 className="font-bold text-gray-800">{testimonial.name}</h4>
-                    <p className="text-purple-600 text-sm">{testimonial.trip}</p>
-                  </div>
-                </div>
-                <div className="relative">
-                  <FaQuoteLeft className="absolute -left-2 -top-2 text-purple-200 text-2xl" />
-                  <p className="text-gray-600 italic pl-6">"{testimonial.text}"</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
+        
         {/* CTA */}
         <div className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-12 text-center text-white shadow-xl">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Join a Group?</h2>
