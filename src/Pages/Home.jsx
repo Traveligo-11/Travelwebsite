@@ -6,8 +6,8 @@ import {
   FaCalendarAlt, FaUserFriends, FaTimes, FaSearch, FaQuoteLeft,
   FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaHeart
 } from 'react-icons/fa';
-import { FaUser, FaEnvelope,FaPhone,FaComment} from 'react-icons/fa';
-import { FaGlobe,  FaUmbrellaBeach, FaStar } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaComment } from 'react-icons/fa';
+import { FaGlobe, FaUmbrellaBeach, FaStar } from 'react-icons/fa';
 import { FiMessageSquare } from 'react-icons/fi';
 import { IoIosFlash, IoMdHeart } from 'react-icons/io';
 import { GiSuitcase } from 'react-icons/gi';
@@ -18,6 +18,8 @@ import kanikaman from "/videos/kanikaman.mp4";
 import ishan from "/videos/ishan.mp4";
 import Rashmika from "/videos/Rashmika.mp4";
 import Raza from '/videos/raza.mp4';
+import Debashree from '/videos/Debashree.mp4';
+import Group from '/videos/Group.mp4';
 
 // Chat Boat Component
 const ChatBoat = () => {
@@ -103,6 +105,103 @@ const ChatBoat = () => {
   );
 };
 
+// Simplified Contact Popup Component with only phone and email
+const ContactPopup = ({ onClose }) => {
+  const [showCallOptions, setShowCallOptions] = useState(true);
+
+  const initiateCall = (number) => {
+    window.location.href = `tel:${number}`;
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full">
+        <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
+          <h3 className="text-xl font-bold text-gray-900">Contact Us</h3>
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <FaTimes className="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div className="p-6">
+          <div className="space-y-6">
+            <h4 className="text-xl font-bold text-gray-900 text-center">Contact Our Team</h4>
+            
+            <div className="grid grid-cols-1 gap-4">
+              <button
+                onClick={() => initiateCall('+919876543210')}
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center">
+                  <div className="bg-pink-100 p-3 rounded-full mr-4">
+                    <FaPhone className="text-pink-600" />
+                  </div>
+                  <div>
+                    <h5 className="font-bold">Sales & Bookings</h5>
+                    <p className="text-gray-600">+91 98765 43210</p>
+                  </div>
+                </div>
+                <span className="text-pink-600 font-medium">Call Now</span>
+              </button>
+              
+              <button
+                onClick={() => initiateCall('+919876543211')}
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center">
+                  <div className="bg-pink-100 p-3 rounded-full mr-4">
+                    <FaPhone className="text-pink-600" />
+                  </div>
+                  <div>
+                    <h5 className="font-bold">Customer Support</h5>
+                    <p className="text-gray-600">+91 98765 43211</p>
+                  </div>
+                </div>
+                <span className="text-pink-600 font-medium">Call Now</span>
+              </button>
+              
+              <button
+                onClick={() => initiateCall('+919876543212')}
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center">
+                  <div className="bg-pink-100 p-3 rounded-full mr-4">
+                    <FaPhone className="text-pink-600" />
+                  </div>
+                  <div>
+                    <h5 className="font-bold">Emergency</h5>
+                    <p className="text-gray-600">+91 98765 43212</p>
+                  </div>
+                </div>
+                <span className="text-pink-600 font-medium">Call Now</span>
+              </button>
+
+              <a
+                href="mailto:info@traveligo.com"
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center">
+                  <div className="bg-pink-100 p-3 rounded-full mr-4">
+                    <FaEnvelope className="text-pink-600" />
+                  </div>
+                  <div>
+                    <h5 className="font-bold">Email Support</h5>
+                    <p className="text-gray-600">info@traveligo.com</p>
+                  </div>
+                </div>
+                <span className="text-pink-600 font-medium">Email Now</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -111,6 +210,8 @@ const Home = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [showQuotesForm, setShowQuotesForm] = useState(false);
+  const [showNotifyForm, setShowNotifyForm] = useState(false);
+  const [showContactPopup, setShowContactPopup] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -130,21 +231,30 @@ const Home = () => {
     name: '',
     email: '',
     phone: '',
-    message: '',
     interest: 'General Inquiry'
+  });
+  const [notifyFormData, setNotifyFormData] = useState({
+    name: '',
+    email: '',
+    interests: []
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [quotesFormSubmitted, setQuotesFormSubmitted] = useState(false);
+  const [notifyFormSubmitted, setNotifyFormSubmitted] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchActive, setSearchActive] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [showAllPackages, setShowAllPackages] = useState(false);
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
   const [likedVideos, setLikedVideos] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState('');
   
   // Video testimonials state
   const [videoStates, setVideoStates] = useState([
+    { isPlaying: false, isMuted: false, progress: 0 },
+    { isPlaying: false, isMuted: false, progress: 0 },
     { isPlaying: false, isMuted: false, progress: 0 },
     { isPlaying: false, isMuted: false, progress: 0 },
     { isPlaying: false, isMuted: false, progress: 0 },
@@ -152,6 +262,19 @@ const Home = () => {
   ]);
   const videoRefs = useRef([]);
   const quotesFormRef = useRef();
+
+  // Destinations for dropdown
+  const destinations = [
+    { id: 'all', name: 'All Destinations' },
+    { id: 'kashmir', name: 'Kashmir' },
+    { id: 'goa', name: 'Goa' },
+    { id: 'bali', name: 'Bali' },
+    { id: 'maldives', name: 'Maldives' },
+    { id: 'darjeeling', name: 'Darjeeling' },
+    { id: 'dubai', name: 'Dubai' },
+    { id: 'europe', name: 'Europe' },
+    { id: 'thailand', name: 'Thailand' }
+  ];
 
   // Categories for filtering
   const categories = [
@@ -166,37 +289,55 @@ const Home = () => {
   // Video testimonials data
   const videoTestimonials = [
     {
-      id: 6,
-      name: 'Ishan Khattar',
+      id: 1,
+      name: 'Ishaan Khatter',
       role: 'Bollywood Actor',
       content: ishan,
       thumbnail: '/images/ishan.jpeg',
-      bgGradient: 'from-violet-500 to-fuchsia-500',
     },
     {
-      id: 7,
-      name: 'Kanika Man',
+      id: 2,
+      name: 'Kanika Mann',
       role: 'Artist',
       content: kanikaman,
       thumbnail: '/images/kanikamann.jpeg',
-      bgGradient: 'from-indigo-500 to-blue-500',
     },
     {
-      id: 8,
-      name: 'Rashmika Kaur',
+      id: 3,
+      name: 'Rashmeet Kaur',
       role: 'Singer',
       content: Rashmika,
       thumbnail: '/images/rashmika.jpeg',
-      bgGradient: 'from-emerald-500 to-teal-500',
     },
     {
-      id: 9,
+      id: 4,
       name: 'Dr Raza',
       role: 'Doctor',
       content: Raza,
       thumbnail: '/images/raza.jpeg',
-      bgGradient: 'from-amber-500 to-orange-500',
     },
+  ];
+
+  // Women's Solo Trip Videos
+  const soloTripVideos = [
+    {
+      id: 5,
+      name: 'Ms Debashree Mukerjee',
+      role: 'Solo Traveler',
+      content: Debashree,
+      thumbnail: '/images/solo1.jpg',
+    },
+  ];
+
+  // Group Trip Videos
+  const groupTripVideos = [
+    {
+      id: 6,
+      name: 'Group Adventure',
+      role: 'Group Trip',
+      content: Group,
+      thumbnail: '/images/group-thumbnail.jpg'
+    }
   ];
 
   // Initialize EmailJS
@@ -332,7 +473,8 @@ const Home = () => {
       inclusions: ['4 nights in overwater villa', 'All meals (breakfast, lunch, dinner)', 'Return airport transfers', 'Sunset cruise', 'Complimentary spa session'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities'],
       tag: 'Romantic Getaway',
-      category: 'luxury'
+      category: 'luxury',
+      destinationId: 'maldives'
     },
     {
       id: 2,
@@ -356,7 +498,8 @@ const Home = () => {
       inclusions: ['6 nights accommodation', 'Daily breakfast', 'All tours and activities mentioned', 'English speaking guide', 'Entrance fees'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities', 'Lunch and dinner unless specified'],
       tag: 'Adventure',
-      category: 'adventure'
+      category: 'adventure',
+      destinationId: 'bali'
     },
     {
       id: 3,
@@ -383,7 +526,8 @@ const Home = () => {
       inclusions: ['9 nights accommodation', 'Daily breakfast', 'Transport between cities', 'Guided tours as per itinerary', 'Entrance fees to mentioned attractions'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities', 'Lunch and dinner unless specified', 'Visa fees'],
       tag: 'Best Seller',
-      category: 'cultural'
+      category: 'cultural',
+      destinationId: 'europe'
     },
     {
       id: 4,
@@ -406,7 +550,8 @@ const Home = () => {
       inclusions: ['5 nights in 5-star hotel', 'Daily breakfast', 'City tour with guide', 'Desert safari with dinner', 'Abu Dhabi excursion'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities', 'Lunch and dinner unless specified'],
       tag: 'Luxury',
-      category: 'luxury'
+      category: 'luxury',
+      destinationId: 'dubai'
     },
     {
       id: 5,
@@ -428,7 +573,8 @@ const Home = () => {
       inclusions: ['4 nights in boutique hotel', 'Daily breakfast', 'Seine River cruise', 'Eiffel Tower summit access', 'Versailles day trip'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities', 'Lunch and dinner unless specified'],
       tag: 'Romantic',
-      category: 'luxury'
+      category: 'luxury',
+      destinationId: 'darjeeling'
     },
     {
       id: 6,
@@ -452,7 +598,8 @@ const Home = () => {
       inclusions: ['6 nights accommodation', 'Daily breakfast', 'Swiss Travel Pass', 'Jungfraujoch excursion', 'All train transfers'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities', 'Lunch and dinner unless specified'],
       tag: 'Best Seller',
-      category: 'luxury'
+      category: 'luxury',
+      destinationId: 'europe'
     },
     {
       id: 7,
@@ -473,7 +620,8 @@ const Home = () => {
       inclusions: ['3 nights in beachfront resort', 'Daily breakfast', 'North Goa sightseeing', 'Water sports activities'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities', 'Lunch and dinner unless specified'],
       tag: 'Beach Holiday',
-      category: 'beach'
+      category: 'beach',
+      destinationId: 'goa'
     },
     {
       id: 8,
@@ -495,7 +643,8 @@ const Home = () => {
       inclusions: ['4 nights accommodation (1 in houseboat)', 'Daily meals', 'All sightseeing tours', 'Ayurvedic massage session'],
       exclusions: ['Airfare', 'Travel insurance', 'Personal expenses', 'Optional activities'],
       tag: 'Cultural Experience',
-      category: 'cultural'
+      category: 'cultural',
+      destinationId: 'kerala'
     },
     {
       id: 9,
@@ -536,7 +685,8 @@ const Home = () => {
         "Airfare"
       ],
       tag: "Nature Lover",
-      category: "cultural"
+      category: "cultural",
+      destinationId: "kashmir"
     },
     {
       id: 10,
@@ -577,8 +727,88 @@ const Home = () => {
         "Optional tours"
       ],
       tag: "Beach Lover",
-      category: "international"
-    }
+      category: "international",
+      destinationId: "thailand"
+    },
+  ];
+
+  // Upcoming Packages Data
+  const upcomingPackages = [
+    {
+      id: 17,
+      title: 'Kashmir Paradise Tour',
+      destination: '7D/6N in Kashmir',
+      duration: '7 Days',
+      price: '₹49,999',
+      originalPrice: '₹64,999',
+      discount: '23%',
+      image: '/images/kashmir.jpeg',
+      highlights: [
+        'Shikara Ride on Dal Lake',
+        'Gondola Ride in Gulmarg',
+        'Pahalgam Valley Exploration',
+        'Stay in Houseboat',
+        'Mughal Gardens Visit'
+      ],
+      itinerary: [
+        { 
+          day: 1, 
+          title: 'Arrival in Srinagar', 
+          description: 'Transfer to hotel. Evening Shikara ride on Dal Lake during sunset.' 
+        },
+        { 
+          day: 2, 
+          title: 'Srinagar Sightseeing', 
+          description: 'Visit Mughal Gardens (Shalimar Bagh, Nishat Bagh), Hazratbal Shrine, and local markets.' 
+        },
+        { 
+          day: 3, 
+          title: 'Gulmarg Excursion', 
+          description: 'Gondola cable car ride (Phase 1 or 2 depending on weather), visit Alpather Lake and golf course.' 
+        },
+        { 
+          day: 4, 
+          title: 'Pahalgam Exploration', 
+          description: 'Visit Betaab Valley, Aru Valley, and Chandanwari (gateway to Amarnath Yatra).' 
+        },
+        { 
+          day: 5, 
+          title: 'Sonmarg Day Trip', 
+          description: 'Visit Thajiwas Glacier (pony ride available) and enjoy mountain views.' 
+        },
+        { 
+          day: 6, 
+          title: 'Houseboat Experience', 
+          description: 'Check into traditional houseboat. Leisure day with optional activities like walnut wood carving demo.' 
+        },
+        { 
+          day: 7, 
+          title: 'Departure', 
+          description: 'Transfer to Srinagar airport with farewell gifts.' 
+        }
+      ],
+      inclusions: [
+        '6 nights accommodation (3-star hotels + 1 night houseboat)',
+        'Daily breakfast and dinner (MAP Plan)',
+        'All transfers in private vehicle (Sedan for 2-3 pax, Innova for 4-6 pax)',
+        'Shikara ride on Dal Lake (1 hour)',
+        'Gulmarg Gondola ticket (Phase 1)',
+        'Driver charges, toll taxes and parking'
+      ],
+      exclusions: [
+        'Airfare to/from Srinagar',
+        'Gondola ticket (Phase 2)',
+        'Pony rides in Sonmarg/Pahalgam',
+        'Lunch and personal expenses',
+        'Travel insurance',
+        'Anything not mentioned in inclusions'
+      ],
+      tag: 'Best Seller',
+      category: 'cultural',
+      launchDate: '2024-03-01',
+      bestSeason: 'April to October',
+      specialNotes: 'Warm clothing recommended even in summer months. Package can be customized for winter snow experience.'
+    },
   ];
 
   // Auto-rotate carousel
@@ -712,19 +942,25 @@ const Home = () => {
   // Package filtering
   const filteredPackages = activeCategory === 'all' 
     ? holidayPackages.filter(pkg => 
-        pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (selectedDestination === '' || pkg.destinationId === selectedDestination) &&
+        (pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pkg.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pkg.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase()))))
+    : holidayPackages.filter(pkg => 
+        pkg.category === activeCategory && 
+        (selectedDestination === '' || pkg.destinationId === selectedDestination) &&
+        (pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         pkg.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
         pkg.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase())))
-    : holidayPackages.filter(pkg => 
-        pkg.category === activeCategory && (
-          pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          pkg.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          pkg.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase())))
         );
 
   const displayedPackages = showAllPackages 
     ? filteredPackages 
-    : filteredPackages.slice(0, 8);
+    : filteredPackages.slice(0, 6);
+
+  const displayedUpcomingPackages = showAllUpcoming
+    ? upcomingPackages
+    : upcomingPackages.slice(0, 3);
 
   // Handle package viewing
   const handleViewDetails = (pkg) => {
@@ -759,10 +995,41 @@ const Home = () => {
     }));
   };
 
+  const handleNotifyInputChange = (e) => {
+    const { name, value } = e.target;
+    setNotifyFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleInterestChange = (interest) => {
+    setNotifyFormData(prev => {
+      const interests = [...prev.interests];
+      const index = interests.indexOf(interest);
+      
+      if (index === -1) {
+        interests.push(interest);
+      } else {
+        interests.splice(index, 1);
+      }
+      
+      return {
+        ...prev,
+        interests
+      };
+    });
+  };
+
   // Handle search
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
     setSearchActive(e.target.value.length > 0);
+  };
+
+  // Handle destination change
+  const handleDestinationChange = (e) => {
+    setSelectedDestination(e.target.value);
   };
 
   // Submit booking form
@@ -871,6 +1138,42 @@ const Home = () => {
     }
   };
 
+  // Submit notify form
+  const handleNotifySubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await emailjs.send(
+        'service_9jzlq6q',
+        'template_fkm3hio',
+        {
+          name: notifyFormData.name,
+          email: notifyFormData.email,
+          interests: notifyFormData.interests.join(', '),
+        
+        },
+        '127OFHb2IQq0zSiFJ'
+      );
+
+      console.log('SUCCESS!', response.status, response.text);
+      setNotifyFormSubmitted(true);
+      
+      // Reset form after successful submission
+      setTimeout(() => {
+        setNotifyFormSubmitted(false);
+        setShowNotifyForm(false);
+        setNotifyFormData({
+          name: '',
+          email: '',
+          interests: []
+        });
+      }, 3000);
+    } catch (error) {
+      console.error('FAILED...', error);
+      alert(`Failed to submit notification request. Error: ${error.text || 'Please try again later.'}`);
+    }
+  };
+
   return (
     <div className="bg-white">
       {/* Search Bar */}
@@ -898,6 +1201,14 @@ const Home = () => {
         className={`fixed bottom-25 right-8 ${primaryColor} text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300 ${searchActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         <FaSearch className="h-6 w-6" />
+      </button>
+
+      {/* Contact Button (floating) */}
+      <button 
+        onClick={() => setShowContactPopup(true)}
+        className={`fixed bottom-40 right-8 ${primaryColor} text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300`}
+      >
+        <FaPhone className="h-6 w-6" />
       </button>
 
       {/* Featured Destinations Carousel */}
@@ -934,13 +1245,13 @@ const Home = () => {
           
           <button 
             onClick={prevSlide}
-            className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/30 text-white p-4 rounded-full hover:bg-white/50 transition-colors z-10 backdrop-blur-sm"
+            className="absolute left-8 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-white/30 text-white p-4 rounded-full hover:bg-white/50 transition-colors duration-200 shadow-lg"
           >
             <FaChevronLeft className="h-6 w-6" />
           </button>
           <button 
             onClick={nextSlide}
-            className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/30 text-white p-4 rounded-full hover:bg-white/50 transition-colors z-10 backdrop-blur-sm"
+            className="absolute right-8 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-white/30 text-white p-4 rounded-full hover:bg-white/50 transition-colors duration-200 shadow-lg"
           >
             <FaChevronRight className="h-6 w-6" />
           </button>
@@ -957,6 +1268,7 @@ const Home = () => {
           </div>
         </div>
 
+        {/* Search Form - Moved Below */}
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10 w-full max-w-6xl px-4">
           <div className={`bg-white rounded-2xl shadow-2xl p-8 ${primaryBorderColor} border-t-4`}>
             <h3 className="text-2xl font-bold text-gray-800 mb-6">Where would you like to go?</h3>
@@ -965,13 +1277,15 @@ const Home = () => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <FaMapMarkerAlt className="text-gray-400" />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Destination"
-                  className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                />
+                <select
+                  value={selectedDestination}
+                  onChange={handleDestinationChange}
+                  className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 appearance-none"
+                >
+                  {destinations.map(dest => (
+                    <option key={dest.id} value={dest.id}>{dest.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -1161,9 +1475,24 @@ const Home = () => {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Area of Interest</label>
+                    <select
+                      name="interest"
+                      value={quotesFormData.interest}
+                      onChange={handleQuotesInputChange}
+                      className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                    >
+                      <option value="General Inquiry">General Inquiry</option>
+                      <option value="Honeymoon Packages">Honeymoon Packages</option>
+                      <option value="Family Vacations">Family Vacations</option>
+                      <option value="Adventure Travel">Adventure Travel</option>
+                      <option value="Luxury Getaways">Luxury Getaways</option>
+                      <option value="Group Tours">Group Tours</option>
+                    </select>
+                  </div>
+                  
                 
-                  
-                  
                   
                   {quotesFormSubmitted ? (
                     <div className="bg-green-100 text-green-700 p-3 rounded-lg text-center">
@@ -1282,7 +1611,7 @@ const Home = () => {
             </div>
           )}
 
-          {filteredPackages.length > 8 && (
+          {filteredPackages.length > 6 && (
             <div className="text-center mt-12">
               <button 
                 className={`border-2 ${primaryBorderColor} ${primaryTextColor} hover:${primaryColor} hover:text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200`}
@@ -1292,6 +1621,98 @@ const Home = () => {
               </button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Upcoming Packages Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-pink-600 font-semibold">COMING SOON</span>
+            <h2 className="text-4xl font-bold text-gray-900 mt-3">Upcoming Travel Packages</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Exciting new destinations we're launching soon - get early bird discounts!
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayedUpcomingPackages.map((pkg) => (
+              <div 
+                key={pkg.id} 
+                className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-pink-200"
+              >
+                <div className="absolute top-4 right-4 z-10 bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  {pkg.tag}
+                </div>
+                <div className="h-64 overflow-hidden relative">
+                  <img 
+                    src={pkg.image} 
+                    alt={pkg.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 bg-white/90 text-pink-600 px-3 py-1 rounded-lg text-sm font-bold flex items-center">
+                    <IoIosFlash className="mr-1" /> Launching {pkg.launchDate}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">{pkg.title}</h3>
+                  <p className="text-gray-600 mb-4 flex items-center">
+                    <GiSuitcase className="mr-2 text-pink-500" /> {pkg.destination}
+                  </p>
+                  
+                  <div className="flex items-center mb-4 text-gray-600">
+                    <FaCalendarAlt className="mr-2 text-pink-500" />
+                    <span>{pkg.duration}</span>
+                  </div>
+                  
+                  <ul className="space-y-2 mb-6">
+                    {pkg.highlights.slice(0, 3).map((highlight, index) => (
+                      <li key={index} className="flex items-start">
+                        <svg className="h-5 w-5 text-pink-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-gray-700">{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="text-2xl font-bold text-pink-600">{pkg.price}</span>
+                      <span className="ml-2 text-sm text-gray-500 line-through">{pkg.originalPrice}</span>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedPackage(pkg);
+                        setShowNotifyForm(true);
+                      }}
+                      className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                    >
+                      Get Early Access
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <button 
+              onClick={() => setShowNotifyForm(true)}
+              className="border-2 border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200"
+            >
+              Notify Me About New Packages
+            </button>
+            {upcomingPackages.length > 3 && (
+              <button 
+                onClick={() => setShowAllUpcoming(!showAllUpcoming)}
+                className="ml-4 border-2 border-gray-300 text-gray-700 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition-colors duration-200"
+              >
+                {showAllUpcoming ? 'Show Less' : 'View All Upcoming'}
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -1459,7 +1880,7 @@ const Home = () => {
 
       {/* Video Testimonials Section */}
       <section className="py-20 bg-gradient-to-br from-gray-100 to-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Video Testimonials
@@ -1489,12 +1910,12 @@ const Home = () => {
                 />
                 
                 {/* Video overlay with gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-6">
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent flex flex-col justify-between p-6`}>
                   {/* Top info */}
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-bold text-xl text-white">{testimonial.name}</h3>
-                      <p className="text-sm text-pink-200">{testimonial.role}</p>
+                      <p className="text-sm text-white/80">{testimonial.role}</p>
                     </div>
                     <button 
                       onClick={(e) => {
@@ -1523,9 +1944,9 @@ const Home = () => {
                   
                   {/* Bottom controls */}
                   <div className="flex flex-col gap-3">
-                    <div className="w-full bg-gray-600 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-white/30 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="bg-pink-500 h-1.5 rounded-full"
+                        className="bg-white h-1.5 rounded-full"
                         style={{ width: `${videoStates[index].progress}%` }}
                       />
                     </div>
@@ -1563,6 +1984,228 @@ const Home = () => {
               className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
             >
               View More Testimonials <FaArrowRight className="ml-2" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Women's Solo Trip Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Women's Solo Trip Experiences
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Safe and empowering travel experiences designed exclusively for women
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {soloTripVideos.map((testimonial, index) => {
+              const videoIndex = index + videoTestimonials.length; // Offset index
+              return (
+                <div 
+                  key={testimonial.id}
+                  className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16] group"
+                  onMouseEnter={() => handleVideoHover(videoIndex, true)}
+                  onMouseLeave={() => handleVideoHover(videoIndex, false)}
+                >
+                  <video
+                    ref={el => videoRefs.current[videoIndex] = el}
+                    src={testimonial.content}
+                    loop
+                    muted={videoStates[videoIndex].isMuted}
+                    className="w-full h-full object-cover"
+                    playsInline
+                    preload="metadata"
+                    poster={testimonial.thumbnail}
+                  />
+                  
+                  {/* Video overlay with gradient */}
+                  <div className={`absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent flex flex-col justify-between p-6`}>
+                    {/* Top info */}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-bold text-xl text-white">{testimonial.name}</h3>
+                        <p className="text-sm text-white/80">{testimonial.role}</p>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleLike(testimonial.id);
+                        }}
+                        className={`p-2 rounded-full ${likedVideos.includes(testimonial.id) ? 'bg-pink-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'} transition-colors`}
+                      >
+                        <FaHeart className="h-5 w-5" />
+                      </button>
+                    </div>
+                    
+                    {/* Bottom controls */}
+                    <div className="flex flex-col gap-3">
+                      <div className="w-full bg-white/30 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-white h-1.5 rounded-full"
+                          style={{ width: `${videoStates[videoIndex].progress}%` }}
+                        />
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <button
+                          onClick={() => togglePlay(videoIndex)}
+                          className={`p-3 rounded-full ${videoStates[videoIndex].isPlaying ? 'bg-white/30' : 'bg-white/20'} hover:bg-white/40 backdrop-blur-md shadow-lg`}
+                        >
+                          {videoStates[videoIndex].isPlaying ? (
+                            <FaPause className="text-white" />
+                          ) : (
+                            <FaPlay className="text-white" />
+                          )}
+                        </button>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleMute(videoIndex);
+                          }}
+                          className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          {videoStates[videoIndex].isMuted ? (
+                            <FaVolumeMute className="text-white" />
+                          ) : (
+                            <FaVolumeUp className="text-white" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Play indicator */}
+                  {!videoStates[videoIndex].isPlaying && (
+                    <div className="absolute top-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <FaPlay size={10} /> PLAY
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          <div className="text-center mt-12">
+            <button 
+              className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
+            >
+              Explore Women's Solo Trips <FaArrowRight className="ml-2" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Group Trips Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Amazing Group Trips
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Create unforgettable memories with friends and family on our curated group tours
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {groupTripVideos.map((testimonial, index) => {
+              const videoIndex = index + videoTestimonials.length + soloTripVideos.length; // Offset index
+              return (
+                <div 
+                  key={testimonial.id}
+                  className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16] group"
+                  onMouseEnter={() => handleVideoHover(videoIndex, true)}
+                  onMouseLeave={() => handleVideoHover(videoIndex, false)}
+                >
+                  <video
+                    ref={el => videoRefs.current[videoIndex] = el}
+                    src={testimonial.content}
+                    loop
+                    muted={videoStates[videoIndex].isMuted}
+                    className="w-full h-full object-cover"
+                    playsInline
+                    preload="metadata"
+                    poster={testimonial.thumbnail}
+                  />
+                  
+                  {/* Video overlay with gradient */}
+                  <div className={`absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent flex flex-col justify-between p-6`}>
+                    {/* Top info */}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-bold text-xl text-white">{testimonial.name}</h3>
+                        <p className="text-sm text-white/80">{testimonial.role}</p>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleLike(testimonial.id);
+                        }}
+                        className={`p-2 rounded-full ${likedVideos.includes(testimonial.id) ? 'bg-pink-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'} transition-colors`}
+                      >
+                        <FaHeart className="h-5 w-5" />
+                      </button>
+                    </div>
+                    
+                    {/* Bottom controls */}
+                    <div className="flex flex-col gap-3">
+                      <div className="w-full bg-white/30 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-white h-1.5 rounded-full"
+                          style={{ width: `${videoStates[videoIndex].progress}%` }}
+                        />
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <button
+                          onClick={() => togglePlay(videoIndex)}
+                          className={`p-3 rounded-full ${videoStates[videoIndex].isPlaying ? 'bg-white/30' : 'bg-white/20'} hover:bg-white/40 backdrop-blur-md shadow-lg`}
+                        >
+                          {videoStates[videoIndex].isPlaying ? (
+                            <FaPause className="text-white" />
+                          ) : (
+                            <FaPlay className="text-white" />
+                          )}
+                        </button>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleMute(videoIndex);
+                          }}
+                          className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          {videoStates[videoIndex].isMuted ? (
+                            <FaVolumeMute className="text-white" />
+                          ) : (
+                            <FaVolumeUp className="text-white" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Play indicator */}
+                  {!videoStates[videoIndex].isPlaying && (
+                    <div className="absolute top-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <FaPlay size={10} /> PLAY
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          <div className="text-center mt-12">
+            <button 
+              className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
+            >
+              Explore Group Trips <FaArrowRight className="ml-2" />
             </button>
           </div>
         </div>
@@ -1802,6 +2445,8 @@ const Home = () => {
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                           required
                         />
+
+
                       </div>
                       <div>
                         <label className="block text-gray-700 mb-2" htmlFor="departureDate">Departure Date *</label>
@@ -1941,7 +2586,116 @@ const Home = () => {
         </div>
       )}
 
-    
+      {/* Notify Me Modal */}
+      {showNotifyForm && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full">
+            <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
+              <h3 className="text-xl font-bold text-gray-900">Notify Me About New Packages</h3>
+              <button 
+                onClick={() => setShowNotifyForm(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {notifyFormSubmitted ? (
+                <div className="text-center py-8">
+                  <svg className="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-2">Request Submitted!</h4>
+                  <p className="text-gray-600 mb-6">We'll notify you as soon as new packages are available.</p>
+                  <button 
+                    className={`${primaryColor} ${primaryHoverColor} text-white px-6 py-2 rounded-lg font-medium`}
+                    onClick={() => setShowNotifyForm(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleNotifySubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-gray-700 mb-2" htmlFor="notify-name">Full Name *</label>
+                    <input
+                      type="text"
+                      id="notify-name"
+                      name="name"
+                      value={notifyFormData.name}
+                      onChange={handleNotifyInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-700 mb-2" htmlFor="notify-email">Email *</label>
+                    <input
+                      type="email"
+                      id="notify-email"
+                      name="email"
+                      value={notifyFormData.email}
+                      onChange={handleNotifyInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-700 mb-3">Interests (Select all that apply)</label>
+                    <div className="space-y-2">
+                      {categories.filter(c => c.id !== 'all').map(category => (
+                        <div key={category.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={`interest-${category.id}`}
+                            checked={notifyFormData.interests.includes(category.id)}
+                            onChange={() => handleInterestChange(category.id)}
+                            className="h-5 w-5 text-pink-600 rounded focus:ring-pink-500"
+                          />
+                          <label htmlFor={`interest-${category.id}`} className="ml-2 text-gray-700">
+                            {category.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 mb-2" htmlFor="notify-message">Additional Message</label>
+                    <textarea
+                      id="notify-message"
+                      name="message"
+                      value={notifyFormData.message}
+                      onChange={handleNotifyInputChange}
+                      rows="3"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="Any specific requirements for the packages you're interested in?"
+                    ></textarea>
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    className={`w-full ${primaryColor} ${primaryHoverColor} text-white py-3 rounded-lg font-bold transition-colors duration-200 mt-4`}
+                  >
+                    Submit Request
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Popup */}
+      {showContactPopup && (
+        <ContactPopup onClose={() => setShowContactPopup(false)} />
+      )}
+
+      {/* Chat Boat Component */}
+      <ChatBoat />
     </div>
   );
 };

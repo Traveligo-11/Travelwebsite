@@ -47,7 +47,9 @@ import Ourteam from './Footer/team.jsx'
 import Testimonials from './Footer/Testimonials.jsx'
 import LoginModal from './Components/LoginModal.jsx';
 import Gallery from './Footer/Gallery.jsx'
-
+import Womens from './Footer/Womens.jsx'
+import Section from './Footer/Section.jsx'
+import Weddings from './Footer/Weddings.jsx'
 function App() {
   return (
     <Router>
@@ -98,8 +100,9 @@ function App() {
             <Route path="/GangtokDargelling" element={<GangtokDargelling />} />
             <Route path="/Testimonials" element={<Testimonials />} /> 
             <Route path="/LoginModal" element={<LoginModal />} />
-       
-           
+            <Route path="/Womens" element={<Womens />} />
+            <Route path="/Section" element={<Section />} />
+            <Route path="/Weddings" element={<Weddings />} />
 
           </Routes>
           

@@ -1,23 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaBars, FaTimes, FaChevronDown, FaWhatsapp } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from './logo.jpeg';
 
 const Navbar = () => {
   const navItems = [
-    { name: 'Home', label: 'Home', path: '/Home' },
+    { name: 'Home', label: 'Home', path: '/' },
     { name: 'flights', label: 'Flights', path: '/flights' },
     { name: 'hotels', label: 'Hotels', path: '/hotels' },
-    { name: 'holidays', label: 'Holidays', path: '/holidays' },
-    { name: 'trains', label: 'Trains', path: '/Trains' },
-    { name: 'cabs', label: 'Cabs', path: '/Cabs' },
+    { name: 'trains', label: 'Trains', path: '/trains' },
+    { name: 'cabs', label: 'Cabs', path: '/cabs' },
   ];
 
-  const [activeTab, setActiveTab] = useState('flights');
+  const [activeTab, setActiveTab] = useState('Home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const mobileMenuRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -34,20 +34,32 @@ const Navbar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const handleNavigation = (path, itemName) => {
+    setActiveTab(itemName);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(path);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <nav className="bg-gradient-to-r from-pink-50 to-blue-50 shadow-lg sticky top-0 z-50 border-b border-pink-100">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
-          <Link to="/" className="flex items-center group">
-            <motion.img 
-              src={logo} 
-              alt="Logo" 
-              className="h-12 w-auto rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300"
+        <div className="flex justify-between items-center py-3">
+          {/* Logo */}
+          <div className="flex items-center">
+            <motion.button
+              onClick={() => handleNavigation('/', 'Home')}
+              className="flex items-center group"
               whileHover={{ scale: 1.05 }}
-            />
-      
-          </Link>
-          
+            >
+              <img 
+                src={logo} 
+                alt="Traveligo Logo" 
+                className="h-12 w-auto rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300"
+              />
+            </motion.button>
+          </div>
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
@@ -57,14 +69,13 @@ const Navbar = () => {
                 onMouseEnter={() => setHoveredItem(item.name)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                <Link
-                  to={item.path}
+                <button
+                  onClick={() => handleNavigation(item.path, item.name)}
                   className={`relative py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
                     activeTab === item.name
                       ? 'text-white bg-gradient-to-r from-pink-500 to-blue-500 shadow-lg'
                       : 'text-gray-700 hover:text-pink-600'
                   }`}
-                  onClick={() => setActiveTab(item.name)}
                 >
                   {item.label}
                   {hoveredItem === item.name && (
@@ -76,13 +87,22 @@ const Navbar = () => {
                       transition={{ duration: 0.3 }}
                     />
                   )}
-                </Link>
+                </button>
               </div>
             ))}
           </div>
-          
+
           {/* Mobile Hamburger Menu */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-3">
+            <a 
+              href="https://wa.me/919796337997" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-2 bg-green-500 text-white rounded-full shadow-sm hover:shadow-md transition-all"
+            >
+              <FaWhatsapp className="text-xl" />
+            </a>
+            
             <motion.button
               onClick={toggleMobileMenu}
               className="p-2 rounded-full bg-gradient-to-r from-pink-100 to-blue-100 shadow-sm hover:shadow-md transition-all"
@@ -115,21 +135,16 @@ const Navbar = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Link
-                    to={item.path}
-                    className={`flex items-center justify-between py-3 px-4 rounded-md text-sm font-medium transition-colors ${
+                  <button
+                    onClick={() => handleNavigation(item.path, item.name)}
+                    className={`flex items-center justify-between w-full py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                       activeTab === item.name
                         ? 'bg-pink-50 text-pink-600'
                         : 'text-gray-700 hover:bg-pink-50'
                     }`}
-                    onClick={() => {
-                      setActiveTab(item.name);
-                      setIsMobileMenuOpen(false);
-                    }}
                   >
                     {item.label}
-                    <FaChevronDown className="text-xs text-gray-400 transform rotate-90" />
-                  </Link>
+                  </button>
                 </motion.div>
               ))}
             </motion.div>
