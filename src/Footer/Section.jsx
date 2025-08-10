@@ -22,16 +22,6 @@ const Section = () => {
       location: "Himachal Pradesh, India",
       duration: "8 days",
       groupSize: "12-15 women",
-      price: "$1,299",
-      rating: 4.8,
-      dates: ["Jun 10-17, 2023", "Jul 8-15, 2023", "Sep 2-9, 2023"],
-      description: "A breathtaking journey through the Himalayan foothills with a group of adventurous women.",
-      highlights: [
-        "Guided treks in Parvati Valley",
-        "Group yoga sessions with mountain views",
-        "Cultural exchanges with local communities",
-        "Comfortable group accommodations"
-      ],
       image: "https://risingkashmir.blr1.digitaloceanspaces.com/wp-content/uploads/2024/08/Image-OP-1-1.png",
       type: "adventure"
     },
@@ -41,16 +31,10 @@ const Section = () => {
       location: "Kerala, India",
       duration: "7 days",
       groupSize: "8-12 women",
-      price: "$1,099",
-      rating: 4.9,
-      dates: ["Aug 5-11, 2023", "Nov 10-16, 2023"],
+  
+  
       description: "A serene group journey through Kerala's backwaters, combining relaxation with cultural immersion.",
-      highlights: [
-        "Private houseboat for the group",
-        "Group Ayurvedic wellness sessions",
-        "Cultural performances just for our group",
-        "Spice plantation tour with tastings"
-      ],
+  
       image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae",
       type: "wellness"
     }
@@ -303,14 +287,14 @@ const Section = () => {
               whileTap={{ scale: 0.95 }}
               className="bg-white text-pink-600 px-8 py-3 rounded-full font-bold hover:bg-gray-50 transition-all shadow-lg"
             >
-              Browse All Group Trips
+              Contact us 
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-transparent border-2 border-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-all shadow-lg"
             >
-              Contact Our Group Specialist
+             +91 9796337997
             </motion.button>
           </div>
         </div>
