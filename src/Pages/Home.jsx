@@ -263,6 +263,73 @@ const Home = () => {
   const videoRefs = useRef([]);
   const quotesFormRef = useRef();
 
+  // Payment handler function
+  const paymentHandler = async (e) => {
+    const amount = 500;
+    const currency = "INR";
+    const receiptTd = "qwsaq1";
+    
+    try {
+      const response = await fetch("http://localhost:5000/order", {
+        method: "POST",
+        body: JSON.stringify({
+          amount,
+          currency,
+          receipt: receiptTd,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const order = await response.json();
+      console.log(order);
+      var options = {
+    "key": "rzp_live_R8Ga0PdPPfJptw", // Enter the Key ID generated from the Dashboard
+    amount, // Amount is in currency subunits.
+    currency,
+    "name": "Traveligo", //your business name
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature)
+    },
+    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+        "name": "Traveligo", //your customer's name
+        "email": "info@traveligo.com", 
+        "contact": "+919796339779"  //Provide the customer's phone number for better conversion rates 
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new window.Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+rzp1.open();
+    e.preventDefault();
+      
+      // You can redirect to payment page here if needed
+      // For example: window.location.href = order.payment_url;
+      
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Payment initialization failed. Please try again.");
+    }
+  };
+
   // Destinations for dropdown
   const destinations = [
     { id: 'all', name: 'All Destinations' },
@@ -2446,13 +2513,23 @@ const Home = () => {
                     
                     <input type="hidden" name="package" value={selectedPackage.title} />
                     
-                    <button
-                      type="submit"
-                      className={`w-full ${primaryColor} ${primaryHoverColor} text-white py-3 rounded-lg font-bold transition-colors duration-200`}
-                    >
-                      Submit Booking Request
-                    </button>
-                  </form>
+                   
+<div className="grid grid-cols-2 gap-4">
+  <button
+    type="submit"
+    className={`${primaryColor} ${primaryHoverColor} text-white py-3 rounded-lg font-bold transition-colors duration-200`}
+  >
+    Submit Booking Request
+  </button>
+  <button
+    type="button"
+    onClick={paymentHandler}
+    className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition-colors duration-200 flex items-center justify-center"
+  >
+    <FaPlane className="mr-2 h-4 w-4" />
+    Pay Now
+  </button>
+</div>         </form>
                 </>
               )}
             </div>

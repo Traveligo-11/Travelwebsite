@@ -10,7 +10,8 @@ const morgan = require("morgan");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { query, validationResult } = require("express-validator");
-
+const Razorpay = require("razorpay");
+const crypto = require("crypto")
 // Load env
 dotenv.config();
 const requiredEnv = [
@@ -19,6 +20,8 @@ const requiredEnv = [
   "MONGO_URI",
   "AIRIQ_API_BASE_URL",
   "AIRIQ_API_KEY",
+  "RAZORPAY_KEY_ID",
+  "RAZORPAY_SECRET"
 ];
 const missing = requiredEnv.filter((k) => !process.env[k]);
 if (missing.length > 0) {
@@ -56,6 +59,29 @@ function authenticate(req, res, next) {
     next();
   });
 }
+
+// Razorpay order endpoint
+app.post("/order", async (req, res) => {
+  try {
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_SECRET
+    });
+    
+    const options = req.body;
+    const order = await razorpay.orders.create(options);
+
+    if (!order) {
+      return res.status(500).send("Error");
+    }
+    res.json(order);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+app.post ("/order/validate" , async (req, res) =>{
+const {} = req.body;
+})
 
 // Axios instance for AirIQ
 const airiq = axios.create({
