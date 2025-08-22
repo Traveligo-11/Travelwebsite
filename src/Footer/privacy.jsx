@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaLock, FaChevronDown, FaShieldAlt, FaUserShield, FaDatabase, FaCookie } from 'react-icons/fa';
+import { FaLock, FaChevronDown, FaShieldAlt, FaUserShield, FaDatabase, FaCookie, FaShippingFast, FaMoneyBillWave, FaPlane, FaHotel, FaGlobe, FaCreditCard, FaEnvelope, FaUmbrellaBeach } from 'react-icons/fa';
 
 const Privacy = () => {
   const [expandedSections, setExpandedSections] = useState([]);
@@ -66,6 +66,54 @@ const Privacy = () => {
         "Right to request a copy of your data in a portable format.",
         "Right to withdraw consent or object to certain processing.",
         "Contact our privacy officer at enquiry@traveligo.com for requests."
+      ]
+    },
+    {
+      id: 'shipping',
+      title: "Shipping Policy",
+      icon: <FaShippingFast className="text-pink-500 text-2xl" />,
+      content: [
+        "All travel documents and tickets are delivered digitally via email immediately after purchase confirmation.",
+        "For physical items (if applicable), standard shipping takes 3-5 business days within the country.",
+        "Express shipping options are available at checkout for an additional fee (1-2 business days).",
+        "International shipping may take 7-14 business days depending on the destination.",
+        "You will receive a tracking number via email once your order has been shipped.",
+        "Shipping costs are calculated at checkout based on weight, dimensions, and destination."
+      ]
+    },
+    {
+      id: 'cancellations',
+      title: "Cancellations and Refunds",
+      icon: <FaMoneyBillWave className="text-pink-500 text-2xl" />,
+      content: [
+        "At Traveligo, we understand that plans may change. To ensure transparency and flexibility, here are our cancellation and refund guidelines:",
+        "",
+        "🛫 Flight Tickets",
+        "• Non-refundable tickets: Most cannot be canceled for a refund.",
+        "• Refundable tickets: Policies vary by airline—please check fare conditions at the time of booking.",
+        "• Change requests: May be subject to airline fees and fare differences.",
+        "",
+        "🏨 Hotel Bookings",
+        "• Free cancellation: Available for most properties up to 24–48 hours before check-in (subject to hotel policy).",
+        "• Late cancellations, no-shows, or early departures: Non-refundable.",
+        "",
+        "🌍 Tour Packages",
+        "• 30+ days before departure: Full refund (minus processing fees).",
+        "• 15–29 days before departure: 50% refund.",
+        "• Within 14 days of departure: Non-refundable.",
+        "• Refund timeline: Processed within 7–10 business days to the original payment method.",
+        "",
+        "💳 Payment Gateway & Refund Policies",
+        "• Refunds are credited back to the original payment method used at the time of booking.",
+        "• Processing fees charged by the payment gateway are non-refundable.",
+        "• In case of failed or incomplete transactions, the deducted amount (if any) is automatically reversed by your bank/payment provider within 5–7 working days.",
+        "",
+        "📩 Need Assistance?",
+        "For cancellations or refund requests, please reach out to our support team:",
+        "✉️ info@traveligo.in",
+        "",
+        "🛡️ Travel Insurance",
+        "We strongly recommend purchasing travel insurance to safeguard against unexpected changes, medical emergencies, or other unforeseen circumstances."
       ]
     }
   ];
@@ -135,7 +183,7 @@ const Privacy = () => {
         </div>
       </div>
 
-      {/* Content Container - All content remains exactly the same */}
+      {/* Content Container */}
       <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -150,10 +198,10 @@ const Privacy = () => {
               whileTap={{ scale: 0.95 }}
               className="inline-flex items-center bg-gradient-to-r from-pink-500 to-pink-600 text-white text-sm font-semibold py-2 px-6 rounded-full mb-6 shadow-lg"
             >
-              <FaLock className="mr-2" /> PRIVACY POLICY
+              <FaLock className="mr-2" /> POLICIES
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-600">Privacy</span> Matters
+              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-600">Policies</span>
             </h1>
             <motion.div
               className="w-24 h-1 bg-gradient-to-r from-pink-300 to-pink-500 mx-auto mb-6 rounded-full"
@@ -161,8 +209,8 @@ const Privacy = () => {
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
             />
-            <p className="text-lg text-white  max-w-2xl mx-auto">
-              We're committed to protecting your personal information and being transparent about our practices.
+            <p className="text-lg text-white max-w-2xl mx-auto">
+              We're committed to transparency about our privacy practices, shipping, and cancellation policies.
             </p>
           </motion.div>
 
@@ -219,20 +267,86 @@ const Privacy = () => {
                         className="overflow-hidden"
                       >
                         <div className="px-6 pb-6 pl-16">
-                          <ul className="space-y-3 text-gray-600">
-                            {section.content.map((item, index) => (
-                              <motion.li 
-                                key={index} 
-                                className="flex items-start"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                              >
-                                <span className="text-pink-400 mr-2">•</span>
-                                {item}
-                              </motion.li>
-                            ))}
-                          </ul>
+                          {section.id === 'cancellations' ? (
+                            <div className="space-y-4 text-gray-600">
+                              {section.content.map((item, index) => {
+                                if (item === "") return <div key={index} className="h-3"></div>;
+                                
+                                if (item.startsWith("🛫") || item.startsWith("🏨") || item.startsWith("🌍") || 
+                                    item.startsWith("💳") || item.startsWith("📩") || item.startsWith("🛡️")) {
+                                  return (
+                                    <motion.div 
+                                      key={index}
+                                      className="font-semibold text-lg mt-4 text-pink-600"
+                                      initial={{ opacity: 0, x: -10 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: index * 0.05 }}
+                                    >
+                                      {item}
+                                    </motion.div>
+                                  );
+                                }
+                                
+                                if (item.startsWith("•")) {
+                                  return (
+                                    <motion.div 
+                                      key={index}
+                                      className="flex items-start"
+                                      initial={{ opacity: 0, x: -10 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: index * 0.05 }}
+                                    >
+                                      <span className="text-pink-400 mr-2">•</span>
+                                      {item.substring(1)}
+                                    </motion.div>
+                                  );
+                                }
+                                
+                                if (item.startsWith("✉️")) {
+                                  return (
+                                    <motion.div 
+                                      key={index}
+                                      className="flex items-center mt-2"
+                                      initial={{ opacity: 0, x: -10 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: index * 0.05 }}
+                                    >
+                                      <span className="text-pink-500 mr-2">✉️</span>
+                                      <a href="mailto:info@traveligo.in" className="text-pink-600 hover:underline">
+                                        {item.substring(2)}
+                                      </a>
+                                    </motion.div>
+                                  );
+                                }
+                                
+                                return (
+                                  <motion.div 
+                                    key={index}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                  >
+                                    {item}
+                                  </motion.div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <ul className="space-y-3 text-gray-600">
+                              {section.content.map((item, index) => (
+                                <motion.li 
+                                  key={index} 
+                                  className="flex items-start"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: index * 0.05 }}
+                                >
+                                  <span className="text-pink-400 mr-2">•</span>
+                                  {item}
+                                </motion.li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       </motion.div>
                     )}
@@ -257,15 +371,15 @@ const Privacy = () => {
                 <FaUserShield className="text-white text-2xl" />
               </motion.div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Privacy Questions?</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Questions About Our Policies?</h3>
                 <p className="text-gray-600 mb-4">
-                  Contact our Data Protection Officer for any questions about your personal data.
+                  Contact our customer service team for any questions about our policies.
                 </p>
                 <a 
-                  href="mailto:privacy@traveligo.com" 
+                  href="mailto:info@traveligo.in" 
                   className="text-pink-600 font-medium hover:text-pink-700 transition-colors inline-flex items-center"
                 >
-                  info@traveligo.com
+                  info@traveligo.in
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
