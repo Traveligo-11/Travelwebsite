@@ -94,15 +94,7 @@ const Navbar = () => {
 
           {/* Mobile Hamburger Menu */}
           <div className="md:hidden flex items-center space-x-3">
-            <a 
-              href="https://wa.me/919796337997" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="p-2 bg-green-500 text-white rounded-full shadow-sm hover:shadow-md transition-all"
-            >
-              <FaWhatsapp className="text-xl" />
-            </a>
-            
+           
             <motion.button
               onClick={toggleMobileMenu}
               className="p-2 rounded-full bg-gradient-to-r from-pink-100 to-blue-100 shadow-sm hover:shadow-md transition-all"

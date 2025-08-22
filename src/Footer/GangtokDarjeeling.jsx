@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaHeart, FaChevronDown, FaMountain, FaTimes, FaPlus, FaMinus } from 'react-icons/fa';
-import { GiTeapot, GiTigerHead, GiMonumentValley } from 'react-icons/gi';
-import { MdFamilyRestroom, MdTrain } from 'react-icons/md';
+import { FaStar, FaHeart, FaChevronDown, FaMountain, FaTimes, FaPlus, FaMinus, FaCalendarAlt, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { GiTeapot, GiTigerHead, GiMonumentValley, GiVillage, GiRiver } from 'react-icons/gi';
+import { MdFamilyRestroom, MdTrain, MdOutlineHiking } from 'react-icons/md';
 import { IoLeaf } from 'react-icons/io5';
 import emailjs from '@emailjs/browser';
 
@@ -11,6 +11,7 @@ const GangtokDarjeeling = () => {
   const [expandedPackage, setExpandedPackage] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,7 +55,57 @@ const GangtokDarjeeling = () => {
       ],
       icon: <FaMountain className="text-2xl text-blue-500" />
     },
-    // ... (other package objects remain the same)
+    {
+      id: 2,
+      title: "Romantic Honeymoon Package",
+      duration: "6 Days / 5 Nights",
+      price: "₹38,999",
+      rating: 4.9,
+      image: "/images/darjeeling2.jpeg",
+      type: "honeymoon",
+      highlights: [
+        "Candlelight dinners with mountain views",
+        "Couple spa treatments",
+        "Romantic room decorations",
+        "Private sunset viewings",
+        "Honeymoon photography session"
+      ],
+      icon: <FaHeart className="text-2xl text-pink-500" />
+    },
+    {
+      id: 3,
+      title: "Family Adventure Tour",
+      duration: "8 Days / 7 Nights",
+      price: "₹49,999",
+      rating: 4.7,
+      image: "/images/Darjeeling3.jpeg",
+      type: "family",
+      highlights: [
+        "Kid-friendly activities",
+        "Family-sized accommodations",
+        "Tea garden visits",
+        "Toy train experience",
+        "Zoo and ropeway adventures"
+      ],
+      icon: <MdFamilyRestroom className="text-2xl text-green-500" />
+    },
+    {
+      id: 4,
+      title: "Tea Estate Experience",
+      duration: "5 Days / 4 Nights",
+      price: "₹32,999",
+      rating: 4.6,
+      image: "/images/Darjeeling4.jpeg",
+      type: "cultural",
+      highlights: [
+        "Stay in heritage tea bungalows",
+        "Tea tasting sessions",
+        "Tea plucking experience",
+        "Visit to tea factories",
+        "Local cultural performances"
+      ],
+      icon: <GiTeapot className="text-2xl text-amber-600" />
+    }
   ];
 
   const galleryImages = [
@@ -77,6 +128,14 @@ const GangtokDarjeeling = () => {
     setSelectedPackage(pkg);
     setShowBookingForm(true);
     setSubmitStatus({ success: false, message: '' });
+  };
+
+  const openImageModal = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
   };
 
   const handleInputChange = (e) => {
@@ -145,7 +204,6 @@ const GangtokDarjeeling = () => {
     setIsSubmitting(true);
     
     try {
-      // Prepare special requests text
       const specialRequests = [];
       if (formData.specialRequests.candlelightDinner) specialRequests.push("Candlelight Dinner");
       if (formData.specialRequests.anniversaryCake) specialRequests.push("Anniversary Cake");
@@ -158,7 +216,6 @@ const GangtokDarjeeling = () => {
         ? specialRequests.join(", ") 
         : 'No special requests';
 
-      // Prepare the template parameters
       const templateParams = {
         package_name: selectedPackage.title,
         package_duration: selectedPackage.duration,
@@ -179,10 +236,8 @@ const GangtokDarjeeling = () => {
         message: `${formData.message}\n\nSpecial Requests: ${specialRequestsText}`
       };
 
-      // Initialize EmailJS with your User ID
       emailjs.init('37pN2ThzFwwhwk7ai');
       
-      // Send the email using EmailJS
       const response = await emailjs.send(
         'service_ov629rm',
         'template_jr1dnto',
@@ -191,7 +246,6 @@ const GangtokDarjeeling = () => {
 
       console.log('Email sent successfully!', response);
       
-      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -220,7 +274,6 @@ const GangtokDarjeeling = () => {
         message: 'Thank you for your booking request! We will contact you within 24 hours.' 
       });
       
-      // Close the form after 3 seconds
       setTimeout(() => {
         setShowBookingForm(false);
       }, 3000);
@@ -238,7 +291,305 @@ const GangtokDarjeeling = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-orange-50">
-      {/* Hero Section and other sections remain the same until the Booking Form Modal */}
+      {/* Hero Section */}
+      <div className="relative h-96 md:h-screen max-h-[80vh] overflow-hidden">
+        <div className="absolute inset-0 bg-black/40 z-10"></div>
+        <img 
+          src="/images/Darjeeling1.jpeg"
+          alt="Gangtok & Darjeeling" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 flex items-center justify-center z-20 px-4">
+          <div className="text-center max-w-4xl">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg"
+            >
+              Gangtok & Darjeeling
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-xl md:text-2xl text-white mb-8 drop-shadow-md"
+            >
+              Where the Himalayas meet colonial charm and tea-scented breezes
+            </motion.p>
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-blue-600 to-orange-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl transition-all hover:brightness-110"
+              onClick={() => document.getElementById('packages').scrollIntoView({ behavior: 'smooth' })}
+            >
+              Explore Packages
+            </motion.button>
+          </div>
+        </div>
+      </div>
+
+      {/* Introduction Section */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Queen of the Himalayas</h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Gangtok and Darjeeling offer a perfect blend of Himalayan grandeur, colonial heritage, and vibrant local culture. 
+            From the world-famous tea gardens to the breathtaking views of Kanchenjunga, every moment here is magical.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <GiTigerHead className="text-4xl text-blue-600" />,
+              title: "Tiger Hill Sunrise",
+              desc: "Witness the spectacular sunrise over Kanchenjunga from Tiger Hill"
+            },
+            {
+              icon: <MdTrain className="text-4xl text-orange-500" />,
+              title: "Toy Train Rides",
+              desc: "Experience the UNESCO-listed Darjeeling Himalayan Railway"
+            },
+            {
+              icon: <GiMonumentValley className="text-4xl text-blue-700" />,
+              title: "Buddhist Culture",
+              desc: "Explore ancient monasteries and spiritual sites"
+            }
+          ].map((feature, index) => (
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + index * 0.1 }}
+              className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center border border-gray-100 hover:border-blue-200"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-blue-50 rounded-full">
+                  {feature.icon}
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
+              <p className="text-gray-600">{feature.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Packages Section */}
+      <section id="packages" className="py-16 px-4 bg-gradient-to-b from-white to-blue-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Tour Packages</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mb-6 rounded-full"></div>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Choose from our carefully curated packages that showcase the best of Gangtok and Darjeeling.
+            </p>
+          </div>
+
+          {/* Package Tabs */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {[
+              { id: 'all', label: 'All Packages' },
+              { id: 'luxury', label: 'Luxury' },
+              { id: 'honeymoon', label: 'Honeymoon' },
+              { id: 'family', label: 'Family' },
+              { id: 'cultural', label: 'Cultural' }
+            ].map(tab => (
+              <motion.button
+                key={tab.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-blue-600 to-orange-600 text-white shadow-md'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300'
+                }`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Package Cards */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {filteredPackages.map(pkg => (
+              <motion.div
+                key={pkg.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow group"
+              >
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={pkg.image} 
+                    alt={pkg.title} 
+                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center text-amber-600 font-bold">
+                    <FaStar className="mr-1" />
+                    {pkg.rating}
+                  </div>
+                  <div className="absolute bottom-4 left-4">
+                    <div className="bg-blue-600/90 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {pkg.duration}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-bold text-gray-800">{pkg.title}</h3>
+                    <div className="flex items-center">
+                      <span className="text-2xl font-bold text-blue-600">{pkg.price}</span>
+                      <span className="text-xs text-gray-500 ml-1">/person</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mb-4">
+                    <div className="mr-3 p-2 bg-blue-100 rounded-lg">
+                      {pkg.icon}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {pkg.type === 'luxury' && 'Luxury Experience'}
+                      {pkg.type === 'honeymoon' && 'Honeymoon Special'}
+                      {pkg.type === 'family' && 'Family Package'}
+                      {pkg.type === 'cultural' && 'Cultural Tour'}
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {expandedPackage === pkg.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mb-4 overflow-hidden"
+                      >
+                        <ul className="space-y-2 pl-2">
+                          {pkg.highlights.map((highlight, i) => (
+                            <li key={i} className="flex items-start">
+                              <span className="text-blue-500 mr-2">✓</span>
+                              <span className="text-gray-700">{highlight}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => togglePackage(pkg.id)}
+                      className="text-blue-600 hover:text-blue-800 font-medium flex items-center transition-colors"
+                    >
+                      {expandedPackage === pkg.id ? 'Show Less' : 'View Highlights'}
+                      <FaChevronDown className={`ml-2 transition-transform ${expandedPackage === pkg.id ? 'rotate-180' : ''}`} />
+                    </button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-gradient-to-r from-blue-600 to-orange-600 text-white px-6 py-2 rounded-lg font-medium shadow-md hover:shadow-lg"
+                      onClick={() => handleBookNow(pkg)}
+                    >
+                      Book Now
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-blue-50 to-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Glimpses of Gangtok & Darjeeling</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mb-6 rounded-full"></div>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Witness the breathtaking beauty of these Himalayan gems through these stunning visuals.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {galleryImages.map((image, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.02 }}
+                className="relative rounded-xl overflow-hidden cursor-pointer group"
+                onClick={() => openImageModal(image)}
+              >
+                <img 
+                  src={image} 
+                  alt={`Gangtok & Darjeeling ${index + 1}`} 
+                  className="w-full h-40 md:h-56 object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Why Choose Our Tours?</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mb-6 rounded-full"></div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: <GiVillage className="text-4xl text-blue-600" />,
+                title: "Local Expertise",
+                desc: "Our guides are Himalayan natives who know every hidden trail and viewpoint"
+              },
+              {
+                icon: <IoLeaf className="text-4xl text-green-500" />,
+                title: "Sustainable Tourism",
+                desc: "We support local communities and preserve the mountain ecosystem"
+              },
+              {
+                icon: <MdOutlineHiking className="text-4xl text-blue-700" />,
+                title: "Adventure Specialists",
+                desc: "Expert-led treks and activities with top safety standards"
+              },
+              {
+                icon: <GiRiver className="text-4xl text-green-400" />,
+                title: "Cultural Immersion",
+                desc: "Authentic experiences with local communities and traditions"
+              }
+            ].map((item, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100"
+              >
+                <div className="text-4xl mb-4 flex justify-center">
+                  <div className="p-3 bg-blue-50 rounded-full">
+                    {item.icon}
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">{item.title}</h3>
+                <p className="text-gray-600 text-center">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Booking Form Modal */}
       <AnimatePresence>
@@ -564,6 +915,32 @@ const GangtokDarjeeling = () => {
               )}
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative max-w-6xl w-full max-h-[90vh]"
+            >
+              <button
+                onClick={closeImageModal}
+                className="absolute -top-12 right-0 text-white hover:text-gray-300 z-10 transition-colors bg-black/50 rounded-full p-2"
+              >
+                <FaTimes className="text-2xl" />
+              </button>
+              <img 
+                src={selectedImage} 
+                alt="Enlarged view" 
+                className="w-full h-full object-contain max-h-[90vh] rounded-lg"
+              />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

@@ -1,11 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import logo from './logo.jpeg';
 import { useState } from 'react';
 import { FaFacebook, FaYoutube, FaInstagram, FaLinkedin, FaArrowRight, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
 import { FaXTwitter, FaHeart } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
-import React from 'react';
 
 emailjs.init("37pN2ThzFwwhwk7ai");
 
@@ -22,19 +21,63 @@ const Footer = () => {
     navigate(path);
   };
 
+  // Function to open WhatsApp with pre-filled message
+  const openWhatsApp = () => {
+    const phoneNumber = "919796337997";
+    const message = "Hello Traveligo!";
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const links = {
     Explore: [
-      { name: 'Kashmir Tours', path: '/kashmir' },
-      { name: 'Ladakh Adventures', path: '/ladakh' },
-      { name: 'Honeymoon Specials', path: '/honeymoon' },
-      { name: 'Himachal Manali Packages', path: '/Himachal' },
-      { name: 'Rajasthan Packages', path: '/Rajasthan' },
-      { name: 'Goa Packages', path: '/Goa' },
-      { name: 'Kerala Packages', path: '/Kerala' },
-      { name: 'Dubai Packages', path: '/Dubai' },
-      { name: 'Bali Packages', path: '/Bali' },
-      { name: 'Thailand Packages', path: '/Thailand' },
-      { name: 'Gangtok & Dargelling', path: '/GangtokDargelling' },
+      {
+        category: "Domestic Packages",
+        items: [
+          { name: 'Kashmir Tours', path: '/kashmir' },
+          { name: 'Ladakh Adventures', path: '/ladakh' },
+          { name: 'Honeymoon Specials', path: '/honeymoon' },
+          { name: 'Himachal Manali Packages', path: '/Himachal' },
+          { name: 'Rajasthan Packages', path: '/Rajasthan' },
+          { name: 'Goa Packages', path: '/Goa' },
+          { name: 'Kerala Packages', path: '/Kerala' },
+          { name: 'Spiti Valley', path: '/Spiti' },
+          { name: 'Andaman and Nicobar Islands', path: '/Andaman' },
+          { name: 'Bhutan', path: '/Bhutan' },
+          { name: 'Meghalaya', path: '/Meghalaya' },
+          { name: 'Darjeeling Gangtok and Sikkim', path: '/GangtokDarjeeling' },
+          { name: 'Uttarakhand', path: '/Utrakhand' },
+          { name: 'Bangalore Mysore Ooty', path: '/Banglore' },
+          { name: 'Lakshadweep', path: '/Lakshadweep' },
+          { name: 'Madhya Pradesh', path: '/MadhyaPradesh' }
+        ]
+      },
+      {
+        category: "International Packages",
+        items: [
+          { name: 'Dubai Packages', path: '/Dubai' },
+          { name: 'Bali Packages', path: '/Bali' },
+          { name: 'Thailand Packages', path: '/Thailand' },
+          { name: 'Vietnam', path: '/Vietnam' },
+          { name: 'Singapore and Malaysia', path: '/Singapore' },
+          { name: 'Hong Kong and Macao', path: '/Hong' },
+          { name: 'New Zealand', path: '/NewZealand' },
+          { name: 'South Africa', path: '/SouthAfrica' },
+          { name: 'Japan', path: '/Japan' },
+          { name: 'Azerbaijan', path: '/Azerbaijan' },
+          { name: 'Almaty', path: '/Almaty' },
+          { name: 'Georgia', path: '/Georgia' },
+          { name: 'Uzbekistan', path: '/Uzbekistan' },
+          { name: 'Kazakhstan', path: '/Kazakhstan' },
+          { name: 'South Korea', path: '/South' },
+          { name: 'Sri Lanka', path: '/Srilanka' },
+          { name: 'Egypt', path: '/Egypt' },
+          { name: 'Russia', path: '/Russia' },
+          { name: 'Mauritius', path: '/Mauritius' },
+          { name: 'Turkey', path: '/Turkey' },
+          { name: 'Nepal', path: '/Nepal' }
+        ]
+      }
     ],
     Company: [
       { name: 'About Us', path: '/about' },
@@ -100,7 +143,7 @@ const Footer = () => {
           className="bg-green-500 text-white p-4 rounded-full shadow-xl hover:bg-green-600 transition-colors flex items-center justify-center relative"
           aria-label="WhatsApp Chat"
         >
-          <FaWhatsapp className="text-3xl" />
+          <FaWhatsapp className="text-2xl" />
           <span className="absolute bg-red-500 text-white text-xs rounded-full px-2 py-1 -top-2 -right-2 animate-pulse">1</span>
         </motion.button>
 
@@ -113,7 +156,7 @@ const Footer = () => {
             <div className="bg-green-500 p-4 text-white flex justify-between items-center">
               <div className="flex items-center">
                 <FaWhatsapp className="text-2xl mr-2" />
-                <span className="font-bold">WhatsApp Support</span>
+                <span className="font-bold">Traveligo Support</span>
               </div>
               <button 
                 onClick={() => setShowWhatsappChat(false)}
@@ -123,21 +166,24 @@ const Footer = () => {
               </button>
             </div>
             <div className="p-4 bg-gray-50 h-64 overflow-y-auto">
-              <div className="text-center py-8">
-                <FaWhatsapp className="text-5xl text-green-500 mx-auto mb-4" />
+              <div className="flex flex-col items-start mb-4">
+                <div className="bg-white p-3 rounded-lg shadow-sm max-w-[80%] mb-2">
+                  <p className="text-gray-800">Hello Traveligo</p>
+                </div>
+                <div className="text-xs text-gray-500 self-start">Just now</div>
+              </div>
+              <div className="text-center py-4">
                 <p className="text-gray-700 mb-4">Hi there! How can we help you?</p>
                 <p className="text-sm text-gray-500">We'll respond as soon as possible</p>
               </div>
             </div>
-            <div className="p-4 border-t border-gray-200">
-              <a 
-                href="https://wa.me/919796337997" 
-                target="_blank" 
-                rel="noopener noreferrer"
+            <div className="p-4 border-t border-gray-200 bg-white">
+              <button 
+                onClick={openWhatsApp}
                 className="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-lg font-medium transition-colors"
               >
-                Start Chat
-              </a>
+                Open WhatsApp
+              </button>
             </div>
           </motion.div>
         )}
@@ -290,7 +336,7 @@ const Footer = () => {
                   </div>
                   <div className="flex justify-center mt-2">
                     <a 
-                      href="https://share.google/D3tHGlyZeHC7nN6xV"
+                      href="https://maps.google.com/?q=First+Boulevard+Road+Lane,+Dalgate,+Srinagar"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-pink-500 hover:text-pink-600 text-xs font-medium flex items-center"
@@ -342,22 +388,51 @@ const Footer = () => {
               <h4 className="text-lg font-bold mb-4 text-pink-600">
                 {category}
               </h4>
-              <ul className="space-y-3">
-                {items.map((item) => (
-                  <motion.li 
-                    key={item.name}
-                    whileHover={{ x: 3 }}
-                  >
-                    <button 
-                      onClick={() => handleNavigation(item.path)}
-                      className="text-gray-600 hover:text-pink-500 transition-colors flex items-center text-sm w-full text-left"
+              
+              {category === 'Explore' ? (
+                <div className="space-y-6">
+                  {items.map((section, sectionIndex) => (
+                    <div key={sectionIndex}>
+                      <h5 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wider">
+                        {section.category}
+                      </h5>
+                      <ul className="space-y-3">
+                        {section.items.map((item) => (
+                          <motion.li 
+                            key={item.name}
+                            whileHover={{ x: 3 }}
+                          >
+                            <button 
+                              onClick={() => handleNavigation(item.path)}
+                              className="text-gray-600 hover:text-pink-500 transition-colors flex items-center text-sm w-full text-left"
+                            >
+                              <span className="w-2 h-2 bg-pink-300 rounded-full mr-2 transition-all group-hover:w-3 group-hover:bg-pink-500"></span>
+                              {item.name}
+                            </button>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {items.map((item) => (
+                    <motion.li 
+                      key={item.name}
+                      whileHover={{ x: 3 }}
                     >
-                      <span className="w-2 h-2 bg-pink-300 rounded-full mr-2 transition-all group-hover:w-3 group-hover:bg-pink-500"></span>
-                      {item.name}
-                    </button>
-                  </motion.li>
-                ))}
-              </ul>
+                      <button 
+                        onClick={() => handleNavigation(item.path)}
+                        className="text-gray-600 hover:text-pink-500 transition-colors flex items-center text-sm w-full text-left"
+                      >
+                        <span className="w-2 h-2 bg-pink-300 rounded-full mr-2 transition-all group-hover:w-3 group-hover:bg-pink-500"></span>
+                        {item.name}
+                      </button>
+                    </motion.li>
+                  ))}
+                </ul>
+              )}
             </motion.div>
           ))}
         </div>

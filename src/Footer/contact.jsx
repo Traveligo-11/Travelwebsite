@@ -5,8 +5,7 @@ import emailjs from '@emailjs/browser';
 
 // Initialize EmailJS with your User ID
 emailjs.init('37pN2ThzFwwhwk7ai'); // Replace with your actual EmailJS User ID
- 
-      
+
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -19,6 +18,25 @@ const ContactUs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [activeLocation, setActiveLocation] = useState(0); // For tracking active location
+
+  // Define multiple locations with coordinates
+  const locations = [
+    {
+      id: 0,
+      name: 'Srinagar Office',
+      address: 'First Boulevard road lane Dalgate Srinagar 190001, Jammu & Kashmir',
+      coordinates: '34.0807346,74.8295321',
+      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3304.0807346!2d74.8295321!3d34.0807346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e18ffa02e8dffd%3A0x5ebe270b595e9617!2sFirst%20Lane%20Boulevard!5e0!3m2!1sen!2sin!4v1712345678901!5m2!1sen!2sin'
+    },
+    {
+      id: 1,
+      name: 'Delhi Office',
+      address: 'Abul Fazal Enclave Part 2, Jamia Nagar, Okhla, New Delhi, 110025',
+      coordinates: '28.560436,77.290303',
+      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14014.097278325854!2d77.28053194999999!3d28.560435999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce7db5d0c41a9%3A0x1b7a0b2b1c0d6e5f!2sAbul%20Fazal%20Enclave%2C%20Jamia%20Nagar%2C%20Okhla%2C%20New%20Delhi%2C%20Delhi%20110025!5e0!3m2!1sen!2sin!4v1712345678901!5m2!1sen!2sin'
+    }
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -126,21 +144,24 @@ const ContactUs = () => {
                   <p className="text-gray-600">info@traveligo.in</p>
                   <p className="text-gray-600">enquiry@traveligo.in</p>
                 </div>
-                  <div>
-                  <h3 className="text-lg font-semibold text-gray-800">Landing Page</h3>
-                  <p className="text-gray-600">Tours.Traveligo.in</p>
-                </div>
               </div>
+              
               <div className="flex items-start">
                 <div className="bg-pink-100 p-3 rounded-full mr-4">
                   <FaMapMarkerAlt className="text-pink-600 text-xl" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">Visit Us</h3>
-                  <p className="text-gray-600">First Boulevard road lane Dalgate Srinagar 190001, Jammu & Kashmir</p>
-                  <p className="text-gray-600">Jammu & Kashmir, India - 190001</p>
-                  <p className="text-gray-600">Abul Fazal Enclave Part 2, Jamia Nagar, Okhla, New Delhi, 110025</p>
-                  <p className="text-gray-600">New Delhi, 110025</p>
+                  <div className="mb-2">
+                    <p className="font-medium text-gray-800">Srinagar Office:</p>
+                    <p className="text-gray-600">First Boulevard road lane Dalgate</p>
+                    <p className="text-gray-600">Srinagar 190001, Jammu & Kashmir</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">Delhi Office:</p>
+                    <p className="text-gray-600">Abul Fazal Enclave Part 2, Jamia Nagar</p>
+                    <p className="text-gray-600">Okhla, New Delhi, 110025</p>
+                  </div>
                 </div>
               </div>
 
@@ -310,16 +331,42 @@ const ContactUs = () => {
           className="mt-16 bg-white p-6 rounded-xl shadow-lg"
         >
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Find Us on Map</h2>
+          
+          {/* Location Selector */}
+          <div className="flex space-x-4 mb-6">
+            {locations.map((location, index) => (
+              <button
+                key={location.id}
+                onClick={() => setActiveLocation(index)}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  activeLocation === index
+                    ? 'bg-pink-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {location.name}
+              </button>
+            ))}
+          </div>
+          
           <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3304.0807346!2d74.8295321!3d34.0807346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e18ffa02e8dffd%3A0x5ebe270b595e9617!2sFirst%20Lane%20Boulevard!5e0!3m2!1sen!2sin!4v1712345678901!5m2!1sen!2sin"
+              src={locations[activeLocation].mapUrl}
               width="100%"
               height="500"
               style={{ border: 0 }}
               allowFullScreen=""
               loading="lazy"
-              title="Traveligo Location"
+              title={`Traveligo ${locations[activeLocation].name}`}
             ></iframe>
+          </div>
+          
+          {/* Location Details */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              {locations[activeLocation].name}
+            </h3>
+            <p className="text-gray-600">{locations[activeLocation].address}</p>
           </div>
         </motion.div>
       </div>

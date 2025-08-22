@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
+import tailwind from '@tailwindcss/vite';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
@@ -16,14 +19,38 @@ export default defineConfig({
         ]
       }
     }),
-    tailwindcss()
+    tailwind() // Official Tailwind Vite plugin
   ],
   resolve: {
     alias: {
-      'react': path.resolve('node_modules/react'),
-      'react-dom': path.resolve('node_modules/react-dom'),
-      'react-icons': path.resolve('node_modules/react-icons'),
-      'leaflet': path.resolve('node_modules/leaflet/dist/leaflet-src.esm.js')
+      '@': path.resolve(__dirname, './src'),
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
+      'react-icons': path.resolve(__dirname, 'node_modules/react-icons'),
+      'leaflet': path.resolve(__dirname, 'node_modules/leaflet/dist/leaflet-src.esm.js')
+    }
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'https://omairiq.azurewebsites.net/login',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: false,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader(
+              'Authorization', 
+              'Bearer NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlBvTjE2NGNkLy9heE53WC9hM00rS1ZrcnJSa2Q0S05adHl3Q0NHZmU4Uzg9'
+            );
+            proxyReq.setHeader('Accept', 'application/json');
+            proxyReq.setHeader('Content-Type', 'application/json');
+          });
+        }
+      }
     }
   },
   optimizeDeps: {
@@ -31,17 +58,24 @@ export default defineConfig({
       'react',
       'react-dom',
       'react/jsx-runtime',
+      'react-router-dom',
       'react-icons',
       'leaflet',
-      'react-leaflet'
+      'react-leaflet',
+      '@headlessui/react',
+      '@heroicons/react'
     ],
     esbuildOptions: {
       loader: {
         '.js': 'jsx'
-      }
+      },
+      jsx: 'automatic'
     }
   },
   build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true,
     rollupOptions: {
       output: {
         interop: 'auto',
@@ -49,9 +83,16 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['@headlessui/react', '@heroicons/react'],
           'chart-vendor': ['chart.js', 'react-chartjs-2'],
-          'map-vendor': ['leaflet', 'react-leaflet']
-        }
+          'map-vendor': ['leaflet', 'react-leaflet'],
+          'utility-vendor': ['axios', 'lodash', 'date-fns']
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       }
+    },
+    commonjsOptions: {
+      include: [/node_modules/]
     }
   }
 });

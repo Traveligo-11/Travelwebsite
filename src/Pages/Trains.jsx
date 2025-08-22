@@ -1,57 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  FaTrain, 
-  FaExchangeAlt,
-  FaCalendarAlt,
-  FaUser,
-  FaSearch,
-  FaPhone,
-  FaEnvelope,
-  FaUserTie,
-  FaStar,
-  FaCheck,
-  FaMapMarkerAlt,
-  FaUsers,
-  FaRegSmileWink,
-  FaArrowRight,
-  FaPaperPlane,
-  FaArrowLeft,
-  FaHeart,
-  FaGlobeAmericas,
-  FaUmbrellaBeach,
-  FaCity,
-  FaMountain,
-  FaQuoteRight,
-  FaChevronDown,
-  FaChevronUp,
-  FaPlus,
-  FaMinus,
-  FaTrash,
-  FaShieldAlt,
-  FaGift,
-  FaMoneyBillWave,
-  FaHotel,
-  FaSuitcase,
-  FaWifi,
-  FaUtensils,
-  FaHeadset,
-  FaCalculator
+  FaTrain, FaExchangeAlt, FaCalendarAlt, FaUser, FaSearch, 
+  FaPhone, FaEnvelope, FaUserTie, FaStar, FaCheck, 
+  FaMapMarkerAlt, FaUsers, FaRegSmileWink, FaArrowRight, 
+  FaPaperPlane, FaArrowLeft, FaHeart, FaGlobeAmericas, 
+  FaUmbrellaBeach, FaCity, FaMountain, FaQuoteRight, 
+  FaChevronDown, FaChevronUp, FaPlus, FaMinus, FaTrash, 
+  FaShieldAlt, FaGift, FaMoneyBillWave, FaHotel, FaSuitcase, 
+  FaWifi, FaUtensils, FaHeadset, FaCalculator, FaTimes
 } from 'react-icons/fa';
-import { 
-  FaFacebook, 
-  FaTwitter, 
-  FaInstagram, 
-  FaLinkedin 
-} from 'react-icons/fa';
-import { IoRocketSharp } from 'react-icons/io5';
-import { GiEarthAmerica } from 'react-icons/gi';
-import { BsClockHistory } from 'react-icons/bs';
+import { IoRocketSharp, IoTrain } from 'react-icons/io5';
+import { GiEarthAmerica, GiRailway } from 'react-icons/gi';
+import { BsClockHistory, BsTrainFront } from 'react-icons/bs';
 import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import emailjs from '@emailjs/browser';
 
-// Image URLs from Unsplash (free to use)
+// Image URLs
 const Manali = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRszBbmcya3FF5OaCFeYTTnt28A2VFwPbaTvWh4mrgfj18vKReAxqZNcfkssi752feoPRw&usqp=CAU";
 const Rishikesh = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7FFmLyredaOlQxG66UYwNA7m4GHQijW1asA&s";
 const Shatabdi = "https://th-i.thgim.com/public/incoming/tiqeka/article69037742.ece/alternates/FREE_1200/Linke-Hofmann-Busch%20LHB%20coach.jpg";
@@ -59,63 +25,61 @@ const Rajdhani = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjvEEgK4
 const Duronto = "https://www.jagranimages.com/images/newimg/01062022/01_06_2022-duronto_exp_coaches_22762989.webp";
 const VandeBharat = "https://metrorailnews.in/wp-content/uploads/2025/04/P14GXF.jpg";
 
-// Initialize emailjs (replace with your actual public key)
+// Initialize emailjs
 emailjs.init('127OFHb2IQq0zSiFJ');
 
 const Trains = () => {
-  const [tripType, setTripType] = useState('ONE WAY');
+  // State for train search
+  const [tripType, setTripType] = useState('ONE_WAY');
   const [fromCity, setFromCity] = useState('Delhi');
   const [toCity, setToCity] = useState('Mumbai');
   const [departureDate, setDepartureDate] = useState(new Date());
   const [returnDate, setReturnDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)));
   const [passengerCount, setPassengerCount] = useState(1);
-  const [classType, setClassType] = useState('AC 2 Tier');
+  const [classType, setClassType] = useState('AC_2_TIER');
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [showClassDropdown, setShowClassDropdown] = useState(false);
+  const [selectedFare, setSelectedFare] = useState('REGULAR');
+
+  // State for train results
+  const [trains, setTrains] = useState([]);
+  const [loadingTrains, setLoadingTrains] = useState(false);
+  const [trainError, setTrainError] = useState('');
+  const [showTrainResults, setShowTrainResults] = useState(false);
+  const [filters, setFilters] = useState({
+    priceRange: [0, 10000],
+    trainTypes: [],
+    departureTime: [],
+    duration: 'any'
+  });
+
+  // State for booking form
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [formError, setFormError] = useState('');
-  const [selectedFare, setSelectedFare] = useState('Regular');
-  const [multiCityTrips, setMultiCityTrips] = useState([
-    { from: 'Delhi', to: 'Mumbai', date: new Date() },
-    { from: 'Mumbai', to: 'Chennai', date: new Date(new Date().setDate(new Date().getDate() + 3)) }
-  ]);
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [showDateCalculator, setShowDateCalculator] = useState(false);
-  const [dateCalculation, setDateCalculation] = useState({
-    startDate: new Date(),
-    endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
-    daysDifference: 1
+  const [requestData, setRequestData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    tripType: 'ONE_WAY',
+    trips: [],
+    passengers: 1,
+    classType: 'AC_2_TIER',
+    specialRequests: ''
   });
 
-  const features = [
-    {
-      icon: <FaTrain className="text-blue-500 text-2xl sm:text-3xl" />,
-      title: "10,000+ Daily Trains",
-      description: "Access to the widest selection of trains across all routes"
-    },
-    {
-      icon: <FaUserTie className="text-purple-500 text-2xl sm:text-3xl" />,
-      title: "Safe & Comfortable",
-      description: "Experienced staff and well-maintained trains for your journey"
-    },
-    {
-      icon: <FaHeadset className="text-pink-500 text-2xl sm:text-3xl" />,
-      title: "24/7 Customer Support",
-      description: "Dedicated support team available round the clock"
-    }
-  ];
+  // State for multi-city trips
+  const [multiCityTrips, setMultiCityTrips] = useState([
+    { from: 'Delhi', to: 'Mumbai', departureDate: new Date() },
+    { from: 'Mumbai', to: 'Chennai', departureDate: new Date(new Date().setDate(new Date().getDate() + 3)) }
+  ]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // UI state
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
 
+  // Cities data
   const cities = [
     'Delhi', 'Mumbai', 'Chennai', 'Bangalore', 'Hyderabad', 'Kolkata', 
     'Ahmedabad', 'Pune', 'Jaipur', 'Lucknow', 'Bhopal', 'Patna',
@@ -124,13 +88,88 @@ const Trains = () => {
   ];
 
   const classTypes = [
-    'AC First Class', 
-    'AC 2 Tier', 
-    'AC 3 Tier', 
-    'Sleeper', 
-    'Second Sitting',
-    'Executive Class',
-    'Chair Car'
+    { code: 'AC_FIRST_CLASS', name: 'AC First Class', icon: <FaTrain className="text-blue-400" /> },
+    { code: 'AC_2_TIER', name: 'AC 2 Tier', icon: <FaTrain className="text-purple-400" /> },
+    { code: 'AC_3_TIER', name: 'AC 3 Tier', icon: <FaTrain className="text-green-400" /> },
+    { code: 'SLEEPER', name: 'Sleeper', icon: <FaTrain className="text-yellow-400" /> },
+    { code: 'SECOND_SITTING', name: 'Second Sitting', icon: <FaTrain className="text-red-400" /> }
+  ];
+
+  const fareTypes = [
+    { code: 'REGULAR', name: 'Regular', description: 'Standard fares with no restrictions', icon: <FaMoneyBillWave className="text-blue-500" /> },
+    { code: 'STUDENT', name: 'Student', description: 'Extra discounts for students', icon: <FaUser className="text-green-500" /> },
+    { code: 'SENIOR_CITIZEN', name: 'Senior Citizen', description: 'Special senior discounts', icon: <FaUserTie className="text-purple-500" /> },
+    { code: 'MILITARY', name: 'Military', description: 'Discounts for armed forces', icon: <FaShieldAlt className="text-red-500" /> }
+  ];
+
+  const features = [
+    {
+      icon: <IoTrain className="text-blue-500 text-3xl sm:text-4xl" />,
+      title: "10,000+ Daily Trains",
+      description: "Access to trains from all major routes across India",
+      color: "from-blue-400 to-blue-600"
+    },
+    {
+      icon: <FaUserTie className="text-purple-500 text-3xl sm:text-4xl" />,
+      title: "Best Price Guarantee",
+    
+      description: "We guarantee the best prices for your train journeys",
+      color: "from-purple-400 to-purple-600"
+    },
+    {
+      icon: <FaHeadset className="text-pink-500 text-3xl sm:text-4xl" />,
+      title: "24/7 Customer Support",
+      description: "Dedicated support team available round the clock",
+      color: "from-pink-400 to-pink-600"
+    }
+  ];
+
+  const trainAmenities = [
+    { icon: <FaWifi className="text-blue-500 text-xl" />, name: "WiFi (Select Trains)", color: "bg-blue-100 text-blue-600" },
+    { icon: <FaUtensils className="text-amber-500 text-xl" />, name: "Food Service", color: "bg-amber-100 text-amber-600" },
+    { icon: <FaSuitcase className="text-purple-500 text-xl" />, name: "Luggage Space", color: "bg-purple-100 text-purple-600" },
+    { icon: <FaHotel className="text-green-500 text-xl" />, name: "Bedding (AC Classes)", color: "bg-green-100 text-green-600" },
+    { icon: <FaHeadset className="text-pink-500 text-xl" />, name: "Entertainment", color: "bg-pink-100 text-pink-600" },
+    { icon: <FaGift className="text-red-500 text-xl" />, name: "Loyalty Rewards", color: "bg-red-100 text-red-600" }
+  ];
+
+  const trainDetails = [
+    {
+      type: 'SHATABDI',
+      name: 'Shatabdi Express',
+      image: Shatabdi,
+      features: ['High-speed', 'Meals included', 'Comfortable seating', 'Limited stops'],
+      priceRange: '₹500 - ₹5,000',
+      classes: 'Chair Car/Executive',
+      color: "border-blue-200 hover:border-blue-300"
+    },
+    {
+      type: 'RAJDHANI',
+      name: 'Rajdhani Express',
+      image: Rajdhani,
+      features: ['Premium service', 'Meals included', 'Bedding provided', 'Overnight journeys'],
+      priceRange: '₹1,200 - ₹8,000',
+      classes: 'AC 1/2/3 Tier',
+      color: "border-purple-200 hover:border-purple-300"
+    },
+    {
+      type: 'DURONTO',
+      name: 'Duronto Express',
+      image: Duronto,
+      features: ['Non-stop', 'Meals included', 'Quick transit', 'Limited stops'],
+      priceRange: '₹900 - ₹6,000',
+      classes: 'AC/Sleeper',
+      color: "border-green-200 hover:border-green-300"
+    },
+    {
+      type: 'VANDE_BHARAT',
+      name: 'Vande Bharat',
+      image: VandeBharat,
+      features: ['Semi-high speed', 'Modern amenities', 'Onboard entertainment', 'Comfortable seating'],
+      priceRange: '₹1,500 - ₹10,000',
+      classes: 'Executive/Chair Car',
+      color: "border-yellow-200 hover:border-yellow-300"
+    }
   ];
 
   const popularDestinations = [
@@ -149,50 +188,17 @@ const Trains = () => {
       price: '₹750',
       distance: '240 km',
       duration: '5 hours'
-    },
-  ];
-
-  const trainAmenities = [
-    { icon: <FaWifi className="text-blue-500" />, name: "WiFi (Select Trains)" },
-    { icon: <FaUtensils className="text-amber-500" />, name: "Food Service" },
-    { icon: <FaSuitcase className="text-purple-500" />, name: "Luggage Space" },
-    { icon: <FaHotel className="text-green-500" />, name: "Bedding (AC Classes)" }
-  ];
-
-  const trainDetails = [
-    {
-      type: 'Shatabdi Express',
-      image: Shatabdi,
-      class: 'Chair Car/Executive',
-      features: ['High-speed', 'Meals included', 'Comfortable seating', 'Limited stops'],
-      pricePerKm: '₹2.5/km',
-      minPrice: '₹500'
-    },
-    {
-      type: 'Rajdhani Express',
-      image: Rajdhani,
-      class: 'AC 1/2/3 Tier',
-      features: ['Premium service', 'Meals included', 'Bedding provided', 'Overnight journeys'],
-      pricePerKm: '₹3.5/km',
-      minPrice: '₹1200'
-    },
-    {
-      type: 'Duronto Express',
-      image: Duronto,
-      class: 'AC/Sleeper',
-      features: ['Non-stop', 'Meals included', 'Quick transit', 'Limited stops'],
-      pricePerKm: '₹3.0/km',
-      minPrice: '₹900'
-    },
-    {
-      type: 'Vande Bharat',
-      image: VandeBharat,
-      class: 'Executive/Chair Car',
-      features: ['Semi-high speed', 'Modern amenities', 'Onboard entertainment', 'Comfortable seating'],
-      pricePerKm: '₹4.0/km',
-      minPrice: '₹1500'
     }
   ];
+
+  // Effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -201,55 +207,101 @@ const Trains = () => {
     return () => clearInterval(interval);
   }, [features.length]);
 
+  // Helper functions
   const formatDate = (date) => {
-    const options = { day: 'numeric', month: 'short', weekday: 'short', year: 'numeric' };
-    return date.toLocaleDateString('en-US', options).replace(',', '');
+    return date.toISOString().split('T')[0];
   };
 
-  const handleHeroAction = (actionType) => {
-    setShowRequestForm(true);
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  // Multi-city trip handlers
+  const addTripSegment = () => {
+    if (multiCityTrips.length >= 6) return; // Limit to 6 segments
+    setMultiCityTrips([
+      ...multiCityTrips,
+      {
+        from: 'Delhi',
+        to: 'Mumbai',
+        departureDate: new Date(new Date().setDate(new Date().getDate() + multiCityTrips.length * 3))
+      }
+    ]);
+  };
+
+  const removeTripSegment = (index) => {
+    if (multiCityTrips.length <= 2) return; // Keep at least 2 segments
+    const newTrips = [...multiCityTrips];
+    newTrips.splice(index, 1);
+    setMultiCityTrips(newTrips);
+  };
+
+  const updateTripSegment = (index, field, value) => {
+    const newTrips = [...multiCityTrips];
+    newTrips[index] = { ...newTrips[index], [field]: value };
     
-    if (actionType === 'bestPrices') {
-      setRequestData(prev => ({
-        ...prev,
-        classType: 'AC 2 Tier',
-        specialRequests: 'Interested in best price deals'
-      }));
-    } else if (actionType === 'expertSupport') {
-      setRequestData(prev => ({
-        ...prev,
-        specialRequests: 'Need expert travel assistance'
-      }));
-    } else if (actionType === 'exclusiveDeals') {
-      setRequestData(prev => ({
-        ...prev,
-        specialRequests: 'Interested in exclusive deals'
-      }));
+    // If updating origin/destination, swap if they're the same as next/previous
+    if (field === 'from' || field === 'to') {
+      if (index > 0 && newTrips[index].from === newTrips[index - 1].to) {
+        // Swap with previous destination
+        const temp = newTrips[index].from;
+        newTrips[index].from = newTrips[index].to;
+        newTrips[index].to = temp;
+      } else if (index < newTrips.length - 1 && newTrips[index].to === newTrips[index + 1].from) {
+        // Swap with next origin
+        const temp = newTrips[index].to;
+        newTrips[index].to = newTrips[index].from;
+        newTrips[index].from = temp;
+      }
     }
+    
+    setMultiCityTrips(newTrips);
   };
 
+  // Event handlers
   const handleSwapCities = () => {
     const temp = fromCity;
     setFromCity(toCity);
     setToCity(temp);
   };
 
+  const handlePassengerCountChange = (count) => {
+    setPassengerCount(Math.max(1, Math.min(6, count)));
+  };
+
+  const handleClassTypeChange = (type) => {
+    setClassType(type);
+    setShowClassDropdown(false);
+  };
+
+  const handleDateChange = (date, isReturn = false) => {
+    if (isReturn) {
+      setReturnDate(date);
+    } else {
+      setDepartureDate(date);
+    }
+  };
+
   const sendEmail = async (formData) => {
     try {
       let tripsInfo = '';
-      if (formData.tripType === 'MULTICITY') {
+      if (formData.tripType === 'MULTI_CITY') {
         tripsInfo = formData.trips.map((trip, index) => 
-          `Trip ${index + 1}: ${trip.from} to ${trip.to} on ${trip.date}`
+          `Trip ${index + 1}: ${trip.from} to ${trip.to} on ${trip.departureDate}`
         ).join('\n');
       } else {
-        tripsInfo = `From: ${formData.trips[0].from} to ${formData.trips[0].to} on ${formData.trips[0].date}`;
-        if (formData.tripType === 'ROUNDTRIP') {
-          tripsInfo += `\nReturn: ${formData.trips[1].from} to ${formData.trips[1].to} on ${formData.trips[1].date}`;
+        tripsInfo = `From: ${formData.trips[0].from} to ${formData.trips[0].to} on ${formData.trips[0].departureDate}`;
+        if (formData.tripType === 'ROUND_TRIP') {
+          tripsInfo += `\nReturn: ${formData.trips[1].from} to ${formData.trips[1].to} on ${formData.trips[1].departureDate}`;
         }
       }
 
       const templateParams = {
-        to_name: 'Travel Team',
+        to_name: 'Train Booking Team',
         from_name: formData.name,
         from_email: formData.email,
         phone: formData.phone,
@@ -262,7 +314,7 @@ const Trains = () => {
       };
 
       await emailjs.send(
-       'service_9jzlq6q', 
+        'service_9jzlq6q',
         'template_mwwf2lg',
         templateParams,
         '127OFHb2IQq0zSiFJ'
@@ -274,17 +326,6 @@ const Trains = () => {
       return false;
     }
   };
-
-  const [requestData, setRequestData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    tripType: 'ONE WAY',
-    trips: [],
-    passengers: 1,
-    classType: 'AC 2 Tier',
-    specialRequests: ''
-  });
 
   const handleRequestSubmit = async (e) => {
     e.preventDefault();
@@ -298,23 +339,23 @@ const Trains = () => {
     }
 
     let tripsData = [];
-    if (tripType === 'MULTICITY') {
+    if (tripType === 'MULTI_CITY') {
       tripsData = multiCityTrips.map(trip => ({
         from: trip.from,
         to: trip.to,
-        date: formatDate(trip.date)
+        departureDate: formatDate(trip.departureDate)
       }));
     } else {
       tripsData = [{
         from: fromCity,
         to: toCity,
-        date: formatDate(departureDate)
+        departureDate: formatDate(departureDate)
       }];
-      if (tripType === 'ROUNDTRIP') {
+      if (tripType === 'ROUND_TRIP') {
         tripsData.push({
           from: toCity,
           to: fromCity,
-          date: formatDate(returnDate)
+          departureDate: formatDate(returnDate)
         });
       }
     }
@@ -346,10 +387,10 @@ const Trains = () => {
           name: '',
           email: '',
           phone: '',
-          tripType: 'ONE WAY',
+          tripType: 'ONE_WAY',
           trips: [],
           passengers: 1,
-          classType: 'AC 2 Tier',
+          classType: 'AC_2_TIER',
           specialRequests: ''
         });
       }, 3000);
@@ -369,109 +410,7 @@ const Trains = () => {
     }));
   };
 
-  const handlePassengerCountChange = (count) => {
-    setPassengerCount(Math.max(1, Math.min(6, count)));
-  };
-
-  const handleClassTypeChange = (type) => {
-    setClassType(type);
-    setShowClassDropdown(false);
-  };
-
-  const handleDateChange = (date, isReturn = false) => {
-    if (isReturn) {
-      setReturnDate(date);
-    } else {
-      setDepartureDate(date);
-    }
-  };
-
-  const addMultiCityTrip = () => {
-    setMultiCityTrips([...multiCityTrips, { 
-      from: '', 
-      to: '', 
-      date: new Date(new Date().setDate(new Date().getDate() + multiCityTrips.length * 3)) 
-    }]);
-  };
-
-  const removeMultiCityTrip = (index) => {
-    if (multiCityTrips.length > 1) {
-      const updatedTrips = [...multiCityTrips];
-      updatedTrips.splice(index, 1);
-      setMultiCityTrips(updatedTrips);
-    }
-  };
-
-  const handleMultiCityChange = (index, field, value) => {
-    const updatedTrips = [...multiCityTrips];
-    updatedTrips[index][field] = value;
-    setMultiCityTrips(updatedTrips);
-  };
-
-  const handleMultiCityDateChange = (date, index) => {
-    const updatedTrips = [...multiCityTrips];
-    updatedTrips[index].date = date;
-    setMultiCityTrips(updatedTrips);
-  };
-
-  const handleDateCalculation = (dates) => {
-    const [start, end] = dates;
-    setDateCalculation(prev => ({
-      ...prev,
-      startDate: start,
-      endDate: end,
-      daysDifference: Math.round((end - start) / (1000 * 60 * 60 * 24))
-    }));
-  };
-
-  const DepartureDatePicker = () => (
-    <motion.div 
-      variants={itemVariants}
-      className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative"
-    >
-      <div className="absolute -right-4 -top-4 opacity-10">
-        <FaCalendarAlt className="text-blue-200 text-3xl" />
-      </div>
-      <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
-        <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
-        DEPARTURE DATE
-      </label>
-      <div className="flex items-center">
-        <DatePicker
-          selected={departureDate}
-          onChange={(date) => handleDateChange(date)}
-          minDate={new Date()}
-          dateFormat="d MMM yyyy"
-          className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
-        />
-      </div>
-    </motion.div>
-  );
-
-  const ReturnDatePicker = () => (
-    <motion.div 
-      variants={itemVariants}
-      className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative"
-    >
-      <div className="absolute -right-4 -top-4 opacity-10">
-        <BsClockHistory className="text-blue-200 text-3xl" />
-      </div>
-      <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
-        <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
-        RETURN DATE
-      </label>
-      <div className="flex items-center">
-        <DatePicker
-          selected={returnDate}
-          onChange={(date) => handleDateChange(date, true)}
-          minDate={departureDate}
-          dateFormat="d MM yyyy"
-          className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
-        />
-      </div>
-    </motion.div>
-  );
-
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -528,14 +467,14 @@ const Trains = () => {
 
       {/* Header with Scrolling Effect */}
       <motion.header 
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-2' : 'bg-transparent py-4'}`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
           <div className="flex items-center">
-            <FaTrain className="text-blue-500 text-2xl sm:text-3xl mr-2" />
+            <GiRailway className="text-blue-500 text-2xl sm:text-3xl mr-2" />
             <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               RailJourney
             </span>
@@ -559,7 +498,7 @@ const Trains = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white shadow-2xl p-4 sm:p-6 md:p-8 mb-8 sm:mb-12 relative overflow-hidden -mt-20 z-20 mx-4 sm:mx-6 rounded-xl"
+        className="bg-white shadow-2xl p-4 sm:p-6 md:p-8 mb-8 sm:mb-12 relative overflow-hidden z-20 mx-4 sm:mx-6 rounded-xl"
       >
         <div className="flex justify-between items-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
@@ -572,7 +511,7 @@ const Trains = () => {
         
         {/* Trip Type Tabs */}
         <div className="flex border-b-2 border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
-          {['ONE WAY', 'ROUNDTRIP', 'MULTICITY'].map((type) => (
+          {['ONE_WAY', 'ROUND_TRIP', 'MULTI_CITY'].map((type) => (
             <motion.button
               key={type}
               whileTap={{ scale: 0.95 }}
@@ -581,7 +520,7 @@ const Trains = () => {
               }`}
               onClick={() => setTripType(type)}
             >
-              {type === 'ONE WAY' ? 'One Way' : type === 'ROUNDTRIP' ? 'Round Trip' : 'Multi City'}
+              {type === 'ONE_WAY' ? 'One Way' : type === 'ROUND_TRIP' ? 'Round Trip' : 'Multi City'}
               {tripType === type && (
                 <motion.div 
                   layoutId="underline"
@@ -604,11 +543,8 @@ const Trains = () => {
           {/* From City */}
           <motion.div 
             variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative overflow-hidden"
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative overflow-hidden rounded-xl border border-gray-200"
           >
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <FaMapMarkerAlt className="text-blue-200 text-3xl" />
-            </div>
             <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
               <FaMapMarkerAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
               FROM STATION
@@ -633,7 +569,7 @@ const Trains = () => {
           >
             <motion.button 
               onClick={handleSwapCities}
-              className="bg-gray-100 p-1 sm:p-2 rounded-full hover:bg-gray-100 transition-colors shadow-md border border-gray-200"
+              className="bg-gray-100 p-2 sm:p-3 rounded-full hover:bg-gray-200 transition-colors shadow-md border border-gray-200"
               aria-label="Swap cities"
               whileHover={{ rotate: 180, scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -645,11 +581,8 @@ const Trains = () => {
           {/* To City */}
           <motion.div 
             variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative overflow-hidden"
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative overflow-hidden rounded-xl border border-gray-200"
           >
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <FaMapMarkerAlt className="text-blue-200 text-3xl" />
-            </div>
             <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
               <FaMapMarkerAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
               TO STATION
@@ -668,16 +601,52 @@ const Trains = () => {
           </motion.div>
 
           {/* Departure Date */}
-          <DepartureDatePicker />
+          <motion.div 
+            variants={itemVariants}
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative rounded-xl border border-gray-200"
+          >
+            <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
+              <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
+              DEPARTURE DATE
+            </label>
+            <div className="flex items-center">
+              <DatePicker
+                selected={departureDate}
+                onChange={(date) => handleDateChange(date)}
+                minDate={new Date()}
+                dateFormat="d MMM yyyy"
+                className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
+              />
+            </div>
+          </motion.div>
+
+          {/* Return Date */}
+          {tripType === 'ROUND_TRIP' && (
+            <motion.div 
+              variants={itemVariants}
+              className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative rounded-xl border border-gray-200"
+            >
+              <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
+                <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
+                RETURN DATE
+              </label>
+              <div className="flex items-center">
+                <DatePicker
+                  selected={returnDate}
+                  onChange={(date) => handleDateChange(date, true)}
+                  minDate={departureDate}
+                  dateFormat="d MMM yyyy"
+                  className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
+                />
+              </div>
+            </motion.div>
+          )}
 
           {/* Travelers & Class */}
           <motion.div 
             variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative"
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative rounded-xl border border-gray-200"
           >
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <FaUser className="text-blue-200 text-3xl" />
-            </div>
             <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2">PASSENGERS & CLASS</label>
             <div className="relative">
               <div 
@@ -686,7 +655,9 @@ const Trains = () => {
               >
                 <div className="flex items-center">
                   <FaUser className="text-blue-400 mr-2" />
-                  <span className="font-bold text-gray-900">{passengerCount} Passenger</span>
+                  <span className="font-bold text-gray-900">
+                    {passengerCount} {passengerCount === 1 ? 'Passenger' : 'Passengers'}
+                  </span>
                 </div>
                 {showPassengerDropdown ? (
                   <FaChevronUp className="text-gray-500" />
@@ -696,7 +667,7 @@ const Trains = () => {
               </div>
               <div className="text-sm text-gray-700 mt-1 flex items-center justify-between cursor-pointer"
                    onClick={() => setShowClassDropdown(!showClassDropdown)}>
-                <span>{classType}</span>
+                <span>{classTypes.find(c => c.code === classType)?.name || classType}</span>
                 {showClassDropdown ? (
                   <FaChevronUp className="text-gray-500" />
                 ) : (
@@ -710,9 +681,9 @@ const Trains = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 p-3"
+                  className="absolute z-10 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-200 p-3"
                 >
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Passengers</span>
                     <div className="flex items-center">
                       <button 
@@ -740,7 +711,7 @@ const Trains = () => {
                   </div>
                   <button 
                     onClick={() => setShowPassengerDropdown(false)}
-                    className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                    className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors mt-4"
                   >
                     Done
                   </button>
@@ -753,19 +724,22 @@ const Trains = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 p-3"
+                  className="absolute z-10 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-200 p-3"
                 >
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {classTypes.map((type) => (
                       <div 
-                        key={type}
-                        className={`p-2 rounded-lg cursor-pointer ${classType === type ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'}`}
+                        key={type.code}
+                        className={`p-3 rounded-lg cursor-pointer flex items-center ${classType === type.code ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'}`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleClassTypeChange(type);
+                          handleClassTypeChange(type.code);
                         }}
                       >
-                        {type}
+                        <div className="mr-3">
+                          {type.icon}
+                        </div>
+                        <span>{type.name}</span>
                       </div>
                     ))}
                   </div>
@@ -779,21 +753,102 @@ const Trains = () => {
               )}
             </div>
           </motion.div>
-
-          {/* Special Fare Options */}
-          <motion.div 
-            variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors"
-          >
-            <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2">SELECT A SPECIAL FARE</label>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full border-2 border-blue-500 flex items-center justify-center mr-2">
-                <FaCheck className="text-blue-500 text-xs" />
-              </div>
-              <span className="text-sm font-bold text-blue-600">EXTRA SAVINGS</span>
-            </div>
-          </motion.div>
         </motion.div>
+
+        {/* Multi-City Trip Segments */}
+        {tripType === 'MULTI_CITY' && (
+          <motion.div 
+            className="col-span-full mt-4 space-y-4"
+            variants={containerVariants}
+          >
+            {multiCityTrips.map((trip, index) => (
+              <motion.div 
+                key={index}
+                variants={itemVariants}
+                className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-blue-50/50 p-4 rounded-xl border border-blue-100"
+              >
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                    {index + 1}
+                  </span>
+                  <h3 className="font-medium text-gray-700">Train Segment</h3>
+                  {multiCityTrips.length > 2 && (
+                    <button 
+                      onClick={() => removeTripSegment(index)}
+                      className="ml-auto text-red-500 hover:text-red-700"
+                      aria-label="Remove segment"
+                    >
+                      <FaTrash className="text-sm" />
+                    </button>
+                  )}
+                </div>
+                
+                <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* From */}
+                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                    <label className="block text-xs font-bold text-blue-600 mb-1">
+                      FROM
+                    </label>
+                    <select 
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm"
+                      value={trip.from}
+                      onChange={(e) => updateTripSegment(index, 'from', e.target.value)}
+                    >
+                      {cities.map(city => (
+                        <option key={`${index}-${city}`} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* To */}
+                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                    <label className="block text-xs font-bold text-blue-600 mb-1">
+                      TO
+                    </label>
+                    <select 
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm"
+                      value={trip.to}
+                      onChange={(e) => updateTripSegment(index, 'to', e.target.value)}
+                    >
+                      {cities.map(city => (
+                        <option key={`${index}-${city}-dest`} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Date */}
+                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                    <label className="block text-xs font-bold text-blue-600 mb-1">
+                      DATE
+                    </label>
+                    <DatePicker
+                      selected={trip.departureDate}
+                      onChange={(date) => updateTripSegment(index, 'departureDate', date)}
+                      minDate={index === 0 ? new Date() : multiCityTrips[index - 1].departureDate}
+                      dateFormat="d MMM yyyy"
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+            
+            <motion.button
+              onClick={addTripSegment}
+              disabled={multiCityTrips.length >= 6}
+              className="flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FaPlus className="mr-2" />
+              Add Another Train
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* Special Fare Options */}
         <motion.div 
@@ -802,70 +857,26 @@ const Trains = () => {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 mt-4 sm:mt-6"
         >
-          {[
-            { 
-              title: "Regular", 
-              desc: "Regular Fares",
-              selected: selectedFare === 'Regular'
-            },
-            { 
-              title: "Student", 
-              desc: "Extra discounts",
-              selected: selectedFare === 'Student'
-            },
-            { 
-              title: "Senior Citizen", 
-              desc: "Up to 40% off",
-              selected: selectedFare === 'Senior Citizen'
-            },
-            { 
-              title: "Armed Forces", 
-              desc: "Special concessions",
-              selected: selectedFare === 'Armed Forces'
-            }
-          ].map((option, index) => (
+          {fareTypes.map((fare, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
-              className={`border-2 rounded-xl p-3 sm:p-4 transition-all cursor-pointer ${
-                option.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+              className={`border-2 rounded-xl p-3 sm:p-4 transition-all cursor-pointer flex items-start ${
+                selectedFare === fare.code ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
               }`}
               whileHover={{ y: -3 }}
-              onClick={() => setSelectedFare(option.title)}
+              onClick={() => setSelectedFare(fare.code)}
             >
-              <div className="flex items-start">
-                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mr-2 ${
-                  option.selected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                }`}>
-                  {option.selected && <FaCheck className="text-white text-xs" />}
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-800">{option.title}</h3>
-                  <p className="text-gray-600 text-sm">{option.desc}</p>
-                </div>
+              <div className={`p-2 rounded-full mr-3 ${selectedFare === fare.code ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>
+                {fare.icon}
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-800">{fare.name}</h3>
+                <p className="text-gray-600 text-sm">{fare.description}</p>
               </div>
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Return Date */}
-        {tripType === 'ROUNDTRIP' && <ReturnDatePicker />}
-
-        {/* Add Return Trip */}
-        {tripType !== 'ROUNDTRIP' && (
-          <motion.div 
-            variants={itemVariants}
-            className="flex items-center mt-4 sm:mt-6"
-          >
-            <button 
-              className="text-blue-600 font-medium flex items-center hover:text-blue-800 transition-colors text-sm sm:text-base md:text-lg whitespace-nowrap"
-              onClick={() => setTripType('ROUNDTRIP')}
-            >
-              <FaPlus className="mr-1 sm:mr-2" />
-              ADD RETURN TRIP FOR BIGGER DISCOUNTS
-            </button>
-          </motion.div>
-        )}
 
         {/* Search Button */}
         <motion.div 
@@ -875,6 +886,9 @@ const Trains = () => {
           transition={{ delay: 0.3 }}
         >
           <motion.button 
+            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center text-sm sm:text-base md:text-lg relative overflow-hidden group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => {
               setShowRequestForm(true);
               setRequestData(prev => ({
@@ -883,9 +897,6 @@ const Trains = () => {
                 classType: classType
               }));
             }}
-            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center text-sm sm:text-base md:text-lg relative overflow-hidden group"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity"></span>
             <span className="relative z-10 flex items-center">
@@ -907,7 +918,7 @@ const Trains = () => {
         </motion.div>
       </motion.div>
 
-      {/* Train Details Section */}
+      {/* Train Types Section */}
       <motion.section 
         initial="offscreen"
         whileInView="onscreen"
@@ -932,32 +943,25 @@ const Trains = () => {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100"
+              className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border-2 ${train.color}`}
               whileHover={{ y: -10 }}
             >
-              <div className="h-48 sm:h-56 overflow-hidden">
+              <div className="h-48 sm:h-56 overflow-hidden relative">
                 <img 
                   src={train.image} 
                   alt={train.type} 
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">{train.name}</h3>
+                  <p className="text-white/90 text-sm">{train.priceRange}</p>
+                </div>
               </div>
               <div className="p-4 sm:p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800">{train.type}</h3>
-                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
-                    {train.class}
-                  </div>
-                </div>
-                
                 <div className="mb-4">
                   <div className="flex items-center text-gray-600 mb-1">
-                    <FaMoneyBillWave className="mr-2 text-blue-500" />
-                    <span className="font-medium">{train.pricePerKm}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaShieldAlt className="mr-2 text-green-500" />
-                    <span className="font-medium">Starting at: {train.minPrice}</span>
+                    <BsTrainFront className="mr-2 text-blue-500" />
+                    <span className="font-medium">{train.classes}</span>
                   </div>
                 </div>
                 
@@ -981,66 +985,16 @@ const Trains = () => {
                     setShowRequestForm(true);
                     setRequestData(prev => ({
                       ...prev,
-                      classType: train.class,
-                      specialRequests: `Interested in ${train.type} train`
+                      classType: train.type,
+                      specialRequests: `Interested in ${train.name} train`
                     }));
                   }}
                 >
-                  Book {train.type}
+                  Book {train.name}
                 </motion.button>
               </div>
             </motion.div>
           ))}
-        </motion.div>
-      </motion.section>
-
-      {/* Features Carousel */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mb-12 sm:mb-16"
-      >
-        <motion.div 
-          variants={cardVariants}
-          className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-white"
-        >
-          <div className="relative h-40 sm:h-48 overflow-hidden rounded-xl">
-            <AnimatePresence mode="wait">
-              {features.map((feature, index) => (
-                activeFeature === index && (
-                  <motion.div
-                    key={index}
-                    variants={featureVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.5 }}
-                    className={`absolute inset-0 p-4 sm:p-6 flex items-center rounded-xl`}
-                  >
-                    <div className="flex items-start">
-                      <div className="p-3 sm:p-4 bg-white rounded-xl shadow-sm mr-4 sm:mr-6">
-                        {feature.icon}
-                      </div>
-                      <div>
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
-                        <p className="text-gray-600 text-sm sm:text-base">{feature.description}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              ))}
-            </AnimatePresence>
-          </div>
-          <div className="flex justify-center mt-4 space-x-2">
-            {features.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveFeature(index)}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors ${activeFeature === index ? 'bg-blue-600' : 'bg-gray-300'}`}
-              />
-            ))}
-          </div>
         </motion.div>
       </motion.section>
 
@@ -1059,7 +1013,7 @@ const Trains = () => {
         </motion.h2>
         
         <motion.div 
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -1069,13 +1023,13 @@ const Trains = () => {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-white rounded-xl p-4 sm:p-6 shadow-md hover:shadow-xl transition-all border border-gray-100 text-center"
+              className={`bg-white rounded-xl p-4 sm:p-6 shadow-md hover:shadow-xl transition-all border border-gray-100 text-center ${amenity.color}`}
               whileHover={{ y: -5 }}
             >
-              <div className="bg-gradient-to-br from-blue-50 to-white p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <div className="bg-white p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 {amenity.icon}
               </div>
-              <h3 className="font-bold text-gray-800 text-sm sm:text-base">{amenity.name}</h3>
+              <h3 className="font-bold text-sm sm:text-base">{amenity.name}</h3>
             </motion.div>
           ))}
         </motion.div>
@@ -1088,10 +1042,9 @@ const Trains = () => {
         viewport={{ once: true, amount: 0.2 }}
         className="relative rounded-3xl p-6 sm:p-8 md:p-12 mb-12 sm:mb-16 overflow-hidden shadow-2xl"
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff758c 100%)'
+          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)'
         }}
       >
-        {/* Decorative elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
         <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full"></div>
         <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/5 rounded-full"></div>
@@ -1105,7 +1058,7 @@ const Trains = () => {
             className="inline-flex items-center bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-2 rounded-full mb-6 sm:mb-8 shadow-lg border border-white/20"
           >
             <FaHeart className="mr-2 text-pink-300 animate-pulse text-sm sm:text-base" />
-            <span className="text-xs sm:text-sm font-bold text-white drop-shadow-md">MOST POPULAR TRAVEL SERVICE</span>
+            <span className="text-xs sm:text-sm font-bold text-white drop-shadow-md">TRENDING NOW</span>
           </motion.div>
           
           <div className="flex flex-col lg:flex-row items-center">
@@ -1116,13 +1069,13 @@ const Trains = () => {
                 transition={{ delay: 0.3 }}
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
                 style={{
-                  background: 'linear-gradient(to right, #f9d423, #ff4e50)',
+                  background: 'linear-gradient(to right, #fde047, #f97316)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   textShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}
               >
-                Your Rail Journey Begins Here
+                Discover India by Rail
               </motion.h1>
               
               <motion.p 
@@ -1135,7 +1088,7 @@ const Trains = () => {
                   textShadow: '0 1px 3px rgba(0,0,0,0.2)'
                 }}
               >
-                Experience <span className="font-bold text-white">comfortable journeys</span> with our exclusive train deals and personalized service
+                Find the perfect train for your next journey with our exclusive deals and personalized service
               </motion.p>
               
               <motion.div 
@@ -1146,22 +1099,19 @@ const Trains = () => {
               >
                 {[
                   { 
-                    icon: <IoRocketSharp className="mr-2 text-xl sm:text-2xl animate-bounce" style={{ color: '#f9d423' }} />, 
-                    text: "Best Prices Guaranteed",
-                    bg: "bg-gradient-to-r from-yellow-400 to-yellow-500",
-                    action: "bestPrices"
+                    icon: <IoRocketSharp className="mr-2 text-xl sm:text-2xl animate-bounce" style={{ color: '#fde047' }} />, 
+                    text: "Best Prices",
+                    bg: "bg-gradient-to-r from-yellow-400 to-yellow-500"
                   },
                   { 
                     icon: <FaUserTie className="mr-2 text-xl sm:text-2xl" style={{ color: '#a5b4fc' }} />, 
-                    text: "24/7 Expert Support",
-                    bg: "bg-gradient-to-r from-indigo-400 to-indigo-500",
-                    action: "expertSupport"
+                    text: "Expert Support",
+                    bg: "bg-gradient-to-r from-indigo-400 to-indigo-500"
                   },
                   { 
                     icon: <FaStar className="mr-2 text-xl sm:text-2xl" style={{ color: '#f472b6' }} />, 
                     text: "Exclusive Deals",
-                    bg: "bg-gradient-to-r from-pink-400 to-pink-500",
-                    action: "exclusiveDeals"
+                    bg: "bg-gradient-to-r from-pink-400 to-pink-500"
                   }
                 ].map((item, index) => (
                   <motion.div
@@ -1169,7 +1119,6 @@ const Trains = () => {
                     variants={itemVariants}
                     className={`flex items-center ${item.bg} px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer group`}
                     whileHover={{ y: -5, scale: 1.05 }}
-                    onClick={() => handleHeroAction(item.action)}
                     style={{
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255,255,255,0.2)'
@@ -1191,20 +1140,20 @@ const Trains = () => {
                 transition={{ delay: 0.5 }}
                 className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border-2 border-white/20"
               >
-                <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Why Book With Us?</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Why Choose Us?</h3>
                 
                 <div className="space-y-4 sm:space-y-6">
                   {[
                     {
-                      icon: <FaTrain className="text-lg sm:text-xl" style={{ color: '#93c5fd' }} />,
+                      icon: <IoTrain className="text-lg sm:text-xl" style={{ color: '#93c5fd' }} />,
                       title: "10,000+ Daily Trains",
-                      description: "Access to the widest selection of trains across all routes",
+                      description: "Access to trains from all major routes across India",
                       color: "text-blue-300"
                     },
                     {
                       icon: <FaUserTie className="text-lg sm:text-xl" style={{ color: '#c4b5fd' }} />,
-                      title: "Safe & Comfortable",
-                      description: "Experienced staff and well-maintained trains for your journey",
+                      title: "Best Price Guarantee",
+                      description: "We guarantee the best prices for your train journeys",
                       color: "text-purple-300"
                     },
                     {
@@ -1234,14 +1183,14 @@ const Trains = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full bg-gradient-to-r from-yellow-400 to-pink-500 text-white font-bold py-3 sm:py-4 px-6 rounded-xl mt-6 sm:mt-8 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
-                  onClick={() => setShowRequestForm(true)}
                   style={{
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255,255,255,0.3)'
                   }}
+                  onClick={() => setShowRequestForm(true)}
                 >
                   <FaPaperPlane className="mr-2 sm:mr-3" />
-                  <span className="text-sm sm:text-base">Request Custom Itinerary</span>
+                  <span className="text-sm sm:text-base">Book Your Journey</span>
                 </motion.button>
               </motion.div>
             </div>
@@ -1249,96 +1198,54 @@ const Trains = () => {
         </div>
       </motion.div>
 
-      {/* Benefits Section */}
+      {/* Features Carousel */}
       <motion.section 
         initial="offscreen"
         whileInView="onscreen"
         viewport={{ once: true, amount: 0.2 }}
-        className="mb-12 sm:mb-20"
+        className="mb-12 sm:mb-16"
       >
-        <motion.h2 
+        <motion.div 
           variants={cardVariants}
-          className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12 text-center text-gray-800"
+          className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-white"
         >
-          Why Choose <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Our Service</span>
-        </motion.h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {[
-            {
-              icon: <FaTrain className="text-3xl sm:text-4xl text-blue-500" />,
-              title: "Exclusive Train Deals",
-              description: "Access to special discounts and offers not available to the general public",
-              features: [
-                "Up to 30% off on select routes",
-                "Early bird specials",
-                "Last-minute deals"
-              ],
-              color: "text-blue-500"
-            },
-            {
-              icon: <FaUserTie className="text-3xl sm:text-4xl text-purple-500" />,
-              title: "Personal Travel Expert",
-              description: "Dedicated professional to handle all your travel arrangements",
-              features: [
-                "24/7 availability",
-                "Custom route planning",
-                "VIP treatment"
-              ],
-              color: "text-purple-500"
-            },
-            {
-              icon: <FaHeadset className="text-3xl sm:text-4xl text-pink-500" />,
-              title: "24/7 Travel Support",
-              description: "Assistance available anytime, anywhere during your journey",
-              features: [
-                "Train changes & cancellations",
-                "Emergency assistance",
-                "Real-time updates"
-              ],
-              color: "text-pink-500"
-            }
-          ].map((benefit, index) => (
-            <motion.div 
-              key={index}
-              variants={cardVariants}
-              className={`rounded-3xl shadow-xl p-6 sm:p-8 flex flex-col items-center text-center border-2 hover:shadow-2xl transition-all h-full relative overflow-hidden group`}
-              whileHover={{ y: -10 }}
-            >
-              <div className="absolute -right-8 -top-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                <FaTrain className="text-gray-800 text-5xl sm:text-6xl" />
-              </div>
-              <div className={`p-4 sm:p-5 rounded-full mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
-                {benefit.icon}
-              </div>
-              <h3 className={`font-bold text-xl sm:text-2xl mb-3 sm:mb-4 ${benefit.color}`}>{benefit.title}</h3>
-              <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">{benefit.description}</p>
-              
-              <div className="w-full mb-4 sm:mb-6">
-                {benefit.features.map((feature, i) => (
-                  <div key={i} className="flex items-center mb-2 text-left">
-                    <FaCheck className="text-green-500 mr-2 sm:mr-3 flex-shrink-0 text-sm" />
-                    <span className="text-gray-700 text-xs sm:text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-xl shadow hover:shadow-md transition-all text-sm sm:text-base"
-                onClick={() => {
-                  setShowRequestForm(true);
-                  if (index === 0) handleHeroAction('bestPrices');
-                  else if (index === 1) handleHeroAction('expertSupport');
-                  else handleHeroAction('exclusiveDeals');
-                }}
-              >
-                Experience Now
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
+          <div className="relative h-40 sm:h-48 overflow-hidden rounded-xl">
+            <AnimatePresence mode="wait">
+              {features.map((feature, index) => (
+                activeFeature === index && (
+                  <motion.div
+                    key={index}
+                    variants={featureVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ duration: 0.5 }}
+                    className={`absolute inset-0 p-4 sm:p-6 flex items-center rounded-xl bg-gradient-to-r ${feature.color} bg-clip-border`}
+                  >
+                    <div className="flex items-start">
+                      <div className="p-3 sm:p-4 bg-white/30 backdrop-blur-sm rounded-xl shadow-sm mr-4 sm:mr-6">
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{feature.title}</h3>
+                        <p className="text-white/90 text-sm sm:text-base">{feature.description}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              ))}
+            </AnimatePresence>
+          </div>
+          <div className="flex justify-center mt-4 space-x-2">
+            {features.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveFeature(index)}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors ${activeFeature === index ? 'bg-blue-600' : 'bg-gray-300'}`}
+              />
+            ))}
+          </div>
+        </motion.div>
       </motion.section>
 
       {/* Request Form Modal */}
@@ -1365,7 +1272,7 @@ const Trains = () => {
                     onClick={() => setShowRequestForm(false)}
                     className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
                   >
-                    <FaArrowLeft className="text-lg" />
+                    <FaTimes className="text-lg" />
                   </button>
                 </div>
 
@@ -1441,9 +1348,9 @@ const Trains = () => {
                             onChange={handleInputChange}
                             className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
                           >
-                            <option value="ONE WAY">One Way</option>
-                            <option value="ROUNDTRIP">Round Trip</option>
-                            <option value="MULTICITY">Multi City</option>
+                            <option value="ONE_WAY">One Way</option>
+                            <option value="ROUND_TRIP">Round Trip</option>
+                            <option value="MULTI_CITY">Multi City</option>
                           </select>
                         </div>
 
@@ -1456,7 +1363,7 @@ const Trains = () => {
                             className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
                           >
                             {classTypes.map(type => (
-                              <option key={type} value={type}>{type}</option>
+                              <option key={type.code} value={type.code}>{type.name}</option>
                             ))}
                           </select>
                         </div>

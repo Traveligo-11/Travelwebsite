@@ -98,14 +98,14 @@ const ChatBoat = () => {
           onClick={() => setIsOpen(true)}
           className="bg-pink-600 text-white p-4 rounded-full shadow-lg hover:bg-pink-700 transition-colors flex items-center justify-center"
         >
-          <FiMessageSquare className="h-6 w-6" />
+          <FiMessageSquare className="h-5 w-5" />
         </button>
       )}
     </div>
   );
 };
 
-// Simplified Contact Popup Component with only phone and email
+// Simplified Contact Popup Component
 const ContactPopup = ({ onClose }) => {
   const [showCallOptions, setShowCallOptions] = useState(true);
 
@@ -122,7 +122,7 @@ const ContactPopup = ({ onClose }) => {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
           >
-            <FaTimes className="h-6 w-6" />
+            <FaTimes className="h-5 w-5" />
           </button>
         </div>
         
@@ -137,7 +137,7 @@ const ContactPopup = ({ onClose }) => {
               >
                 <div className="flex items-center">
                   <div className="bg-pink-100 p-3 rounded-full mr-4">
-                    <FaPhone className="text-pink-600" />
+                    <FaPhone className="text-pink-600 h-4 w-4" />
                   </div>
                   <div>
                     <h5 className="font-bold">Sales & Bookings</h5>
@@ -153,7 +153,7 @@ const ContactPopup = ({ onClose }) => {
               >
                 <div className="flex items-center">
                   <div className="bg-pink-100 p-3 rounded-full mr-4">
-                    <FaPhone className="text-pink-600" />
+                    <FaPhone className="text-pink-600 h-4 w-4" />
                   </div>
                   <div>
                     <h5 className="font-bold">Customer Support</h5>
@@ -169,7 +169,7 @@ const ContactPopup = ({ onClose }) => {
               >
                 <div className="flex items-center">
                   <div className="bg-pink-100 p-3 rounded-full mr-4">
-                    <FaPhone className="text-pink-600" />
+                    <FaPhone className="text-pink-600 h-4 w-4" />
                   </div>
                   <div>
                     <h5 className="font-bold">Emergency</h5>
@@ -185,7 +185,7 @@ const ContactPopup = ({ onClose }) => {
               >
                 <div className="flex items-center">
                   <div className="bg-pink-100 p-3 rounded-full mr-4">
-                    <FaEnvelope className="text-pink-600" />
+                    <FaEnvelope className="text-pink-600 h-4 w-4" />
                   </div>
                   <div>
                     <h5 className="font-bold">Email Support</h5>
@@ -307,7 +307,7 @@ const Home = () => {
       name: 'Rashmeet Kaur',
       role: 'Singer',
       content: Rashmika,
-      thumbnail: '/images/rashmika.jpeg',
+      thumbnail: '/images/Rahmeet.jpeg',
     },
     {
       id: 4,
@@ -321,13 +321,16 @@ const Home = () => {
   // Women's Solo Trip Videos
   const soloTripVideos = [
     {
-      id: 5,
-      name: 'Ms Debashree Mukerjee',
-      role: 'Solo Traveler',
-      content: Debashree,
-      thumbnail: '/images/solo1.jpg',
-    },
-  ];
+    id: 5,
+    name: 'Ms Debashree Mukerjee',
+    role: 'Solo Traveler',
+    content: Debashree,
+    thumbnail: '/images/Debashree.jpeg', // Make sure this path is correct
+    destination: 'Kashmir Solo Trip',
+   
+  
+  },
+];
 
   // Group Trip Videos
   const groupTripVideos = [
@@ -336,7 +339,7 @@ const Home = () => {
       name: 'Group Adventure',
       role: 'Group Trip',
       content: Group,
-      thumbnail: '/images/group-thumbnail.jpg'
+      thumbnail: '/images/group.jpeg'
     }
   ];
 
@@ -940,20 +943,17 @@ const Home = () => {
   };
 
   // Package filtering
-  const filteredPackages = activeCategory === 'all' 
-    ? holidayPackages.filter(pkg => 
-        (selectedDestination === '' || pkg.destinationId === selectedDestination) &&
-        (pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase()))))
-    : holidayPackages.filter(pkg => 
-        pkg.category === activeCategory && 
-        (selectedDestination === '' || pkg.destinationId === selectedDestination) &&
-        (pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase())))
-        );
-
+  const filteredPackages = holidayPackages.filter(pkg => {
+    const matchesCategory = activeCategory === 'all' || pkg.category === activeCategory;
+    const matchesDestination = selectedDestination === '' || pkg.destinationId === selectedDestination;
+    const matchesSearch = searchQuery === '' || 
+      pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pkg.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pkg.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesCategory && matchesDestination && matchesSearch;
+  });
+  
   const displayedPackages = showAllPackages 
     ? filteredPackages 
     : filteredPackages.slice(0, 6);
@@ -1190,7 +1190,7 @@ const Home = () => {
             onClick={() => setSearchActive(false)}
             className="ml-4 text-gray-500 hover:text-gray-700"
           >
-            <FaTimes className="h-6 w-6" />
+            <FaTimes className="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -1200,7 +1200,7 @@ const Home = () => {
         onClick={() => setSearchActive(true)}
         className={`fixed bottom-25 right-8 ${primaryColor} text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300 ${searchActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
-        <FaSearch className="h-6 w-6" />
+        <FaSearch className="h-5 w-5" />
       </button>
 
       {/* Contact Button (floating) */}
@@ -1208,7 +1208,7 @@ const Home = () => {
         onClick={() => setShowContactPopup(true)}
         className={`fixed bottom-40 right-8 ${primaryColor} text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300`}
       >
-        <FaPhone className="h-6 w-6" />
+        <FaPhone className="h-5 w-5" />
       </button>
 
       {/* Featured Destinations Carousel */}
@@ -1236,7 +1236,7 @@ const Home = () => {
                     className={`bg-white hover:bg-gray-100 ${primaryTextColor} px-8 py-4 rounded-xl font-bold text-lg transition-colors duration-200 inline-flex items-center shadow-lg hover:shadow-xl`}
                     onClick={() => navigate(`/${dest.title.toLowerCase()}`)}
                   >
-                    Explore <FaArrowRight className="ml-3" />
+                    Explore <FaArrowRight className="ml-3 h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -1247,13 +1247,13 @@ const Home = () => {
             onClick={prevSlide}
             className="absolute left-8 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-white/30 text-white p-4 rounded-full hover:bg-white/50 transition-colors duration-200 shadow-lg"
           >
-            <FaChevronLeft className="h-6 w-6" />
+            <FaChevronLeft className="h-5 w-5" />
           </button>
           <button 
             onClick={nextSlide}
             className="absolute right-8 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-white/30 text-white p-4 rounded-full hover:bg-white/50 transition-colors duration-200 shadow-lg"
           >
-            <FaChevronRight className="h-6 w-6" />
+            <FaChevronRight className="h-5 w-5" />
           </button>
           
           <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex space-x-3 z-10">
@@ -1267,7 +1267,7 @@ const Home = () => {
             ))}
           </div>
         </div>
-
+<br /> <br /> 
         {/* Search Form - Moved Below */}
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10 w-full max-w-6xl px-4">
           <div className={`bg-white rounded-2xl shadow-2xl p-8 ${primaryBorderColor} border-t-4`}>
@@ -1275,7 +1275,7 @@ const Home = () => {
             <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FaMapMarkerAlt className="text-gray-400" />
+                  <FaMapMarkerAlt className="text-gray-400 h-4 w-4" />
                 </div>
                 <select
                   value={selectedDestination}
@@ -1289,7 +1289,7 @@ const Home = () => {
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FaCalendarAlt className="text-gray-400" />
+                  <FaCalendarAlt className="text-gray-400 h-4 w-4" />
                 </div>
                 <DatePicker
                   selected={startDate}
@@ -1303,7 +1303,7 @@ const Home = () => {
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FaUserFriends className="text-gray-400" />
+                  <FaUserFriends className="text-gray-400 h-4 w-4" />
                 </div>
                 <select
                   className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 appearance-none"
@@ -1320,13 +1320,13 @@ const Home = () => {
                 onClick={() => setSearchActive(true)}
                 className={`${primaryColor} ${primaryHoverColor} text-white px-6 py-3 rounded-lg font-bold transition-colors duration-200 flex items-center justify-center`}
               >
-                Search Packages <FaArrowRight className="ml-2" />
+                Search Packages <FaArrowRight className="ml-2 h-4 w-4" />
               </button>
             </form>
           </div>
         </div>
       </section>
-
+<br /><br /> <br /> <br />
       {/* Trending Cities Section with Links */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1346,7 +1346,7 @@ const Home = () => {
                   alt={city.name} 
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent flex flex-col justify-end p-6">
                   <h3 className="text-xl font-bold text-white">{city.name}</h3>
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-white font-medium">From {city.price}</span>
@@ -1395,7 +1395,7 @@ const Home = () => {
               <div className="space-y-8">
                 <div className="flex items-start transform hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-shrink-0 bg-white/30 p-3 rounded-full mr-4 backdrop-blur-sm">
-                    <FaGlobe className="h-7 w-7 text-pink-200" />
+                    <FaGlobe className="h-5 w-5 text-pink-200" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white drop-shadow-lg">200+ International Destinations</h3>
@@ -1405,7 +1405,7 @@ const Home = () => {
                 
                 <div className="flex items-start transform hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-shrink-0 bg-white/30 p-3 rounded-full mr-4 backdrop-blur-sm">
-                    <FaHotel className="h-7 w-7 text-pink-200" />
+                    <FaHotel className="h-5 w-5 text-pink-200" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white drop-shadow-lg">Luxury Accommodations</h3>
@@ -1415,7 +1415,7 @@ const Home = () => {
                 
                 <div className="flex items-start transform hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-shrink-0 bg-white/30 p-3 rounded-full mr-4 backdrop-blur-sm">
-                    <FaUmbrellaBeach className="h-7 w-7 text-pink-200" />
+                    <FaUmbrellaBeach className="h-5 w-5 text-pink-200" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white drop-shadow-lg">Custom Experiences</h3>
@@ -1475,22 +1475,7 @@ const Home = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Area of Interest</label>
-                    <select
-                      name="interest"
-                      value={quotesFormData.interest}
-                      onChange={handleQuotesInputChange}
-                      className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-                    >
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="Honeymoon Packages">Honeymoon Packages</option>
-                      <option value="Family Vacations">Family Vacations</option>
-                      <option value="Adventure Travel">Adventure Travel</option>
-                      <option value="Luxury Getaways">Luxury Getaways</option>
-                      <option value="Group Tours">Group Tours</option>
-                    </select>
-                  </div>
+                
                   
                 
                   
@@ -1556,24 +1541,24 @@ const Home = () => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute bottom-4 left-4 bg-white/90 text-pink-600 px-3 py-1 rounded-lg text-sm font-bold flex items-center">
-                      <IoIosFlash className="mr-1" /> {pkg.discount} OFF
+                      <IoIosFlash className="mr-1 h-4 w-4" /> {pkg.discount} OFF
                     </div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">{pkg.title}</h3>
                     <p className="text-gray-600 mb-4 flex items-center">
-                      <GiSuitcase className="mr-2 text-pink-500" /> {pkg.destination}
+                      <GiSuitcase className="mr-2 text-pink-500 h-4 w-4" /> {pkg.destination}
                     </p>
                     
                     <div className="flex items-center mb-4 text-gray-600">
-                      <FaCalendarAlt className="mr-2 text-pink-500" />
+                      <FaCalendarAlt className="mr-2 text-pink-500 h-4 w-4" />
                       <span>{pkg.duration}</span>
                     </div>
                     
                     <ul className="space-y-2 mb-6">
                       {pkg.highlights.slice(0, 3).map((highlight, index) => (
                         <li key={index} className="flex items-start">
-                          <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                           <span className="text-gray-700">{highlight}</span>
@@ -1623,99 +1608,97 @@ const Home = () => {
           )}
         </div>
       </section>
+{/* Upcoming Packages Section */}
+<section className="py-20 bg-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <span className="text-pink-600 font-semibold">COMING SOON</span>
+      <h2 className="text-4xl font-bold text-gray-900 mt-3">Upcoming Travel Packages</h2>
+      <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+        Exciting new destinations we're launching soon - get early bird discounts!
+      </p>
+    </div>
 
-      {/* Upcoming Packages Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-pink-600 font-semibold">COMING SOON</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-3">Upcoming Travel Packages</h2>
-            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-              Exciting new destinations we're launching soon - get early bird discounts!
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {displayedUpcomingPackages.map((pkg) => (
+        <div 
+          key={pkg.id} 
+          className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-pink-200"
+        >
+          <div className="absolute top-4 right-4 z-10 bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+            {pkg.tag}
+          </div>
+          <div className="h-64 overflow-hidden relative">
+            <img 
+              src={pkg.image} 
+              alt={pkg.title} 
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
+            <div className="absolute bottom-4 left-4 bg-white/90 text-pink-600 px-3 py-1 rounded-lg text-sm font-bold flex items-center">
+              <IoIosFlash className="mr-1 h-4 w-4" /> Launching 01 Oct 2025
+            </div>
+          </div>
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">{pkg.title}</h3>
+            <p className="text-gray-600 mb-4 flex items-center">
+              <GiSuitcase className="mr-2 text-pink-500 h-4 w-4" /> {pkg.destination}
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayedUpcomingPackages.map((pkg) => (
-              <div 
-                key={pkg.id} 
-                className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-pink-200"
-              >
-                <div className="absolute top-4 right-4 z-10 bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  {pkg.tag}
-                </div>
-                <div className="h-64 overflow-hidden relative">
-                  <img 
-                    src={pkg.image} 
-                    alt={pkg.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 bg-white/90 text-pink-600 px-3 py-1 rounded-lg text-sm font-bold flex items-center">
-                    <IoIosFlash className="mr-1" /> Launching {pkg.launchDate}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">{pkg.title}</h3>
-                  <p className="text-gray-600 mb-4 flex items-center">
-                    <GiSuitcase className="mr-2 text-pink-500" /> {pkg.destination}
-                  </p>
-                  
-                  <div className="flex items-center mb-4 text-gray-600">
-                    <FaCalendarAlt className="mr-2 text-pink-500" />
-                    <span>{pkg.duration}</span>
-                  </div>
-                  
-                  <ul className="space-y-2 mb-6">
-                    {pkg.highlights.slice(0, 3).map((highlight, index) => (
-                      <li key={index} className="flex items-start">
-                        <svg className="h-5 w-5 text-pink-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-gray-700">{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <span className="text-2xl font-bold text-pink-600">{pkg.price}</span>
-                      <span className="ml-2 text-sm text-gray-500 line-through">{pkg.originalPrice}</span>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        setSelectedPackage(pkg);
-                        setShowNotifyForm(true);
-                      }}
-                      className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                    >
-                      Get Early Access
-                    </button>
-                  </div>
-                </div>
+            
+            <div className="flex items-center mb-4 text-gray-600">
+              <FaCalendarAlt className="mr-2 text-pink-500 h-4 w-4" />
+              <span>{pkg.duration}</span>
+            </div>
+            
+            <ul className="space-y-2 mb-6">
+              {pkg.highlights.slice(0, 3).map((highlight, index) => (
+                <li key={index} className="flex items-start">
+                  <svg className="h-4 w-4 text-pink-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-700">{highlight}</span>
+                </li>
+              ))}
+            </ul>
+            
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="text-2xl font-bold text-pink-600">{pkg.price}</span>
+                <span className="ml-2 text-sm text-gray-500 line-through">{pkg.originalPrice}</span>
               </div>
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <button 
-              onClick={() => setShowNotifyForm(true)}
-              className="border-2 border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200"
-            >
-              Notify Me About New Packages
-            </button>
-            {upcomingPackages.length > 3 && (
               <button 
-                onClick={() => setShowAllUpcoming(!showAllUpcoming)}
-                className="ml-4 border-2 border-gray-300 text-gray-700 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition-colors duration-200"
+                onClick={() => {
+                  setSelectedPackage(pkg);
+                  setShowNotifyForm(true);
+                }}
+                className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
               >
-                {showAllUpcoming ? 'Show Less' : 'View All Upcoming'}
+                Get Early Access
               </button>
-            )}
+            </div>
           </div>
         </div>
-      </section>
-
+      ))}
+    </div>
+    
+    <div className="text-center mt-12">
+      <button 
+        onClick={() => setShowNotifyForm(true)}
+        className="border-2 border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200"
+      >
+        Notify Me About New Packages
+      </button>
+      {upcomingPackages.length > 3 && (
+        <button 
+          onClick={() => setShowAllUpcoming(!showAllUpcoming)}
+          className="ml-4 border-2 border-gray-300 text-gray-700 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition-colors duration-200"
+        >
+          {showAllUpcoming ? 'Show Less' : 'View All Upcoming'}
+        </button>
+      )}
+    </div>
+  </div>
+</section>
       {/* Why Choose Us Section */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1730,7 +1713,7 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 text-center">
               <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
                 </svg>
               </div>
@@ -1742,7 +1725,7 @@ const Home = () => {
 
             <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 text-center">
               <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
@@ -1754,7 +1737,7 @@ const Home = () => {
 
             <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 text-center">
               <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="h-8 w-8 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
@@ -1767,116 +1750,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className={`py-24 ${primaryColor} text-white relative overflow-hidden`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-pink-700/20"></div>
-        <div className="absolute top-0 left-0 w-full h-full opacity-10">
-          <div className="absolute top-20 left-20 w-40 h-40 rounded-full bg-white/30"></div>
-          <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-white/20"></div>
-          <div className="absolute top-1/3 right-1/4 w-32 h-32 rounded-full bg-white/15"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <span className="text-pink-200 font-semibold">HAPPY TRAVELERS</span>
-            <h2 className="text-4xl font-bold mt-3">What Our Guests Say</h2>
-            <p className="mt-4 text-lg text-pink-100 max-w-2xl mx-auto">
-              Don't just take our word for it - hear from our happy customers
-            </p>
-          </div>
-
-          <div className="relative">
-            <button 
-              onClick={prevTestimonial}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-white/20 text-white p-4 rounded-full hover:bg-white/30 transition-colors duration-200 shadow-lg"
-            >
-              <FaChevronLeft className="h-6 w-6" />
-            </button>
-            
-            <button 
-              onClick={nextTestimonial}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-white/20 text-white p-4 rounded-full hover:bg-white/30 transition-colors duration-200 shadow-lg"
-            >
-              <FaChevronRight className="h-6 w-6" />
-            </button>
-
-            <div className="overflow-hidden">
-              <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${activeTestimonial * 100}%)` }}>
-                {testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
-                    <div className="bg-white/10 p-8 rounded-3xl backdrop-blur-sm border-2 border-white/20 shadow-2xl">
-                      <div className="flex flex-col lg:flex-row gap-8">
-                        <div className="lg:w-1/2">
-                          <FaQuoteLeft className="text-pink-300 text-4xl mb-6" />
-                          <p className="text-xl text-white mb-8 italic relative pl-8">
-                            <span className="absolute left-0 top-0 text-6xl text-pink-300 font-serif">"</span>
-                            {testimonial.quote}
-                          </p>
-                          <div className="flex items-center">
-                            <div className="relative">
-                              <img 
-                                src={testimonial.image} 
-                                alt={testimonial.name} 
-                                className="w-20 h-20 rounded-full border-4 border-pink-300 object-cover shadow-md"
-                              />
-                              <div className="absolute -bottom-2 -right-2 bg-pink-400 rounded-full p-1 shadow-md">
-                                <div className="bg-white rounded-full p-1 flex">
-                                  {[...Array(5)].map((_, i) => (
-                                    i < testimonial.rating ? 
-                                      <FaStar key={i} className="text-yellow-400 h-4 w-4" /> : 
-                                      <FaRegStar key={i} className="text-yellow-400 h-4 w-4" />
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <h4 className="font-bold text-2xl text-white">{testimonial.name}</h4>
-                              <p className="text-pink-200">{testimonial.location}</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="lg:w-1/2 hidden lg:block">
-                          <div className="relative h-full rounded-xl overflow-hidden border-4 border-white shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
-                            <div className="absolute inset-0 bg-gradient-to-br from-pink-600/20 to-pink-900/30"></div>
-                            <img 
-                              src={testimonial.destinationImage} 
-                              alt={testimonial.location} 
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                              <div className="flex items-center">
-                                <div className="bg-pink-500 p-2 rounded-lg mr-4">
-                                  <FaMapMarkerAlt className="text-white text-xl" />
-                                </div>
-                                <div>
-                                  <h3 className="text-white text-2xl font-bold">{testimonial.location.split(',')[0]}</h3>
-                                  <p className="text-pink-200 font-medium">Featured Destination</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-8 space-x-3">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveTestimonial(index)}
-                className={`w-3 h-3 rounded-full transition-all ${index === activeTestimonial ? 'bg-white w-6 shadow-md' : 'bg-white/50'}`}
-                aria-label={`Go to testimonial ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+    
 
       {/* Video Testimonials Section */}
       <section className="py-20 bg-gradient-to-br from-gray-100 to-gray-200">
@@ -1924,7 +1798,7 @@ const Home = () => {
                       }}
                       className={`p-2 rounded-full ${likedVideos.includes(testimonial.id) ? 'bg-pink-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'} transition-colors`}
                     >
-                      <FaHeart className="h-5 w-5" />
+                      <FaHeart className="h-4 w-4" />
                     </button>
                   </div>
                   
@@ -1935,9 +1809,9 @@ const Home = () => {
                       className={`p-5 rounded-full ${videoStates[index].isPlaying ? 'bg-white/30' : 'bg-white/20'} hover:bg-white/40 backdrop-blur-md shadow-lg transform group-hover:scale-110 transition-transform`}
                     >
                       {videoStates[index].isPlaying ? (
-                        <FaPause className="text-white text-2xl" />
+                        <FaPause className="text-white text-xl h-4 w-4" />
                       ) : (
-                        <FaPlay className="text-white text-2xl" />
+                        <FaPlay className="text-white text-xl h-4 w-4" />
                       )}
                     </button>
                   </div>
@@ -1983,7 +1857,7 @@ const Home = () => {
             <button 
               className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
             >
-              View More Testimonials <FaArrowRight className="ml-2" />
+              View More Testimonials <FaArrowRight className="ml-2 h-4 w-4" />
             </button>
           </div>
         </div>
@@ -2037,7 +1911,7 @@ const Home = () => {
                         }}
                         className={`p-2 rounded-full ${likedVideos.includes(testimonial.id) ? 'bg-pink-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'} transition-colors`}
                       >
-                        <FaHeart className="h-5 w-5" />
+                        <FaHeart className="h-4 w-4" />
                       </button>
                     </div>
                     
@@ -2056,9 +1930,9 @@ const Home = () => {
                           className={`p-3 rounded-full ${videoStates[videoIndex].isPlaying ? 'bg-white/30' : 'bg-white/20'} hover:bg-white/40 backdrop-blur-md shadow-lg`}
                         >
                           {videoStates[videoIndex].isPlaying ? (
-                            <FaPause className="text-white" />
+                            <FaPause className="text-white h-4 w-4" />
                           ) : (
-                            <FaPlay className="text-white" />
+                            <FaPlay className="text-white h-4 w-4" />
                           )}
                         </button>
                         
@@ -2070,9 +1944,9 @@ const Home = () => {
                           className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                         >
                           {videoStates[videoIndex].isMuted ? (
-                            <FaVolumeMute className="text-white" />
+                            <FaVolumeMute className="text-white h-4 w-4" />
                           ) : (
-                            <FaVolumeUp className="text-white" />
+                            <FaVolumeUp className="text-white h-4 w-4" />
                           )}
                         </button>
                       </div>
@@ -2094,7 +1968,7 @@ const Home = () => {
             <button 
               className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
             >
-              Explore Women's Solo Trips <FaArrowRight className="ml-2" />
+              Explore Women's Solo Trips <FaArrowRight className="ml-2 h-4 w-4" />
             </button>
           </div>
         </div>
@@ -2148,7 +2022,7 @@ const Home = () => {
                         }}
                         className={`p-2 rounded-full ${likedVideos.includes(testimonial.id) ? 'bg-pink-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'} transition-colors`}
                       >
-                        <FaHeart className="h-5 w-5" />
+                        <FaHeart className="h-4 w-4" />
                       </button>
                     </div>
                     
@@ -2167,9 +2041,9 @@ const Home = () => {
                           className={`p-3 rounded-full ${videoStates[videoIndex].isPlaying ? 'bg-white/30' : 'bg-white/20'} hover:bg-white/40 backdrop-blur-md shadow-lg`}
                         >
                           {videoStates[videoIndex].isPlaying ? (
-                            <FaPause className="text-white" />
+                            <FaPause className="text-white h-4 w-4" />
                           ) : (
-                            <FaPlay className="text-white" />
+                            <FaPlay className="text-white h-4 w-4" />
                           )}
                         </button>
                         
@@ -2181,9 +2055,9 @@ const Home = () => {
                           className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                         >
                           {videoStates[videoIndex].isMuted ? (
-                            <FaVolumeMute className="text-white" />
+                            <FaVolumeMute className="text-white h-4 w-4" />
                           ) : (
-                            <FaVolumeUp className="text-white" />
+                            <FaVolumeUp className="text-white h-4 w-4" />
                           )}
                         </button>
                       </div>
@@ -2205,7 +2079,7 @@ const Home = () => {
             <button 
               className={`${primaryColor} ${primaryHoverColor} text-white px-8 py-3 rounded-lg font-bold transition-colors duration-200 inline-flex items-center`}
             >
-              Explore Group Trips <FaArrowRight className="ml-2" />
+              Explore Group Trips <FaArrowRight className="ml-2 h-4 w-4" />
             </button>
           </div>
         </div>
@@ -2221,7 +2095,7 @@ const Home = () => {
                 onClick={() => setShowDetailsModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FaTimes className="h-6 w-6" />
+                <FaTimes className="h-5 w-5" />
               </button>
             </div>
             
@@ -2235,7 +2109,7 @@ const Home = () => {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute bottom-4 left-4 bg-white/90 text-pink-600 px-3 py-1 rounded-lg text-sm font-bold flex items-center">
-                      <IoIosFlash className="mr-1" /> {selectedPackage.discount} OFF
+                      <IoIosFlash className="mr-1 h-4 w-4" /> {selectedPackage.discount} OFF
                     </div>
                   </div>
                   
@@ -2244,7 +2118,7 @@ const Home = () => {
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {selectedPackage.highlights.map((highlight, index) => (
                         <li key={index} className="flex items-start bg-pink-50 p-3 rounded-lg">
-                          <svg className="h-5 w-5 text-pink-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="h-4 w-4 text-pink-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                           <span className="text-gray-700">{highlight}</span>
@@ -2316,7 +2190,7 @@ const Home = () => {
                       <ul className="space-y-2">
                         {selectedPackage.inclusions.map((item, index) => (
                           <li key={index} className="flex items-start">
-                            <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                             <span className="text-gray-700">{item}</span>
@@ -2330,7 +2204,7 @@ const Home = () => {
                       <ul className="space-y-2">
                         {selectedPackage.exclusions.map((item, index) => (
                           <li key={index} className="flex items-start">
-                            <svg className="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-4 w-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                             <span className="text-gray-700">{item}</span>
@@ -2366,7 +2240,7 @@ const Home = () => {
                 onClick={() => setShowBookingForm(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FaTimes className="h-6 w-6" />
+                <FaTimes className="h-5 w-5" />
               </button>
             </div>
             
@@ -2596,7 +2470,7 @@ const Home = () => {
                 onClick={() => setShowNotifyForm(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FaTimes className="h-6 w-6" />
+                <FaTimes className="h-5 w-5" />
               </button>
             </div>
             
@@ -2694,7 +2568,7 @@ const Home = () => {
         <ContactPopup onClose={() => setShowContactPopup(false)} />
       )}
 
-   
+    
     </div>
   );
 };

@@ -1,113 +1,207 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  FaCar, 
-  FaExchangeAlt,
-  FaCalendarAlt,
-  FaUser,
-  FaSearch,
-  FaPhone,
-  FaEnvelope,
-  FaUserTie,
-  FaStar,
-  FaCheck,
-  FaMapMarkerAlt,
-  FaUsers,
-  FaRegSmileWink,
-  FaArrowRight,
-  FaPaperPlane,
-  FaArrowLeft,
-  FaHeart,
-  FaGlobeAmericas,
-  FaUmbrellaBeach,
-  FaCity,
-  FaMountain,
-  FaQuoteRight,
-  FaChevronDown,
-  FaChevronUp,
-  FaPlus,
-  FaMinus,
-  FaTrash,
-  FaShieldAlt,
-  FaGift,
-  FaMoneyBillWave,
-  FaHotel,
-  FaSuitcase,
-  FaWifi,
-  FaUtensils,
-  FaHeadset,
-  FaCalculator
+  FaCar, FaExchangeAlt, FaCalendarAlt, FaUser, FaSearch, 
+  FaPhone, FaEnvelope, FaUserTie, FaStar, FaCheck, 
+  FaMapMarkerAlt, FaUsers, FaRegSmileWink, FaArrowRight, 
+  FaPaperPlane, FaArrowLeft, FaHeart, FaGlobeAmericas, 
+  FaUmbrellaBeach, FaCity, FaMountain, FaQuoteRight, 
+  FaChevronDown, FaChevronUp, FaPlus, FaMinus, FaTrash, 
+  FaShieldAlt, FaGift, FaMoneyBillWave, FaHotel, FaSuitcase, 
+  FaWifi, FaUtensils, FaHeadset, FaCalculator, FaTimes
 } from 'react-icons/fa';
-import { 
-  FaFacebook, 
-  FaTwitter, 
-  FaInstagram, 
-  FaLinkedin 
-} from 'react-icons/fa';
-import { IoRocketSharp } from 'react-icons/io5';
-import { GiEarthAmerica } from 'react-icons/gi';
-import { BsClockHistory } from 'react-icons/bs';
+import { IoRocketSharp, IoCarSport } from 'react-icons/io5';
+import { GiEarthAmerica, GiRoad } from 'react-icons/gi';
+import { BsClockHistory, BsCarFrontFill, BsGlobe } from 'react-icons/bs';
 import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import emailjs from '@emailjs/browser';
 
-// Image URLs from Unsplash (free to use)
-const Manalih = "https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-const Rishikesh = "https://images.unsplash.com/photo-1581852057101-dc9a1c70d5a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-const Sedan = "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-const SUV = "https://imgd.aeplcdn.com/600x337/n/cw/ec/106815/creta-exterior-right-front-three-quarter-5.jpeg?isig=0&q=80";
-const LuxuryCar = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDufYJALnyws9AyMRHeHyJyRNefnLQU6ygIQ&s";
-const Tempo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGV7CXgqGW6RD_1dx2234kIUJVhxES9h5rMg&s";
-
-// Initialize emailjs (replace with your actual public key)
+// Initialize emailjs
 emailjs.init('127OFHb2IQq0zSiFJ');
 
 const Cabs = () => {
-  const [tripType, setTripType] = useState('ONE WAY');
+  // State for cab search
+  const [tripType, setTripType] = useState('ONE_WAY');
   const [fromCity, setFromCity] = useState('Delhi');
   const [toCity, setToCity] = useState('Gurugram');
   const [pickupDate, setPickupDate] = useState(new Date());
   const [returnDate, setReturnDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)));
   const [passengerCount, setPassengerCount] = useState(1);
-  const [cabType, setCabType] = useState('Sedan');
+  const [cabType, setCabType] = useState('SEDAN');
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [showCabTypeDropdown, setShowCabTypeDropdown] = useState(false);
+  const [selectedFare, setSelectedFare] = useState('REGULAR');
+
+  // State for cab results
+  const [cabs, setCabs] = useState([]);
+  const [loadingCabs, setLoadingCabs] = useState(false);
+  const [cabError, setCabError] = useState('');
+  const [showCabResults, setShowCabResults] = useState(false);
+  const [filters, setFilters] = useState({
+    priceRange: [0, 100000],
+    operators: [],
+    pickupTime: [],
+    vehicleTypes: []
+  });
+
+  // State for booking form
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [formError, setFormError] = useState('');
-  const [selectedFare, setSelectedFare] = useState('Regular');
+  const [requestData, setRequestData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    tripType: 'ONE_WAY',
+    trips: [],
+    passengers: 1,
+    cabType: 'SEDAN',
+    specialRequests: ''
+  });
+
+  // State for multi-city trips
   const [multiCityTrips, setMultiCityTrips] = useState([
     { from: 'Delhi', to: 'Gurugram', date: new Date() },
     { from: 'Gurugram', to: 'Jaipur', date: new Date(new Date().setDate(new Date().getDate() + 3)) }
   ]);
-  const [activeFeature, setActiveFeature] = useState(0);
+
+  // UI state
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showDateCalculator, setShowDateCalculator] = useState(false);
-  const [dateCalculation, setDateCalculation] = useState({
-    startDate: new Date(),
-    endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
-    daysDifference: 1
-  });
+  const [activeFeature, setActiveFeature] = useState(0);
+
+  // Cities data
+  const cities = [
+    { name: 'Delhi', popular: true },
+    { name: 'Gurugram', popular: true },
+    { name: 'Noida', popular: true },
+    { name: 'Faridabad', popular: false },
+    { name: 'Jaipur', popular: true },
+    { name: 'Udaipur', popular: true },
+    { name: 'Chandigarh', popular: true },
+    { name: 'Amritsar', popular: false },
+    { name: 'Shimla', popular: true },
+    { name: 'Manali', popular: true },
+    { name: 'Dehradun', popular: false },
+    { name: 'Rishikesh', popular: true },
+    { name: 'Haridwar', popular: false },
+    { name: 'Agra', popular: true },
+    { name: 'Varanasi', popular: false },
+    { name: 'Lucknow', popular: false },
+    { name: 'Mumbai', popular: true },
+    { name: 'Pune', popular: true },
+    { name: 'Bangalore', popular: true },
+    { name: 'Hyderabad', popular: true },
+    { name: 'Chennai', popular: false },
+    { name: 'Kolkata', popular: false },
+    { name: 'Goa', popular: true },
+    { name: 'Kochi', popular: false }
+  ];
+
+  const cabTypes = [
+    { code: 'SEDAN', name: 'Sedan', icon: <IoCarSport className="text-blue-400" /> },
+    { code: 'SUV', name: 'SUV', icon: <BsCarFrontFill className="text-purple-400" /> },
+    { code: 'LUXURY', name: 'Luxury', icon: <FaCar className="text-green-400" /> },
+    { code: 'TEMPO', name: 'Tempo Traveller', icon: <FaUsers className="text-yellow-400" /> }
+  ];
+
+  const fareTypes = [
+    { code: 'REGULAR', name: 'Regular', description: 'Standard fares with no restrictions', icon: <FaMoneyBillWave className="text-blue-500" /> },
+    { code: 'STUDENT', name: 'Student', description: 'Extra discounts for students', icon: <FaUser className="text-green-500" /> },
+    { code: 'SENIOR_CITIZEN', name: 'Senior Citizen', description: 'Special senior discounts', icon: <FaUserTie className="text-purple-500" /> },
+    { code: 'MILITARY', name: 'Military', description: 'Discounts for armed forces', icon: <FaShieldAlt className="text-red-500" /> }
+  ];
 
   const features = [
     {
-      icon: <FaCar className="text-blue-500 text-2xl sm:text-3xl" />,
+      icon: <IoCarSport className="text-blue-500 text-3xl sm:text-4xl" />,
       title: "5000+ Cabs Available",
-      description: "Access to the widest selection of cabs across all major providers"
+      description: "Access to the widest selection of cabs across all major providers",
+      color: "from-blue-400 to-blue-600"
     },
     {
-      icon: <FaUserTie className="text-purple-500 text-2xl sm:text-3xl" />,
-      title: "Professional Drivers",
-      description: "Experienced and verified drivers for your safety and comfort"
+      icon: <FaUserTie className="text-purple-500 text-3xl sm:text-4xl" />,
+      title: "Best Price Guarantee",
+      description: "We guarantee the best prices for your cab rides",
+      color: "from-purple-400 to-purple-600"
     },
     {
-      icon: <FaHeadset className="text-pink-500 text-2xl sm:text-3xl" />,
+      icon: <FaHeadset className="text-pink-500 text-3xl sm:text-4xl" />,
       title: "24/7 Customer Support",
-      description: "Dedicated support team available round the clock"
+      description: "Dedicated support team available round the clock",
+      color: "from-pink-400 to-pink-600"
     }
   ];
 
+  const cabAmenities = [
+    { icon: <FaWifi className="text-blue-500 text-xl" />, name: "Free WiFi", color: "bg-blue-100 text-blue-600" },
+    { icon: <FaUtensils className="text-amber-500 text-xl" />, name: "Refreshments", color: "bg-amber-100 text-amber-600" },
+    { icon: <FaSuitcase className="text-purple-500 text-xl" />, name: "Extra Luggage", color: "bg-purple-100 text-purple-600" },
+    { icon: <FaHotel className="text-green-500 text-xl" />, name: "Hotel Pickup", color: "bg-green-100 text-green-600" },
+    { icon: <FaHeadset className="text-pink-500 text-xl" />, name: "Entertainment", color: "bg-pink-100 text-pink-600" },
+    { icon: <FaShieldAlt className="text-red-500 text-xl" />, name: "Safety Features", color: "bg-red-100 text-red-600" }
+  ];
+
+  const cabDetails = [
+    {
+      type: 'SEDAN',
+      name: 'Sedan',
+      image: "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      features: ['AC', 'Comfortable Seats', 'Music System', 'Ample Legroom'],
+      priceRange: '₹12 - ₹15/km',
+      capacity: '4 passengers',
+      color: "border-blue-200 hover:border-blue-300"
+    },
+    {
+      type: 'SUV',
+      name: 'SUV',
+      image: "https://imgd.aeplcdn.com/600x337/n/cw/ec/106815/creta-exterior-right-front-three-quarter-5.jpeg?isig=0&q=80",
+      features: ['Spacious Interior', 'Luggage Space', 'Comfortable Ride', 'AC'],
+      priceRange: '₹15 - ₹18/km',
+      capacity: '6 passengers',
+      color: "border-purple-200 hover:border-purple-300"
+    },
+    {
+      type: 'LUXURY',
+      name: 'Luxury',
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDufYJALnyws9AyMRHeHyJyRNefnLQU6ygIQ&s",
+      features: ['Premium AC', 'Leather Seats', 'Entertainment System', 'Chauffeur'],
+      priceRange: '₹25 - ₹30/km',
+      capacity: '4 passengers',
+      color: "border-green-200 hover:border-green-300"
+    },
+    {
+      type: 'TEMPO',
+      name: 'Tempo Traveller',
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGV7CXgqGW6RD_1dx2234kIUJVhxES9h5rMg&s",
+      features: ['AC', 'Spacious', 'Comfortable Seats', 'Luggage Space'],
+      priceRange: '₹20 - ₹25/km',
+      capacity: '12 passengers',
+      color: "border-yellow-200 hover:border-yellow-300"
+    }
+  ];
+
+  const popularDestinations = [
+    { 
+      name: 'Manali', 
+      icon: <FaMountain className="text-amber-400" />,
+      image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      price: '₹5,999',
+      distance: '550 km',
+      duration: '12 hours'
+    },
+    { 
+      name: 'Rishikesh', 
+      icon: <FaGlobeAmericas className="text-emerald-400" />,
+      image: "https://images.unsplash.com/photo-1581852057101-dc9a1c70d5a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      price: '₹3,750',
+      distance: '240 km',
+      duration: '5 hours'
+    },
+  ];
+
+  // Effects
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -116,77 +210,6 @@ const Cabs = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const cities = [
-    'Delhi', 'Gurugram', 'Noida', 'Faridabad', 'Jaipur', 'Udaipur', 
-    'Chandigarh', 'Amritsar', 'Shimla', 'Manali', 'Dehradun', 
-    'Rishikesh', 'Haridwar', 'Agra', 'Varanasi', 'Lucknow', 
-    'Mumbai', 'Pune', 'Bangalore', 'Hyderabad', 'Chennai', 
-    'Kolkata', 'Goa', 'Kochi'
-  ];
-
-  const cabTypes = ['Sedan', 'SUV', 'Luxury', 'Premium Sedan', 'Tempo Traveller', 'Minibus'];
-
-  const popularDestinations = [
-    { 
-      name: 'Manali', 
-      icon: <FaMountain className="text-amber-400" />,
-      image: Manalih,
-      price: '₹5,999',
-      distance: '550 km',
-      duration: '12 hours'
-    },
-    { 
-      name: 'Rishikesh', 
-      icon: <FaGlobeAmericas className="text-emerald-400" />,
-      image: Rishikesh,
-      price: '₹3,750',
-      distance: '240 km',
-      duration: '5 hours'
-    },
-  ];
-
-  const cabAmenities = [
-    { icon: <FaWifi className="text-blue-500" />, name: "Free WiFi" },
-    { icon: <FaUtensils className="text-amber-500" />, name: "Refreshments" },
-    { icon: <FaSuitcase className="text-purple-500" />, name: "Extra Luggage" },
-    { icon: <FaHotel className="text-green-500" />, name: "Hotel Pickup" }
-  ];
-
-  const cabDetails = [
-    {
-      type: 'Sedan',
-      image: Sedan,
-      capacity: '4 passengers',
-      features: ['AC', 'Comfortable Seats', 'Music System', 'Ample Legroom'],
-      pricePerKm: '₹12/km',
-      minPrice: '₹1500'
-    },
-    {
-      type: 'SUV',
-      image: SUV,
-      capacity: '6 passengers',
-      features: ['AC', 'Spacious Interior', 'Luggage Space', 'Comfortable Ride'],
-      pricePerKm: '₹15/km',
-      minPrice: '₹2000'
-    },
-    {
-      type: 'Luxury',
-      image: LuxuryCar,
-      capacity: '4 passengers',
-      features: ['Premium AC', 'Leather Seats', 'Entertainment System', 'Chauffeur'],
-      pricePerKm: '₹25/km',
-      minPrice: '₹3500'
-    },
-    {
-      type: 'Tempo Traveller',
-      image: Tempo,
-      capacity: '12 passengers',
-      features: ['AC', 'Spacious', 'Comfortable Seats', 'Luggage Space'],
-      pricePerKm: '₹20/km',
-      minPrice: '₹3000'
-    }
-  ];
-
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
@@ -194,55 +217,101 @@ const Cabs = () => {
     return () => clearInterval(interval);
   }, [features.length]);
 
+  // Helper functions
   const formatDate = (date) => {
-    const options = { day: 'numeric', month: 'short', weekday: 'short', year: 'numeric' };
-    return date.toLocaleDateString('en-US', options).replace(',', '');
+    return date.toISOString().split('T')[0];
   };
 
-  const handleHeroAction = (actionType) => {
-    setShowRequestForm(true);
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  // Multi-city trip handlers
+  const addTripSegment = () => {
+    if (multiCityTrips.length >= 6) return; // Limit to 6 segments
+    setMultiCityTrips([
+      ...multiCityTrips,
+      {
+        from: 'Delhi',
+        to: 'Gurugram',
+        date: new Date(new Date().setDate(multiCityTrips[multiCityTrips.length - 1].date.getDate() + 1))
+      }
+    ]);
+  };
+
+  const removeTripSegment = (index) => {
+    if (multiCityTrips.length <= 2) return; // Keep at least 2 segments
+    const newTrips = [...multiCityTrips];
+    newTrips.splice(index, 1);
+    setMultiCityTrips(newTrips);
+  };
+
+  const updateTripSegment = (index, field, value) => {
+    const newTrips = [...multiCityTrips];
+    newTrips[index] = { ...newTrips[index], [field]: value };
     
-    if (actionType === 'bestPrices') {
-      setRequestData(prev => ({
-        ...prev,
-        cabType: 'Sedan',
-        specialRequests: 'Interested in best price deals'
-      }));
-    } else if (actionType === 'expertSupport') {
-      setRequestData(prev => ({
-        ...prev,
-        specialRequests: 'Need expert travel assistance'
-      }));
-    } else if (actionType === 'exclusiveDeals') {
-      setRequestData(prev => ({
-        ...prev,
-        specialRequests: 'Interested in exclusive deals'
-      }));
+    // If updating from/to, swap if they're the same as next/previous
+    if (field === 'from' || field === 'to') {
+      if (index > 0 && newTrips[index].from === newTrips[index - 1].to) {
+        // Swap with previous destination
+        const temp = newTrips[index].from;
+        newTrips[index].from = newTrips[index].to;
+        newTrips[index].to = temp;
+      } else if (index < newTrips.length - 1 && newTrips[index].to === newTrips[index + 1].from) {
+        // Swap with next origin
+        const temp = newTrips[index].to;
+        newTrips[index].to = newTrips[index].from;
+        newTrips[index].from = temp;
+      }
     }
+    
+    setMultiCityTrips(newTrips);
   };
 
+  // Event handlers
   const handleSwapCities = () => {
     const temp = fromCity;
     setFromCity(toCity);
     setToCity(temp);
   };
 
+  const handlePassengerCountChange = (count) => {
+    setPassengerCount(Math.max(1, Math.min(12, count)));
+  };
+
+  const handleCabTypeChange = (type) => {
+    setCabType(type);
+    setShowCabTypeDropdown(false);
+  };
+
+  const handleDateChange = (date, isReturn = false) => {
+    if (isReturn) {
+      setReturnDate(date);
+    } else {
+      setPickupDate(date);
+    }
+  };
+
   const sendEmail = async (formData) => {
     try {
       let tripsInfo = '';
-      if (formData.tripType === 'MULTICITY') {
+      if (formData.tripType === 'MULTI_CITY') {
         tripsInfo = formData.trips.map((trip, index) => 
           `Trip ${index + 1}: ${trip.from} to ${trip.to} on ${trip.date}`
         ).join('\n');
       } else {
         tripsInfo = `From: ${formData.trips[0].from} to ${formData.trips[0].to} on ${formData.trips[0].date}`;
-        if (formData.tripType === 'ROUNDTRIP') {
+        if (formData.tripType === 'ROUND_TRIP') {
           tripsInfo += `\nReturn: ${formData.trips[1].from} to ${formData.trips[1].to} on ${formData.trips[1].date}`;
         }
       }
 
       const templateParams = {
-        to_name: 'Travel Team',
+        to_name: 'Cab Booking Team',
         from_name: formData.name,
         from_email: formData.email,
         phone: formData.phone,
@@ -255,7 +324,7 @@ const Cabs = () => {
       };
 
       await emailjs.send(
-       'service_9jzlq6q', 
+        'service_9jzlq6q',
         'template_mwwf2lg',
         templateParams,
         '127OFHb2IQq0zSiFJ'
@@ -267,17 +336,6 @@ const Cabs = () => {
       return false;
     }
   };
-
-  const [requestData, setRequestData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    tripType: 'ONE WAY',
-    trips: [],
-    passengers: 1,
-    cabType: 'Sedan',
-    specialRequests: ''
-  });
 
   const handleRequestSubmit = async (e) => {
     e.preventDefault();
@@ -291,7 +349,7 @@ const Cabs = () => {
     }
 
     let tripsData = [];
-    if (tripType === 'MULTICITY') {
+    if (tripType === 'MULTI_CITY') {
       tripsData = multiCityTrips.map(trip => ({
         from: trip.from,
         to: trip.to,
@@ -303,7 +361,7 @@ const Cabs = () => {
         to: toCity,
         date: formatDate(pickupDate)
       }];
-      if (tripType === 'ROUNDTRIP') {
+      if (tripType === 'ROUND_TRIP') {
         tripsData.push({
           from: toCity,
           to: fromCity,
@@ -339,10 +397,10 @@ const Cabs = () => {
           name: '',
           email: '',
           phone: '',
-          tripType: 'ONE WAY',
+          tripType: 'ONE_WAY',
           trips: [],
           passengers: 1,
-          cabType: 'Sedan',
+          cabType: 'SEDAN',
           specialRequests: ''
         });
       }, 3000);
@@ -362,109 +420,7 @@ const Cabs = () => {
     }));
   };
 
-  const handlePassengerCountChange = (count) => {
-    setPassengerCount(Math.max(1, Math.min(12, count)));
-  };
-
-  const handleCabTypeChange = (type) => {
-    setCabType(type);
-    setShowCabTypeDropdown(false);
-  };
-
-  const handleDateChange = (date, isReturn = false) => {
-    if (isReturn) {
-      setReturnDate(date);
-    } else {
-      setPickupDate(date);
-    }
-  };
-
-  const addMultiCityTrip = () => {
-    setMultiCityTrips([...multiCityTrips, { 
-      from: '', 
-      to: '', 
-      date: new Date(new Date().setDate(new Date().getDate() + multiCityTrips.length * 3)) 
-    }]);
-  };
-
-  const removeMultiCityTrip = (index) => {
-    if (multiCityTrips.length > 1) {
-      const updatedTrips = [...multiCityTrips];
-      updatedTrips.splice(index, 1);
-      setMultiCityTrips(updatedTrips);
-    }
-  };
-
-  const handleMultiCityChange = (index, field, value) => {
-    const updatedTrips = [...multiCityTrips];
-    updatedTrips[index][field] = value;
-    setMultiCityTrips(updatedTrips);
-  };
-
-  const handleMultiCityDateChange = (date, index) => {
-    const updatedTrips = [...multiCityTrips];
-    updatedTrips[index].date = date;
-    setMultiCityTrips(updatedTrips);
-  };
-
-  const handleDateCalculation = (dates) => {
-    const [start, end] = dates;
-    setDateCalculation(prev => ({
-      ...prev,
-      startDate: start,
-      endDate: end,
-      daysDifference: Math.round((end - start) / (1000 * 60 * 60 * 24))
-    }));
-  };
-
-  const PickupDatePicker = () => (
-    <motion.div 
-      variants={itemVariants}
-      className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative"
-    >
-      <div className="absolute -right-4 -top-4 opacity-10">
-        <FaCalendarAlt className="text-blue-200 text-3xl" />
-      </div>
-      <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
-        <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
-        PICKUP DATE
-      </label>
-      <div className="flex items-center">
-        <DatePicker
-          selected={pickupDate}
-          onChange={(date) => handleDateChange(date)}
-          minDate={new Date()}
-          dateFormat="d MMM yyyy"
-          className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
-        />
-      </div>
-    </motion.div>
-  );
-
-  const ReturnDatePicker = () => (
-    <motion.div 
-      variants={itemVariants}
-      className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative"
-    >
-      <div className="absolute -right-4 -top-4 opacity-10">
-        <BsClockHistory className="text-blue-200 text-3xl" />
-      </div>
-      <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
-        <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
-        RETURN DATE
-      </label>
-      <div className="flex items-center">
-        <DatePicker
-          selected={returnDate}
-          onChange={(date) => handleDateChange(date, true)}
-          minDate={pickupDate}
-          dateFormat="d MM yyyy"
-          className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
-        />
-      </div>
-    </motion.div>
-  );
-
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -521,16 +477,16 @@ const Cabs = () => {
 
       {/* Header with Scrolling Effect */}
       <motion.header 
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-2' : 'bg-transparent py-4'}`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
           <div className="flex items-center">
-            <FaCar className="text-blue-500 text-2xl sm:text-3xl mr-2" />
+            <GiRoad className="text-blue-500 text-2xl sm:text-3xl mr-2" />
             <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              RoadJourney
+              RoadVoyage
             </span>
           </div>
           <nav className="hidden md:flex space-x-6">
@@ -552,7 +508,7 @@ const Cabs = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white shadow-2xl p-4 sm:p-6 md:p-8 mb-8 sm:mb-12 relative overflow-hidden -mt-20 z-20 mx-4 sm:mx-6 rounded-xl"
+        className="bg-white shadow-2xl p-4 sm:p-6 md:p-8 mb-8 sm:mb-12 relative overflow-hidden z-20 mx-4 sm:mx-6 rounded-xl"
       >
         <div className="flex justify-between items-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
@@ -565,7 +521,7 @@ const Cabs = () => {
         
         {/* Trip Type Tabs */}
         <div className="flex border-b-2 border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
-          {['ONE WAY', 'ROUNDTRIP', 'MULTICITY'].map((type) => (
+          {['ONE_WAY', 'ROUND_TRIP', 'MULTI_CITY'].map((type) => (
             <motion.button
               key={type}
               whileTap={{ scale: 0.95 }}
@@ -574,7 +530,7 @@ const Cabs = () => {
               }`}
               onClick={() => setTripType(type)}
             >
-              {type === 'ONE WAY' ? 'One Way' : type === 'ROUNDTRIP' ? 'Round Trip' : 'Multi City'}
+              {type === 'ONE_WAY' ? 'One Way' : type === 'ROUND_TRIP' ? 'Round Trip' : 'Multi City'}
               {tripType === type && (
                 <motion.div 
                   layoutId="underline"
@@ -597,11 +553,8 @@ const Cabs = () => {
           {/* From City */}
           <motion.div 
             variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative overflow-hidden"
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative overflow-hidden rounded-xl border border-gray-200"
           >
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <FaMapMarkerAlt className="text-blue-200 text-3xl" />
-            </div>
             <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
               <FaMapMarkerAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
               PICKUP LOCATION
@@ -613,7 +566,9 @@ const Cabs = () => {
                 onChange={(e) => setFromCity(e.target.value)}
               >
                 {cities.map(city => (
-                  <option key={city} value={city}>{city}</option>
+                  <option key={city.name} value={city.name}>
+                    {city.name} {city.popular && '★'}
+                  </option>
                 ))}
               </select>
             </div>
@@ -626,7 +581,7 @@ const Cabs = () => {
           >
             <motion.button 
               onClick={handleSwapCities}
-              className="bg-gray-100 p-1 sm:p-2 rounded-full hover:bg-gray-100 transition-colors shadow-md border border-gray-200"
+              className="bg-gray-100 p-2 sm:p-3 rounded-full hover:bg-gray-200 transition-colors shadow-md border border-gray-200"
               aria-label="Swap cities"
               whileHover={{ rotate: 180, scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -638,11 +593,8 @@ const Cabs = () => {
           {/* To City */}
           <motion.div 
             variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative overflow-hidden"
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative overflow-hidden rounded-xl border border-gray-200"
           >
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <FaMapMarkerAlt className="text-blue-200 text-3xl" />
-            </div>
             <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
               <FaMapMarkerAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
               DROP LOCATION
@@ -654,23 +606,61 @@ const Cabs = () => {
                 onChange={(e) => setToCity(e.target.value)}
               >
                 {cities.map(city => (
-                  <option key={city} value={city}>{city}</option>
+                  <option key={city.name} value={city.name}>
+                    {city.name} {city.popular && '★'}
+                  </option>
                 ))}
               </select>
             </div>
           </motion.div>
 
           {/* Pickup Date */}
-          <PickupDatePicker />
+          <motion.div 
+            variants={itemVariants}
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative rounded-xl border border-gray-200"
+          >
+            <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
+              <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
+              PICKUP DATE
+            </label>
+            <div className="flex items-center">
+              <DatePicker
+                selected={pickupDate}
+                onChange={(date) => handleDateChange(date)}
+                minDate={new Date()}
+                dateFormat="d MMM yyyy"
+                className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
+              />
+            </div>
+          </motion.div>
+
+          {/* Return Date */}
+          {tripType === 'ROUND_TRIP' && (
+            <motion.div 
+              variants={itemVariants}
+              className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative rounded-xl border border-gray-200"
+            >
+              <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2 items-center whitespace-nowrap overflow-hidden text-ellipsis">
+                <FaCalendarAlt className="text-blue-400 mr-1 sm:mr-2 inline" />
+                RETURN DATE
+              </label>
+              <div className="flex items-center">
+                <DatePicker
+                  selected={returnDate}
+                  onChange={(date) => handleDateChange(date, true)}
+                  minDate={pickupDate}
+                  dateFormat="d MMM yyyy"
+                  className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm sm:text-base md:text-lg cursor-pointer"
+                />
+              </div>
+            </motion.div>
+          )}
 
           {/* Travelers & Cab Type */}
           <motion.div 
             variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors relative"
+            className="bg-gray-50 p-3 sm:p-4 hover:border-blue-400 transition-colors relative rounded-xl border border-gray-200"
           >
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <FaUser className="text-blue-200 text-3xl" />
-            </div>
             <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2">TRAVELERS & CAB TYPE</label>
             <div className="relative">
               <div 
@@ -679,7 +669,9 @@ const Cabs = () => {
               >
                 <div className="flex items-center">
                   <FaUser className="text-blue-400 mr-2" />
-                  <span className="font-bold text-gray-900">{passengerCount} Traveller</span>
+                  <span className="font-bold text-gray-900">
+                    {passengerCount} {passengerCount === 1 ? 'Traveller' : 'Travellers'}
+                  </span>
                 </div>
                 {showPassengerDropdown ? (
                   <FaChevronUp className="text-gray-500" />
@@ -689,7 +681,7 @@ const Cabs = () => {
               </div>
               <div className="text-sm text-gray-700 mt-1 flex items-center justify-between cursor-pointer"
                    onClick={() => setShowCabTypeDropdown(!showCabTypeDropdown)}>
-                <span>{cabType}</span>
+                <span>{cabTypes.find(c => c.code === cabType)?.name || cabType}</span>
                 {showCabTypeDropdown ? (
                   <FaChevronUp className="text-gray-500" />
                 ) : (
@@ -703,37 +695,42 @@ const Cabs = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 p-3"
+                  className="absolute z-10 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-200 p-3"
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-700">Passengers</span>
-                    <div className="flex items-center">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePassengerCountChange(passengerCount - 1);
-                        }}
-                        disabled={passengerCount <= 1}
-                        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
-                      >
-                        <FaMinus className="text-xs" />
-                      </button>
-                      <span className="mx-3 font-medium">{passengerCount}</span>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePassengerCountChange(passengerCount + 1);
-                        }}
-                        disabled={passengerCount >= 12}
-                        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
-                      >
-                        <FaPlus className="text-xs" />
-                      </button>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-gray-700">Passengers</div>
+                        <div className="text-xs text-gray-500">All ages</div>
+                      </div>
+                      <div className="flex items-center">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePassengerCountChange(passengerCount - 1);
+                          }}
+                          disabled={passengerCount <= 1}
+                          className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                        >
+                          <FaMinus className="text-xs" />
+                        </button>
+                        <span className="mx-3 font-medium">{passengerCount}</span>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePassengerCountChange(passengerCount + 1);
+                          }}
+                          disabled={passengerCount >= 12}
+                          className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                        >
+                          <FaPlus className="text-xs" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <button 
                     onClick={() => setShowPassengerDropdown(false)}
-                    className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                    className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors mt-4"
                   >
                     Done
                   </button>
@@ -746,19 +743,22 @@ const Cabs = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 p-3"
+                  className="absolute z-10 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-200 p-3"
                 >
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {cabTypes.map((type) => (
                       <div 
-                        key={type}
-                        className={`p-2 rounded-lg cursor-pointer ${cabType === type ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'}`}
+                        key={type.code}
+                        className={`p-3 rounded-lg cursor-pointer flex items-center ${cabType === type.code ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'}`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleCabTypeChange(type);
+                          handleCabTypeChange(type.code);
                         }}
                       >
-                        {type}
+                        <div className="mr-3">
+                          {type.icon}
+                        </div>
+                        <span>{type.name}</span>
                       </div>
                     ))}
                   </div>
@@ -772,21 +772,102 @@ const Cabs = () => {
               )}
             </div>
           </motion.div>
-
-          {/* Special Fare Options */}
-          <motion.div 
-            variants={itemVariants}
-            className="bg-gray-100 p-2 sm:p-3 hover:border-blue-400 transition-colors"
-          >
-            <label className="block text-xs sm:text-sm font-bold text-blue-600 mb-1 sm:mb-2">SELECT A SPECIAL FARE</label>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full border-2 border-blue-500 flex items-center justify-center mr-2">
-                <FaCheck className="text-blue-500 text-xs" />
-              </div>
-              <span className="text-sm font-bold text-blue-600">EXTRA SAVINGS</span>
-            </div>
-          </motion.div>
         </motion.div>
+
+        {/* Multi-City Trip Segments */}
+        {tripType === 'MULTI_CITY' && (
+          <motion.div 
+            className="col-span-full mt-4 space-y-4"
+            variants={containerVariants}
+          >
+            {multiCityTrips.map((trip, index) => (
+              <motion.div 
+                key={index}
+                variants={itemVariants}
+                className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-blue-50/50 p-4 rounded-xl border border-blue-100"
+              >
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                    {index + 1}
+                  </span>
+                  <h3 className="font-medium text-gray-700">Trip Segment</h3>
+                  {multiCityTrips.length > 2 && (
+                    <button 
+                      onClick={() => removeTripSegment(index)}
+                      className="ml-auto text-red-500 hover:text-red-700"
+                      aria-label="Remove segment"
+                    >
+                      <FaTrash className="text-sm" />
+                    </button>
+                  )}
+                </div>
+                
+                <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* From */}
+                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                    <label className="block text-xs font-bold text-blue-600 mb-1">
+                      FROM
+                    </label>
+                    <select 
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm"
+                      value={trip.from}
+                      onChange={(e) => updateTripSegment(index, 'from', e.target.value)}
+                    >
+                      {cities.map(city => (
+                        <option key={`${index}-${city.name}`} value={city.name}>
+                          {city.name} {city.popular && '★'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* To */}
+                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                    <label className="block text-xs font-bold text-blue-600 mb-1">
+                      TO
+                    </label>
+                    <select 
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm"
+                      value={trip.to}
+                      onChange={(e) => updateTripSegment(index, 'to', e.target.value)}
+                    >
+                      {cities.map(city => (
+                        <option key={`${index}-${city.name}-dest`} value={city.name}>
+                          {city.name} {city.popular && '★'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Date */}
+                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                    <label className="block text-xs font-bold text-blue-600 mb-1">
+                      DATE
+                    </label>
+                    <DatePicker
+                      selected={trip.date}
+                      onChange={(date) => updateTripSegment(index, 'date', date)}
+                      minDate={index === 0 ? new Date() : multiCityTrips[index - 1].date}
+                      dateFormat="d MMM yyyy"
+                      className="w-full outline-none font-bold text-gray-900 bg-transparent text-sm cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+            
+            <motion.button
+              onClick={addTripSegment}
+              disabled={multiCityTrips.length >= 6}
+              className="flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FaPlus className="mr-2" />
+              Add Another Trip
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* Special Fare Options */}
         <motion.div 
@@ -795,70 +876,26 @@ const Cabs = () => {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 mt-4 sm:mt-6"
         >
-          {[
-            { 
-              title: "Regular", 
-              desc: "Regular Fares",
-              selected: selectedFare === 'Regular'
-            },
-            { 
-              title: "Student", 
-              desc: "Extra discounts/baggage",
-              selected: selectedFare === 'Student'
-            },
-            { 
-              title: "Senior Citizen", 
-              desc: "Up to ₹600 off",
-              selected: selectedFare === 'Senior Citizen'
-            },
-            { 
-              title: "Armed Forces", 
-              desc: "Up to ₹600 off",
-              selected: selectedFare === 'Armed Forces'
-            }
-          ].map((option, index) => (
+          {fareTypes.map((fare, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
-              className={`border-2 rounded-xl p-3 sm:p-4 transition-all cursor-pointer ${
-                option.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+              className={`border-2 rounded-xl p-3 sm:p-4 transition-all cursor-pointer flex items-start ${
+                selectedFare === fare.code ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
               }`}
               whileHover={{ y: -3 }}
-              onClick={() => setSelectedFare(option.title)}
+              onClick={() => setSelectedFare(fare.code)}
             >
-              <div className="flex items-start">
-                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mr-2 ${
-                  option.selected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                }`}>
-                  {option.selected && <FaCheck className="text-white text-xs" />}
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-800">{option.title}</h3>
-                  <p className="text-gray-600 text-sm">{option.desc}</p>
-                </div>
+              <div className={`p-2 rounded-full mr-3 ${selectedFare === fare.code ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>
+                {fare.icon}
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-800">{fare.name}</h3>
+                <p className="text-gray-600 text-sm">{fare.description}</p>
               </div>
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Return Date */}
-        {tripType === 'ROUNDTRIP' && <ReturnDatePicker />}
-
-        {/* Add Return Trip */}
-        {tripType !== 'ROUNDTRIP' && (
-          <motion.div 
-            variants={itemVariants}
-            className="flex items-center mt-4 sm:mt-6"
-          >
-            <button 
-              className="text-blue-600 font-medium flex items-center hover:text-blue-800 transition-colors text-sm sm:text-base md:text-lg whitespace-nowrap"
-              onClick={() => setTripType('ROUNDTRIP')}
-            >
-              <FaPlus className="mr-1 sm:mr-2" />
-              ADD RETURN TRIP FOR BIGGER DISCOUNTS
-            </button>
-          </motion.div>
-        )}
 
         {/* Search Button */}
         <motion.div 
@@ -868,6 +905,9 @@ const Cabs = () => {
           transition={{ delay: 0.3 }}
         >
           <motion.button 
+            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center text-sm sm:text-base md:text-lg relative overflow-hidden group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => {
               setShowRequestForm(true);
               setRequestData(prev => ({
@@ -876,9 +916,6 @@ const Cabs = () => {
                 cabType: cabType
               }));
             }}
-            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center text-sm sm:text-base md:text-lg relative overflow-hidden group"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity"></span>
             <span className="relative z-10 flex items-center">
@@ -900,7 +937,7 @@ const Cabs = () => {
         </motion.div>
       </motion.div>
 
-      {/* Cab Details Section */}
+      {/* Cab Class Details Section */}
       <motion.section 
         initial="offscreen"
         whileInView="onscreen"
@@ -925,32 +962,25 @@ const Cabs = () => {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100"
+              className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border-2 ${cab.color}`}
               whileHover={{ y: -10 }}
             >
-              <div className="h-48 sm:h-56 overflow-hidden">
+              <div className="h-48 sm:h-56 overflow-hidden relative">
                 <img 
                   src={cab.image} 
                   alt={cab.type} 
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">{cab.name}</h3>
+                  <p className="text-white/90 text-sm">{cab.priceRange}</p>
+                </div>
               </div>
               <div className="p-4 sm:p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800">{cab.type}</h3>
-                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
-                    {cab.capacity}
-                  </div>
-                </div>
-                
                 <div className="mb-4">
                   <div className="flex items-center text-gray-600 mb-1">
-                    <FaMoneyBillWave className="mr-2 text-blue-500" />
-                    <span className="font-medium">{cab.pricePerKm}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaShieldAlt className="mr-2 text-green-500" />
-                    <span className="font-medium">Min. Price: {cab.minPrice}</span>
+                    <FaUsers className="mr-2 text-blue-500" />
+                    <span className="font-medium">{cab.capacity}</span>
                   </div>
                 </div>
                 
@@ -975,69 +1005,17 @@ const Cabs = () => {
                     setRequestData(prev => ({
                       ...prev,
                       cabType: cab.type,
-                      specialRequests: `Interested in ${cab.type} cab`
+                      specialRequests: `Interested in ${cab.name} cab`
                     }));
                   }}
                 >
-                  Book {cab.type} Cab
+                  Book {cab.name}
                 </motion.button>
               </div>
             </motion.div>
           ))}
         </motion.div>
       </motion.section>
-
-      {/* Features Carousel */}
-      <motion.section 
-        initial="offscreen"
-        whileInView="onscreen"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mb-12 sm:mb-16"
-      >
-        <motion.div 
-          variants={cardVariants}
-          className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-white"
-        >
-          <div className="relative h-40 sm:h-48 overflow-hidden rounded-xl">
-            <AnimatePresence mode="wait">
-              {features.map((feature, index) => (
-                activeFeature === index && (
-                  <motion.div
-                    key={index}
-                    variants={featureVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.5 }}
-                    className={`absolute inset-0 p-4 sm:p-6 flex items-center rounded-xl`}
-                  >
-                    <div className="flex items-start">
-                      <div className="p-3 sm:p-4 bg-white rounded-xl shadow-sm mr-4 sm:mr-6">
-                        {feature.icon}
-                      </div>
-                      <div>
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
-                        <p className="text-gray-600 text-sm sm:text-base">{feature.description}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              ))}
-            </AnimatePresence>
-          </div>
-          <div className="flex justify-center mt-4 space-x-2">
-            {features.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveFeature(index)}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors ${activeFeature === index ? 'bg-blue-600' : 'bg-gray-300'}`}
-              />
-            ))}
-          </div>
-        </motion.div>
-      </motion.section>
-
-    
 
       {/* Cab Amenities */}
       <motion.section 
@@ -1054,7 +1032,7 @@ const Cabs = () => {
         </motion.h2>
         
         <motion.div 
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -1064,13 +1042,13 @@ const Cabs = () => {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-white rounded-xl p-4 sm:p-6 shadow-md hover:shadow-xl transition-all border border-gray-100 text-center"
+              className={`rounded-xl p-4 sm:p-6 shadow-md hover:shadow-xl transition-all border border-gray-100 text-center ${amenity.color}`}
               whileHover={{ y: -5 }}
             >
-              <div className="bg-gradient-to-br from-blue-50 to-white p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <div className="bg-white p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 {amenity.icon}
               </div>
-              <h3 className="font-bold text-gray-800 text-sm sm:text-base">{amenity.name}</h3>
+              <h3 className="font-bold text-sm sm:text-base">{amenity.name}</h3>
             </motion.div>
           ))}
         </motion.div>
@@ -1083,10 +1061,9 @@ const Cabs = () => {
         viewport={{ once: true, amount: 0.2 }}
         className="relative rounded-3xl p-6 sm:p-8 md:p-12 mb-12 sm:mb-16 overflow-hidden shadow-2xl"
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff758c 100%)'
+          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)'
         }}
       >
-        {/* Decorative elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
         <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full"></div>
         <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/5 rounded-full"></div>
@@ -1100,7 +1077,7 @@ const Cabs = () => {
             className="inline-flex items-center bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-2 rounded-full mb-6 sm:mb-8 shadow-lg border border-white/20"
           >
             <FaHeart className="mr-2 text-pink-300 animate-pulse text-sm sm:text-base" />
-            <span className="text-xs sm:text-sm font-bold text-white drop-shadow-md">MOST POPULAR TRAVEL SERVICE</span>
+            <span className="text-xs sm:text-sm font-bold text-white drop-shadow-md">TRENDING NOW</span>
           </motion.div>
           
           <div className="flex flex-col lg:flex-row items-center">
@@ -1111,13 +1088,13 @@ const Cabs = () => {
                 transition={{ delay: 0.3 }}
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
                 style={{
-                  background: 'linear-gradient(to right, #f9d423, #ff4e50)',
+                  background: 'linear-gradient(to right, #fde047, #f97316)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   textShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}
               >
-                Your Road Journey Begins Here
+                Discover the Road with Ease
               </motion.h1>
               
               <motion.p 
@@ -1130,7 +1107,7 @@ const Cabs = () => {
                   textShadow: '0 1px 3px rgba(0,0,0,0.2)'
                 }}
               >
-                Experience <span className="font-bold text-white">comfortable rides</span> with our exclusive cab deals and personalized service
+                Find the perfect cab for your next journey with our exclusive deals and personalized service
               </motion.p>
               
               <motion.div 
@@ -1141,22 +1118,19 @@ const Cabs = () => {
               >
                 {[
                   { 
-                    icon: <IoRocketSharp className="mr-2 text-xl sm:text-2xl animate-bounce" style={{ color: '#f9d423' }} />, 
-                    text: "Best Prices Guaranteed",
-                    bg: "bg-gradient-to-r from-yellow-400 to-yellow-500",
-                    action: "bestPrices"
+                    icon: <IoRocketSharp className="mr-2 text-xl sm:text-2xl animate-bounce" style={{ color: '#fde047' }} />, 
+                    text: "Best Prices",
+                    bg: "bg-gradient-to-r from-yellow-400 to-yellow-500"
                   },
                   { 
                     icon: <FaUserTie className="mr-2 text-xl sm:text-2xl" style={{ color: '#a5b4fc' }} />, 
-                    text: "24/7 Expert Support",
-                    bg: "bg-gradient-to-r from-indigo-400 to-indigo-500",
-                    action: "expertSupport"
+                    text: "Expert Support",
+                    bg: "bg-gradient-to-r from-indigo-400 to-indigo-500"
                   },
                   { 
                     icon: <FaStar className="mr-2 text-xl sm:text-2xl" style={{ color: '#f472b6' }} />, 
                     text: "Exclusive Deals",
-                    bg: "bg-gradient-to-r from-pink-400 to-pink-500",
-                    action: "exclusiveDeals"
+                    bg: "bg-gradient-to-r from-pink-400 to-pink-500"
                   }
                 ].map((item, index) => (
                   <motion.div
@@ -1164,7 +1138,6 @@ const Cabs = () => {
                     variants={itemVariants}
                     className={`flex items-center ${item.bg} px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer group`}
                     whileHover={{ y: -5, scale: 1.05 }}
-                    onClick={() => handleHeroAction(item.action)}
                     style={{
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255,255,255,0.2)'
@@ -1186,20 +1159,20 @@ const Cabs = () => {
                 transition={{ delay: 0.5 }}
                 className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border-2 border-white/20"
               >
-                <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Why Book With Us?</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Why Choose Us?</h3>
                 
                 <div className="space-y-4 sm:space-y-6">
                   {[
                     {
                       icon: <FaCar className="text-lg sm:text-xl" style={{ color: '#93c5fd' }} />,
-                      title: "5000+ Cabs Available",
+                      title: "5000+ Cabs",
                       description: "Access to the widest selection of cabs across all major providers",
                       color: "text-blue-300"
                     },
                     {
                       icon: <FaUserTie className="text-lg sm:text-xl" style={{ color: '#c4b5fd' }} />,
-                      title: "Professional Drivers",
-                      description: "Experienced and verified drivers for your safety and comfort",
+                      title: "Best Price Guarantee",
+                      description: "We guarantee the best prices for your cab rides",
                       color: "text-purple-300"
                     },
                     {
@@ -1229,14 +1202,14 @@ const Cabs = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full bg-gradient-to-r from-yellow-400 to-pink-500 text-white font-bold py-3 sm:py-4 px-6 rounded-xl mt-6 sm:mt-8 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
-                  onClick={() => setShowRequestForm(true)}
                   style={{
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255,255,255,0.3)'
                   }}
+                  onClick={() => setShowRequestForm(true)}
                 >
                   <FaPaperPlane className="mr-2 sm:mr-3" />
-                  <span className="text-sm sm:text-base">Request Custom Itinerary</span>
+                  <span className="text-sm sm:text-base">Find Your Cab</span>
                 </motion.button>
               </motion.div>
             </div>
@@ -1244,96 +1217,127 @@ const Cabs = () => {
         </div>
       </motion.div>
 
-      {/* Benefits Section */}
+      {/* Features Carousel */}
       <motion.section 
         initial="offscreen"
         whileInView="onscreen"
         viewport={{ once: true, amount: 0.2 }}
-        className="mb-12 sm:mb-20"
+        className="mb-12 sm:mb-16"
+      >
+        <motion.div 
+          variants={cardVariants}
+          className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-white"
+        >
+          <div className="relative h-40 sm:h-48 overflow-hidden rounded-xl">
+            <AnimatePresence mode="wait">
+              {features.map((feature, index) => (
+                activeFeature === index && (
+                  <motion.div
+                    key={index}
+                    variants={featureVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ duration: 0.5 }}
+                    className={`absolute inset-0 p-4 sm:p-6 flex items-center rounded-xl bg-gradient-to-r ${feature.color} bg-clip-border`}
+                  >
+                    <div className="flex items-start">
+                      <div className="p-3 sm:p-4 bg-white/30 backdrop-blur-sm rounded-xl shadow-sm mr-4 sm:mr-6">
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{feature.title}</h3>
+                        <p className="text-white/90 text-sm sm:text-base">{feature.description}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              ))}
+            </AnimatePresence>
+          </div>
+          <div className="flex justify-center mt-4 space-x-2">
+            {features.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveFeature(index)}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors ${activeFeature === index ? 'bg-blue-600' : 'bg-gray-300'}`}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </motion.section>
+
+      {/* Popular Destinations */}
+      <motion.section 
+        initial="offscreen"
+        whileInView="onscreen"
+        viewport={{ once: true, amount: 0.2 }}
+        className="mb-12 sm:mb-16"
       >
         <motion.h2 
           variants={cardVariants}
-          className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12 text-center text-gray-800"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-center text-gray-800"
         >
-          Why Choose <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Our Service</span>
+          Popular <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Destinations</span>
         </motion.h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {[
-            {
-              icon: <FaCar className="text-3xl sm:text-4xl text-blue-500" />,
-              title: "Exclusive Cab Deals",
-              description: "Access to special discounts and offers not available to the general public",
-              features: [
-                "Up to 30% off on select routes",
-                "Early bird specials",
-                "Last-minute deals"
-              ],
-              color: "text-blue-500"
-            },
-            {
-              icon: <FaUserTie className="text-3xl sm:text-4xl text-purple-500" />,
-              title: "Personal Travel Expert",
-              description: "Dedicated professional to handle all your travel arrangements",
-              features: [
-                "24/7 availability",
-                "Custom route planning",
-                "VIP treatment"
-              ],
-              color: "text-purple-500"
-            },
-            {
-              icon: <FaHeadset className="text-3xl sm:text-4xl text-pink-500" />,
-              title: "24/7 Travel Support",
-              description: "Assistance available anytime, anywhere during your journey",
-              features: [
-                "Cab changes & cancellations",
-                "Emergency assistance",
-                "Real-time updates"
-              ],
-              color: "text-pink-500"
-            }
-          ].map((benefit, index) => (
-            <motion.div 
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {popularDestinations.map((destination, index) => (
+            <motion.div
               key={index}
-              variants={cardVariants}
-              className={`rounded-3xl shadow-xl p-6 sm:p-8 flex flex-col items-center text-center border-2 hover:shadow-2xl transition-all h-full relative overflow-hidden group`}
+              variants={itemVariants}
+              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100"
               whileHover={{ y: -10 }}
             >
-              <div className="absolute -right-8 -top-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                <FaCar className="text-gray-800 text-5xl sm:text-6xl" />
-              </div>
-              <div className={`p-4 sm:p-5 rounded-full mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
-                {benefit.icon}
-              </div>
-              <h3 className={`font-bold text-xl sm:text-2xl mb-3 sm:mb-4 ${benefit.color}`}>{benefit.title}</h3>
-              <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">{benefit.description}</p>
-              
-              <div className="w-full mb-4 sm:mb-6">
-                {benefit.features.map((feature, i) => (
-                  <div key={i} className="flex items-center mb-2 text-left">
-                    <FaCheck className="text-green-500 mr-2 sm:mr-3 flex-shrink-0 text-sm" />
-                    <span className="text-gray-700 text-xs sm:text-sm">{feature}</span>
+              <div className="h-48 sm:h-56 overflow-hidden relative">
+                <img 
+                  src={destination.image} 
+                  alt={destination.name} 
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                  <div className="flex items-center mb-2">
+                    {destination.icon}
+                    <h3 className="text-xl sm:text-2xl font-bold text-white ml-2">{destination.name}</h3>
                   </div>
-                ))}
+                  <div className="flex justify-between text-white/90 text-sm">
+                    <span>{destination.distance}</span>
+                    <span>{destination.duration}</span>
+                    <span className="font-bold">{destination.price}</span>
+                  </div>
+                </div>
               </div>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-xl shadow hover:shadow-md transition-all text-sm sm:text-base"
-                onClick={() => {
-                  setShowRequestForm(true);
-                  if (index === 0) handleHeroAction('bestPrices');
-                  else if (index === 1) handleHeroAction('expertSupport');
-                  else handleHeroAction('exclusiveDeals');
-                }}
-              >
-                Experience Now
-              </motion.button>
+              <div className="p-4 sm:p-6">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-2 sm:py-3 px-4 rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    setShowRequestForm(true);
+                    setRequestData(prev => ({
+                      ...prev,
+                      trips: [{
+                        from: 'Your Location',
+                        to: destination.name,
+                        date: new Date()
+                      }],
+                      specialRequests: `Interested in trip to ${destination.name}`
+                    }));
+                  }}
+                >
+                  Book Cab to {destination.name}
+                </motion.button>
+              </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </motion.section>
 
       {/* Request Form Modal */}
@@ -1360,7 +1364,7 @@ const Cabs = () => {
                     onClick={() => setShowRequestForm(false)}
                     className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
                   >
-                    <FaArrowLeft className="text-lg" />
+                    <FaTimes className="text-lg" />
                   </button>
                 </div>
 
@@ -1436,9 +1440,9 @@ const Cabs = () => {
                             onChange={handleInputChange}
                             className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
                           >
-                            <option value="ONE WAY">One Way</option>
-                            <option value="ROUNDTRIP">Round Trip</option>
-                            <option value="MULTICITY">Multi City</option>
+                            <option value="ONE_WAY">One Way</option>
+                            <option value="ROUND_TRIP">Round Trip</option>
+                            <option value="MULTI_CITY">Multi City</option>
                           </select>
                         </div>
 
@@ -1451,7 +1455,7 @@ const Cabs = () => {
                             className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
                           >
                             {cabTypes.map(type => (
-                              <option key={type} value={type}>{type}</option>
+                              <option key={type.code} value={type.code}>{type.name}</option>
                             ))}
                           </select>
                         </div>

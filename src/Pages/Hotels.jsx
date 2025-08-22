@@ -14,39 +14,39 @@ import emailjs from '@emailjs/browser';
 
 // Enhanced amenity icons with better styling
 const amenityIcons = {
-  'Free WiFi': <FiWifi className="mr-2 text-pink-500 text-lg" />,
-  'Pool': <FiDroplet className="mr-2 text-pink-500 text-lg" />,
-  'Spa': <FiHeart className="mr-2 text-pink-500 text-lg" />,
-  'Restaurant': <FiCoffee className="mr-2 text-pink-500 text-lg" />,
-  'Parking': <FiHome className="mr-2 text-pink-500 text-lg" />,
-  'Beachfront': <FiUmbrella className="mr-2 text-pink-500 text-lg" />,
-  'Bar': <FiCoffee className="mr-2 text-pink-500 text-lg" />,
-  'Fitness Center': <FiZap className="mr-2 text-pink-500 text-lg" />,
-  'Room Service': <FiCheck className="mr-2 text-pink-500 text-lg" />,
-  'Business Center': <FiEdit className="mr-2 text-pink-500 text-lg" />,
-  'TV': <FiTv className="mr-2 text-pink-500 text-lg" />,
-  'Air conditioning': <FiZap className="mr-2 text-pink-500 text-lg" />,
-  'Minibar': <FiCoffee className="mr-2 text-pink-500 text-lg" />,
-  'Safe': <FiLock className="mr-2 text-pink-500 text-lg" />,
-  'Work desk': <FiEdit className="mr-2 text-pink-500 text-lg" />,
-  'Balcony': <FiHome className="mr-2 text-pink-500 text-lg" />,
-  'Sea view': <FiMapPin className="mr-2 text-pink-500 text-lg" />,
-  'Lake view': <FiMapPin className="mr-2 text-pink-500 text-lg" />,
-  'Private pool': <FiDroplet className="mr-2 text-pink-500 text-lg" />,
-  'Butler service': <FiUser className="mr-2 text-pink-500 text-lg" />,
-  'Jacuzzi': <FiDroplet className="mr-2 text-pink-500 text-lg" />,
-  'Dining table': <FiCoffee className="mr-2 text-pink-500 text-lg" />,
-  'Premium toiletries': <FiCheck className="mr-2 text-pink-500 text-lg" />,
-  'Separate living area': <FiHome className="mr-2 text-pink-500 text-lg" />,
-  'Club lounge access': <FiStar className="mr-2 text-pink-500 text-lg" />,
-  'Private terrace': <FiHome className="mr-2 text-pink-500 text-lg" />,
-  'Personal butler': <FiUser className="mr-2 text-pink-500 text-lg" />,
-  'Dining room': <FiCoffee className="mr-2 text-pink-500 text-lg" />,
-  'Study': <FiEdit className="mr-2 text-pink-500 text-lg" />,
-  'Yoga Classes': <FiHeart className="mr-2 text-pink-500 text-lg" />,
-  'Boat Ride': <FiDroplet className="mr-2 text-pink-500 text-lg" />,
-  'Concierge': <FiUser className="mr-2 text-pink-500 text-lg" />,
-  'Airport Shuttle': <FiHome className="mr-2 text-pink-500 text-lg" />
+  'Free WiFi': <FiWifi className="mr-2 text-rose-500 text-lg" />,
+  'Pool': <FiDroplet className="mr-2 text-rose-500 text-lg" />,
+  'Spa': <FiHeart className="mr-2 text-rose-500 text-lg" />,
+  'Restaurant': <FiCoffee className="mr-2 text-rose-500 text-lg" />,
+  'Parking': <FiHome className="mr-2 text-rose-500 text-lg" />,
+  'Beachfront': <FiUmbrella className="mr-2 text-rose-500 text-lg" />,
+  'Bar': <FiCoffee className="mr-2 text-rose-500 text-lg" />,
+  'Fitness Center': <FiZap className="mr-2 text-rose-500 text-lg" />,
+  'Room Service': <FiCheck className="mr-2 text-rose-500 text-lg" />,
+  'Business Center': <FiEdit className="mr-2 text-rose-500 text-lg" />,
+  'TV': <FiTv className="mr-2 text-rose-500 text-lg" />,
+  'Air conditioning': <FiZap className="mr-2 text-rose-500 text-lg" />,
+  'Minibar': <FiCoffee className="mr-2 text-rose-500 text-lg" />,
+  'Safe': <FiLock className="mr-2 text-rose-500 text-lg" />,
+  'Work desk': <FiEdit className="mr-2 text-rose-500 text-lg" />,
+  'Balcony': <FiHome className="mr-2 text-rose-500 text-lg" />,
+  'Sea view': <FiMapPin className="mr-2 text-rose-500 text-lg" />,
+  'Lake view': <FiMapPin className="mr-2 text-rose-500 text-lg" />,
+  'Private pool': <FiDroplet className="mr-2 text-rose-500 text-lg" />,
+  'Butler service': <FiUser className="mr-2 text-rose-500 text-lg" />,
+  'Jacuzzi': <FiDroplet className="mr-2 text-rose-500 text-lg" />,
+  'Dining table': <FiCoffee className="mr-2 text-rose-500 text-lg" />,
+  'Premium toiletries': <FiCheck className="mr-2 text-rose-500 text-lg" />,
+  'Separate living area': <FiHome className="mr-2 text-rose-500 text-lg" />,
+  'Club lounge access': <FiStar className="mr-2 text-rose-500 text-lg" />,
+  'Private terrace': <FiHome className="mr-2 text-rose-500 text-lg" />,
+  'Personal butler': <FiUser className="mr-2 text-rose-500 text-lg" />,
+  'Dining room': <FiCoffee className="mr-2 text-rose-500 text-lg" />,
+  'Study': <FiEdit className="mr-2 text-rose-500 text-lg" />,
+  'Yoga Classes': <FiHeart className="mr-2 text-rose-500 text-lg" />,
+  'Boat Ride': <FiDroplet className="mr-2 text-rose-500 text-lg" />,
+  'Concierge': <FiUser className="mr-2 text-rose-500 text-lg" />,
+  'Airport Shuttle': <FiHome className="mr-2 text-rose-500 text-lg" />
 };
 
 const Hotels = () => {
@@ -71,6 +71,7 @@ const Hotels = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Hotel Data
   const hotels = [
@@ -103,6 +104,7 @@ const Hotels = () => {
           type: 'Premium Room', 
           price: 32000, 
           size: '300 sq ft', 
+          beds: '1 King Bed',
           amenities: [
             'Heating', 
             'TV', 
@@ -113,7 +115,7 @@ const Hotels = () => {
           maxOccupancy: 2,
           images: [
             "/images/Premium Room.webp",
-            "/images/Premium Room.webp"
+            "/images/Dalview.jpeg"
           ]
         }
       ],
@@ -181,7 +183,7 @@ const Hotels = () => {
           maxOccupancy: 2,
           images: [
             "/images/Sideeq3.jpeg",
-            "/images/ladakh4.jpeg"
+            "/images/Sideeq4.jpeg"
           ]
         },
         {
@@ -202,7 +204,7 @@ const Hotels = () => {
           maxOccupancy: 3,
           images: [
             "/images/Sideeq2.jpeg",
-            "/images/ladakh1.jpeg"
+            "/images/Sideeq4.jpeg"
           ]
         }
       ],
@@ -213,7 +215,19 @@ const Hotels = () => {
         pets: "Not allowed",
         payment: "Credit card required at booking",
         children: "Children of all ages are welcome"
-      }
+      },
+      nearbyAttractions: [
+        "Dal Lake (2 km)",
+        "Mughal Gardens (4 km)",
+        "Shankaracharya Temple (6 km)",
+        "Hazratbal Shrine (5 km)"
+      ],
+      specialFeatures: [
+        "Traditional Kashmiri Architecture",
+        "Panoramic Mountain Views",
+        "Cultural Evenings",
+        "Guided Tours"
+      ]
     },
     {
       id: 3,
@@ -225,7 +239,7 @@ const Hotels = () => {
       price: 9980,
       taxes: 1500,
       image: "/images/Welcome3.jpeg",
-      description: 'Inspired by the grandeur of Chola dynasty architecture, this luxury hotel features 600 rooms, 9 restaurants, and one of Asia\'s largest spas.',
+      description: 'Inspired by the grandeur of Chola dynasty architecture, this luxury hotel features beautiful rooms, restaurants, and spa services amidst the natural beauty of Pahalgam.',
       amenities: ['Free WiFi', 'Pool', 'Spa', 'Restaurant', 'Fitness Center', 'Bar', 'Parking', 'Business Center', 'Concierge', 'Airport Shuttle'],
       rooms: [
         { 
@@ -234,7 +248,7 @@ const Hotels = () => {
           price: 7500, 
           size: '400 sq ft', 
           beds: '1 King Bed', 
-          amenities: ['Air conditioning', 'Minibar', 'Safe', 'TV', 'Work desk', 'Club lounge access'], 
+          amenities: ['Air conditioning', 'Minibar', 'Safe', 'TV', 'Work desk', 'Mountain view'], 
           maxOccupancy: 2,
           images: [
             "/images/Welcome2.jpeg",
@@ -249,7 +263,19 @@ const Hotels = () => {
         pets: 'Not allowed',
         payment: 'Credit card required at booking',
         children: 'Children of all ages are welcome'
-      }
+      },
+      nearbyAttractions: [
+        'Betaab Valley (5 km)',
+        'Aru Valley (15 km)',
+        'Lidder River (2 km)',
+        'Baisaran Hills (8 km)'
+      ],
+      specialFeatures: [
+        'Chola-inspired Architecture',
+        'Ayurvedic Spa Treatments',
+        'River-facing Restaurants',
+        'Trekking Guides Available'
+      ]
     },
     {
       id: 4,
@@ -291,6 +317,7 @@ const Hotels = () => {
           maxOccupancy: 2,
           images: [
             '/images/heritage2.jpeg',
+            '/images/heritage1.jpeg'
           ]
         },
         { 
@@ -311,6 +338,7 @@ const Hotels = () => {
           maxOccupancy: 4,
           images: [
             '/images/heritage3.jpeg',
+            '/images/heritage1.jpeg'
           ]
         }
       ],
@@ -380,6 +408,7 @@ const Hotels = () => {
           maxOccupancy: 2,
           images: [
             '/images/Deluxeroomcity.jpg',
+            '/images/CityGrace.jpeg'
           ]
         },
         { 
@@ -398,6 +427,7 @@ const Hotels = () => {
           maxOccupancy: 4,
           images: [
             '/images/Familyroomcity.jpg',
+            '/images/CityGrace.jpeg'
           ]
         }
       ],
@@ -450,6 +480,7 @@ const Hotels = () => {
     setSelectedRoom(null);
     setShowEmailForm(false);
     setCurrentImageIndex(0);
+    setActiveTab('details');
     setShowModal(true);
   };
 
@@ -457,6 +488,8 @@ const Hotels = () => {
   const closeModal = () => {
     setShowModal(false);
     setShowEmailForm(false);
+    setSelectedRoom(null);
+    setEmailSent(false);
   };
 
   // Handle input change for booking form
@@ -471,6 +504,8 @@ const Hotels = () => {
   // Send booking email
   const sendBookingEmail = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     try {
       const templateParams = {
         hotel_name: selectedHotel.name,
@@ -489,12 +524,13 @@ const Hotels = () => {
       };
 
       await emailjs.send(
-      'service_ov629rm',
+        'service_ov629rm',
         'template_jr1dnto',
         templateParams
       );
 
       setEmailSent(true);
+      setLoading(false);
       setTimeout(() => {
         setShowModal(false);
         setEmailSent(false);
@@ -508,6 +544,7 @@ const Hotels = () => {
     } catch (error) {
       console.error('Failed to send email:', error);
       alert('Failed to send booking confirmation. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -535,7 +572,7 @@ const Hotels = () => {
 
   // Next image in gallery
   const nextImage = () => {
-    if (selectedHotel && selectedHotel.rooms[0].images.length > currentImageIndex + 1) {
+    if (selectedHotel && selectedHotel.rooms[0]?.images && selectedHotel.rooms[0].images.length > currentImageIndex + 1) {
       setCurrentImageIndex(currentImageIndex + 1);
     }
   };
@@ -548,36 +585,43 @@ const Hotels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white">
       {/* Enhanced Hero Section */}
-      <div className="relative h-96 overflow-hidden bg-gradient-to-r from-pink-500 to-pink-600 flex items-center justify-center">
-        <div className="absolute inset-0 bg-[url('/images/hotel-bg.jpg')] bg-cover bg-center opacity-20"></div>
+      <div className="relative h-96 overflow-hidden bg-gradient-to-r from-rose-600 to-rose-800 flex items-center justify-center">
+        <div className="absolute inset-0 bg-[url('/images/kashmir-bg.jpg')] bg-cover bg-center opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-rose-900/70 to-rose-800/60"></div>
         <div className="relative z-10 text-center px-4">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">Discover Kashmir's Finest Stays</h1>
           <p className="text-xl text-white mb-8 max-w-2xl mx-auto drop-shadow-md">
             Experience world-class hospitality amidst breathtaking Himalayan landscapes
           </p>
+          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl inline-block">
+            <div className="flex items-center justify-center space-x-2 text-white">
+              <FiMapPin className="text-rose-200" />
+              <span className="font-medium">Srinagar • Gulmarg • Pahalgam • Sonamarg</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8 -mt-20 relative z-20">
         {/* Search and Filter Card */}
-        <div className="bg-white rounded-xl shadow-xl p-6 mb-8 transform transition-all duration-300 hover:shadow-2xl">
+        <div className="bg-white rounded-xl shadow-xl p-6 mb-8 transform transition-all duration-300 hover:shadow-2xl border border-rose-100">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="relative flex-grow">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch className="text-gray-400" />
+                <FiSearch className="text-rose-400" />
               </div>
               <input
                 type="text"
                 placeholder="Search hotels by name or location..."
-                className="w-full p-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full p-3 pl-10 border border-rose-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <button 
-              className="flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+              className="flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
               onClick={() => setShowFilters(!showFilters)}
             >
               <FiFilter />
@@ -587,12 +631,12 @@ const Hotels = () => {
           </div>
 
           {showFilters && (
-            <div className="bg-white p-6 rounded-lg shadow-md mb-4 border border-gray-100 animate-fadeIn">
+            <div className="bg-white p-6 rounded-lg shadow-md mb-4 border border-rose-100 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                   <h3 className="font-medium mb-3 text-gray-800 text-lg">Sort By</h3>
                   <select 
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none focus:border-transparent shadow-sm"
+                    className="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none focus:border-transparent shadow-sm"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                   >
@@ -609,7 +653,7 @@ const Hotels = () => {
                       <label key={amenity} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          className="h-5 w-5 text-pink-600 rounded focus:ring-pink-500 border-gray-300"
+                          className="h-5 w-5 text-rose-600 rounded focus:ring-rose-500 border-gray-300"
                           checked={selectedAmenities.includes(amenity)}
                           onChange={() => {
                             if (selectedAmenities.includes(amenity)) {
@@ -630,7 +674,7 @@ const Hotels = () => {
                     <input
                       type="number"
                       placeholder="Min"
-                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none focus:border-transparent shadow-sm"
+                      className="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none focus:border-transparent shadow-sm"
                       value={priceRange[0]}
                       onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
                     />
@@ -638,7 +682,7 @@ const Hotels = () => {
                     <input
                       type="number"
                       placeholder="Max"
-                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none focus:border-transparent shadow-sm"
+                      className="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none focus:border-transparent shadow-sm"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 50000])}
                     />
@@ -650,7 +694,7 @@ const Hotels = () => {
                       max="50000"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full h-2 bg-pink-100 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
                 </div>
@@ -669,7 +713,7 @@ const Hotels = () => {
               {sortedHotels.length > 0 ? 'Handpicked selections for your perfect stay' : 'Try adjusting your filters to find more options'}
             </p>
           </div>
-          <div className="mt-4 md:mt-0 bg-pink-100 text-pink-800 px-4 py-2 rounded-full text-sm font-medium">
+          <div className="mt-4 md:mt-0 bg-rose-100 text-rose-800 px-4 py-2 rounded-full text-sm font-medium">
             Showing {Math.min(sortedHotels.length, 10)} of {sortedHotels.length}
           </div>
         </div>
@@ -679,7 +723,7 @@ const Hotels = () => {
           {sortedHotels.map(hotel => (
             <div 
               key={hotel.id} 
-              className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
+              className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-rose-50"
               onClick={() => openHotelDetails(hotel)}
             >
               <div className="flex flex-col md:flex-row h-full">
@@ -692,10 +736,10 @@ const Hotels = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                   <div className="absolute top-4 right-4 bg-white bg-opacity-90 px-3 py-1 rounded-full flex items-center shadow-sm">
-                    <FiStar className="text-yellow-400 fill-current mr-1" />
+                    <FiStar className="text-amber-400 fill-current mr-1" />
                     <span className="font-medium">{hotel.rating}</span>
                   </div>
-                  <div className="absolute bottom-4 left-4 bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                  <div className="absolute bottom-4 left-4 bg-rose-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
                     {hotel.stars} Star Luxury
                   </div>
                 </div>
@@ -707,7 +751,7 @@ const Hotels = () => {
                       <div>
                         <h3 className="text-2xl font-bold text-gray-800 mb-1">{hotel.name}</h3>
                         <div className="flex items-center text-gray-600">
-                          <FiMapPin className="mr-2 text-pink-500" size={16} />
+                          <FiMapPin className="mr-2 text-rose-500" size={16} />
                           <span>{hotel.location}</span>
                         </div>
                       </div>
@@ -722,7 +766,7 @@ const Hotels = () => {
                     
                     <div className="mt-4 flex flex-wrap gap-2">
                       {hotel.amenities.slice(0, 4).map(amenity => (
-                        <span key={amenity} className="flex items-center text-sm bg-pink-50 text-pink-700 px-3 py-1.5 rounded-full border border-pink-100">
+                        <span key={amenity} className="flex items-center text-sm bg-rose-50 text-rose-700 px-3 py-1.5 rounded-full border border-rose-100">
                           {amenityIcons[amenity] || <FiCheck className="mr-1" />}
                           {amenity}
                         </span>
@@ -742,7 +786,7 @@ const Hotels = () => {
                       <p className="text-gray-500 text-xs">+ ₹{hotel.taxes.toLocaleString()} taxes & fees</p>
                     </div>
                     <button 
-                      className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
+                      className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -758,6 +802,29 @@ const Hotels = () => {
             </div>
           ))}
         </div>
+
+        {/* No Results Message */}
+        {sortedHotels.length === 0 && (
+          <div className="text-center py-16">
+            <div className="bg-rose-50 p-8 rounded-2xl border border-rose-100 max-w-md mx-auto">
+              <div className="bg-rose-100 text-rose-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <FiSearch size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">No hotels found</h3>
+              <p className="text-gray-600 mb-4">Try adjusting your search criteria or filters to find more options.</p>
+              <button 
+                className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2 rounded-lg transition-colors"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedAmenities([]);
+                  setPriceRange([0, 50000]);
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Hotel Details Modal */}
         {showModal && selectedHotel && (
@@ -775,12 +842,12 @@ const Hotels = () => {
                   <h2 className="text-3xl font-bold text-gray-800">{selectedHotel.name}</h2>
                   <div className="flex items-center mt-3 text-gray-600 space-x-4">
                     <div className="flex items-center">
-                      <FiMapPin className="mr-1 text-pink-500" size={16} />
+                      <FiMapPin className="mr-1 text-rose-500" size={16} />
                       <span>{selectedHotel.location}</span>
                     </div>
                     <div className="flex items-center">
                       {Array(selectedHotel.stars).fill().map((_, i) => (
-                        <FiStar key={i} className="text-yellow-400 fill-current mr-0.5" size={18} />
+                        <FiStar key={i} className="text-amber-400 fill-current mr-0.5" size={18} />
                       ))}
                       <span className="ml-2 font-medium">{selectedHotel.rating}</span>
                       <span className="text-gray-500 text-sm ml-1">({selectedHotel.reviews} reviews)</span>
@@ -792,28 +859,28 @@ const Hotels = () => {
                 <div className="border-b border-gray-200 mb-8">
                   <nav className="flex space-x-8">
                     <button
-                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'details' ? 'border-pink-500 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'details' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       onClick={() => setActiveTab('details')}
                     >
                       <FiHome className="mr-2" />
                       Details
                     </button>
                     <button
-                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'rooms' ? 'border-pink-500 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'rooms' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       onClick={() => setActiveTab('rooms')}
                     >
                       <FiUser className="mr-2" />
                       Rooms & Rates
                     </button>
                     <button
-                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'amenities' ? 'border-pink-500 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'amenities' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       onClick={() => setActiveTab('amenities')}
                     >
                       <FiStar className="mr-2" />
                       Amenities
                     </button>
                     <button
-                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'policies' ? 'border-pink-500 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                      className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'policies' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       onClick={() => setActiveTab('policies')}
                     >
                       <FiCreditCard className="mr-2" />
@@ -829,14 +896,14 @@ const Hotels = () => {
                         {/* Enhanced Image Gallery */}
                         <div className="relative h-96 w-full rounded-xl overflow-hidden mb-8 shadow-lg">
                           <img 
-                            src={selectedHotel.rooms[0]?.images[currentImageIndex] || selectedHotel.image} 
+                            src={selectedHotel.rooms[0]?.images?.[currentImageIndex] || selectedHotel.image} 
                             alt={selectedHotel.name}
                             className="w-full h-full object-cover transition-opacity duration-300"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                           
                           {/* Navigation Arrows */}
-                          {selectedHotel.rooms[0]?.images.length > 1 && (
+                          {selectedHotel.rooms[0]?.images?.length > 1 && (
                             <>
                               <button 
                                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
@@ -848,7 +915,7 @@ const Hotels = () => {
                               <button 
                                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-                                disabled={currentImageIndex === selectedHotel.rooms[0]?.images.length - 1}
+                                disabled={currentImageIndex === (selectedHotel.rooms[0]?.images?.length - 1)}
                               >
                                 <FiChevronRight size={24} />
                               </button>
@@ -856,7 +923,7 @@ const Hotels = () => {
                           )}
                           
                           {/* Image Indicators */}
-                          {selectedHotel.rooms[0]?.images.length > 1 && (
+                          {selectedHotel.rooms[0]?.images?.length > 1 && (
                             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
                               {selectedHotel.rooms[0].images.map((_, index) => (
                                 <button
@@ -874,15 +941,15 @@ const Hotels = () => {
                           <p className="text-gray-600 leading-relaxed mb-6">{selectedHotel.description}</p>
                           
                           {selectedHotel.specialFeatures && (
-                            <div className="bg-pink-50 border border-pink-100 rounded-xl p-6">
-                              <h4 className="font-bold text-pink-700 mb-3 flex items-center">
-                                <FiZap className="mr-2 text-pink-600" />
+                            <div className="bg-rose-50 border border-rose-100 rounded-xl p-6">
+                              <h4 className="font-bold text-rose-700 mb-3 flex items-center">
+                                <FiZap className="mr-2 text-rose-600" />
                                 Unique Features
                               </h4>
                               <ul className="space-y-3">
                                 {selectedHotel.specialFeatures.map((feature, index) => (
                                   <li key={index} className="flex items-start">
-                                    <span className="bg-pink-100 text-pink-600 rounded-full p-1 mr-3">
+                                    <span className="bg-rose-100 text-rose-600 rounded-full p-1 mr-3">
                                       <FiCheck size={14} />
                                     </span>
                                     <span className="text-gray-700">{feature}</span>
@@ -893,24 +960,26 @@ const Hotels = () => {
                           )}
                         </div>
 
-                        <div className="mb-6">
-                          <h3 className="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">Nearby Attractions</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {selectedHotel.nearbyAttractions.map((attraction, index) => (
-                              <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-pink-300 transition-colors">
-                                <div className="bg-pink-100 text-pink-600 p-2 rounded-full mr-3">
-                                  <FiMapPin size={18} />
+                        {selectedHotel.nearbyAttractions && (
+                          <div className="mb-6">
+                            <h3 className="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">Nearby Attractions</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {selectedHotel.nearbyAttractions.map((attraction, index) => (
+                                <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-rose-300 transition-colors">
+                                  <div className="bg-rose-100 text-rose-600 p-2 rounded-full mr-3">
+                                    <FiMapPin size={18} />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium text-gray-800">{attraction.split('(')[0]}</h4>
+                                    {attraction.includes('(') && (
+                                      <p className="text-sm text-gray-500 mt-1">{attraction.match(/\(([^)]+)\)/)[1]}</p>
+                                    )}
+                                  </div>
                                 </div>
-                                <div>
-                                  <h4 className="font-medium text-gray-800">{attraction.split('(')[0]}</h4>
-                                  {attraction.includes('(') && (
-                                    <p className="text-sm text-gray-500 mt-1">{attraction.match(/\(([^)]+)\)/)[1]}</p>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </>
                     )}
 
@@ -919,8 +988,8 @@ const Hotels = () => {
                         <h3 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">Amenities & Services</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {selectedHotel.amenities.map((amenity, index) => (
-                            <div key={index} className="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-pink-300 transition-colors">
-                              <div className="bg-pink-100 text-pink-600 p-2 rounded-full mr-4">
+                            <div key={index} className="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-rose-300 transition-colors">
+                              <div className="bg-rose-100 text-rose-600 p-2 rounded-full mr-4">
                                 {amenityIcons[amenity] || <FiCheck size={18} />}
                               </div>
                               <span className="text-gray-700 font-medium">{amenity}</span>
@@ -934,9 +1003,9 @@ const Hotels = () => {
                       <div className="mb-6">
                         <h3 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">Hotel Policies</h3>
                         <div className="space-y-5">
-                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-pink-300 transition-colors">
+                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-rose-300 transition-colors">
                             <h4 className="font-bold text-gray-800 flex items-center mb-3">
-                              <div className="bg-pink-100 text-pink-600 p-2 rounded-full mr-3">
+                              <div className="bg-rose-100 text-rose-600 p-2 rounded-full mr-3">
                                 <FiClock size={18} />
                               </div>
                               Check-in/Check-out
@@ -951,9 +1020,9 @@ const Hotels = () => {
                             </div>
                           </div>
                           
-                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-pink-300 transition-colors">
+                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-rose-300 transition-colors">
                             <h4 className="font-bold text-gray-800 flex items-center mb-3">
-                              <div className="bg-pink-100 text-pink-600 p-2 rounded-full mr-3">
+                              <div className="bg-rose-100 text-rose-600 p-2 rounded-full mr-3">
                                 <FiEdit size={18} />
                               </div>
                               Cancellation Policy
@@ -961,9 +1030,9 @@ const Hotels = () => {
                             <p className="text-gray-600 pl-11">{selectedHotel.policies.cancellation}</p>
                           </div>
                           
-                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-pink-300 transition-colors">
+                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-rose-300 transition-colors">
                             <h4 className="font-bold text-gray-800 flex items-center mb-3">
-                              <div className="bg-pink-100 text-pink-600 p-2 rounded-full mr-3">
+                              <div className="bg-rose-100 text-rose-600 p-2 rounded-full mr-3">
                                 <FiUsers size={18} />
                               </div>
                               Children Policy
@@ -971,9 +1040,9 @@ const Hotels = () => {
                             <p className="text-gray-600 pl-11">{selectedHotel.policies.children}</p>
                           </div>
                           
-                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-pink-300 transition-colors">
+                          <div className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-rose-300 transition-colors">
                             <h4 className="font-bold text-gray-800 flex items-center mb-3">
-                              <div className="bg-pink-100 text-pink-600 p-2 rounded-full mr-3">
+                              <div className="bg-rose-100 text-rose-600 p-2 rounded-full mr-3">
                                 <FiCreditCard size={18} />
                               </div>
                               Payment Policy
@@ -987,10 +1056,10 @@ const Hotels = () => {
 
                   {/* Booking Sidebar - Sticky */}
                   <div className="lg:sticky lg:top-4 h-fit">
-                    <div className="bg-gradient-to-br from-pink-50 to-white p-6 rounded-xl shadow-lg border border-pink-100">
+                    <div className="bg-gradient-to-br from-rose-50 to-white p-6 rounded-xl shadow-lg border border-rose-100">
                       {activeTab === 'rooms' && !showEmailForm && (
                         <>
-                          <h3 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-pink-200">Book Your Stay</h3>
+                          <h3 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-rose-200">Book Your Stay</h3>
                           
                           <div className="space-y-5 mb-6">
                             <div>
@@ -1000,7 +1069,7 @@ const Hotels = () => {
                                   selected={checkInDate}
                                   onChange={(date) => setCheckInDate(date)}
                                   minDate={new Date()}
-                                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none shadow-sm"
+                                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none shadow-sm"
                                   popperPlacement="top-start"
                                 />
                                 <FiCalendar className="absolute right-3 top-3.5 text-gray-400" />
@@ -1013,7 +1082,7 @@ const Hotels = () => {
                                   selected={checkOutDate}
                                   onChange={(date) => setCheckOutDate(date)}
                                   minDate={checkInDate}
-                                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none shadow-sm"
+                                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none shadow-sm"
                                   popperPlacement="top-start"
                                 />
                                 <FiCalendar className="absolute right-3 top-3.5 text-gray-400" />
@@ -1027,7 +1096,7 @@ const Hotels = () => {
                               {selectedHotel.rooms.map(room => (
                                 <div 
                                   key={room.id} 
-                                  className={`border rounded-xl overflow-hidden transition-all duration-200 ${selectedRoom?.id === room.id ? 'border-pink-500 bg-pink-50 shadow-md' : 'border-gray-200 hover:border-pink-300'}`}
+                                  className={`border rounded-xl overflow-hidden transition-all duration-200 ${selectedRoom?.id === room.id ? 'border-rose-500 bg-rose-50 shadow-md' : 'border-gray-200 hover:border-rose-300'}`}
                                 >
                                   <div className="flex flex-col">
                                     {/* Room Image */}
@@ -1050,7 +1119,7 @@ const Hotels = () => {
                                           </div>
                                           <div className="mt-3 flex flex-wrap gap-1">
                                             {room.amenities.slice(0, 2).map(amenity => (
-                                              <span key={amenity} className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full">
+                                              <span key={amenity} className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full">
                                                 {amenity}
                                               </span>
                                             ))}
@@ -1067,7 +1136,7 @@ const Hotels = () => {
                                         </div>
                                       </div>
                                       <button 
-                                        className={`w-full mt-4 py-2.5 rounded-lg transition-all duration-200 ${selectedRoom?.id === room.id ? 'bg-pink-700 text-white shadow-md' : 'bg-pink-600 hover:bg-pink-700 text-white'}`}
+                                        className={`w-full mt-4 py-2.5 rounded-lg transition-all duration-200 ${selectedRoom?.id === room.id ? 'bg-rose-700 text-white shadow-md' : 'bg-rose-600 hover:bg-rose-700 text-white'}`}
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setSelectedRoom(room);
@@ -1083,7 +1152,7 @@ const Hotels = () => {
 
                             {selectedRoom && (
                               <button
-                                className="w-full mt-6 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white py-3.5 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center"
+                                className="w-full mt-6 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white py-3.5 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center"
                                 onClick={() => setShowEmailForm(true)}
                               >
                                 Continue to Book
@@ -1096,21 +1165,21 @@ const Hotels = () => {
 
                       {showEmailForm && selectedRoom && (
                         <div className="animate-fadeIn">
-                          <h3 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-pink-200">Complete Booking</h3>
+                          <h3 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-rose-200">Complete Booking</h3>
                           
                           {/* Booking Summary */}
-                          <div className="mb-6 bg-pink-50 p-4 rounded-lg border border-pink-100">
+                          <div className="mb-6 bg-rose-50 p-4 rounded-lg border border-rose-100">
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-bold text-gray-800">{selectedHotel.name}</h4>
                                 <p className="text-sm text-gray-600 mt-1">{selectedRoom.type}</p>
                               </div>
                               <div className="text-right">
-                                <p className="text-lg font-bold text-pink-600">₹{selectedRoom.price.toLocaleString()}</p>
+                                <p className="text-lg font-bold text-rose-600">₹{selectedRoom.price.toLocaleString()}</p>
                                 <p className="text-xs text-gray-500">per night</p>
                               </div>
                             </div>
-                            <div className="mt-3 pt-3 border-t border-pink-200 text-sm">
+                            <div className="mt-3 pt-3 border-t border-rose-200 text-sm">
                               <div className="flex justify-between mb-1">
                                 <span className="text-gray-600">Check-in:</span>
                                 <span className="font-medium">{checkInDate.toLocaleDateString()}</span>
@@ -1119,7 +1188,7 @@ const Hotels = () => {
                                 <span className="text-gray-600">Check-out:</span>
                                 <span className="font-medium">{checkOutDate.toLocaleDateString()}</span>
                               </div>
-                              <div className="mt-2 pt-2 border-t border-pink-200 flex justify-between font-medium">
+                              <div className="mt-2 pt-2 border-t border-rose-200 flex justify-between font-medium">
                                 <span>Total Nights:</span>
                                 <span>{calculateNights()} night{calculateNights() !== 1 ? 's' : ''}</span>
                               </div>
@@ -1135,7 +1204,7 @@ const Hotels = () => {
                                 <div>
                                   <p className="font-medium text-yellow-800 mb-1">Have an account?</p>
                                   <button 
-                                    className="text-pink-600 hover:underline font-medium"
+                                    className="text-rose-600 hover:underline font-medium"
                                     onClick={() => setIsAuthenticated(true)}
                                   >
                                     Sign in for faster booking
@@ -1157,7 +1226,7 @@ const Hotels = () => {
                                     type="text"
                                     name="name"
                                     required
-                                    className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none shadow-sm"
+                                    className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none shadow-sm"
                                     value={emailForm.name}
                                     onChange={handleInputChange}
                                     placeholder="Your full name"
@@ -1175,7 +1244,7 @@ const Hotels = () => {
                                     type="email"
                                     name="email"
                                     required
-                                    className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none shadow-sm"
+                                    className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none shadow-sm"
                                     value={emailForm.email}
                                     onChange={handleInputChange}
                                     placeholder="your@email.com"
@@ -1193,7 +1262,7 @@ const Hotels = () => {
                                     type="tel"
                                     name="phone"
                                     required
-                                    className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none shadow-sm"
+                                    className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none shadow-sm"
                                     value={emailForm.phone}
                                     onChange={handleInputChange}
                                     placeholder="+91 1234567890"
@@ -1205,7 +1274,7 @@ const Hotels = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
                                 <textarea
                                   name="specialRequests"
-                                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none shadow-sm"
+                                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none shadow-sm"
                                   rows="3"
                                   value={emailForm.specialRequests}
                                   onChange={handleInputChange}
@@ -1227,7 +1296,7 @@ const Hotels = () => {
                                   </div>
                                   <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold text-lg text-gray-800">
                                     <span>Total:</span>
-                                    <span className="text-pink-600">₹{(calculateTotal() + selectedHotel.taxes).toLocaleString()}</span>
+                                    <span className="text-rose-600">₹{(calculateTotal() + selectedHotel.taxes).toLocaleString()}</span>
                                   </div>
                                 </div>
                               </div>
@@ -1236,10 +1305,10 @@ const Hotels = () => {
                               <div className="mt-6">
                                 <button
                                   type="submit"
-                                  className="w-full bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white py-3.5 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center"
-                                  disabled={emailSent}
+                                  className="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white py-3.5 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center"
+                                  disabled={loading || emailSent}
                                 >
-                                  {emailSent ? (
+                                  {loading ? (
                                     <>
                                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -1247,6 +1316,8 @@ const Hotels = () => {
                                       </svg>
                                       Processing...
                                     </>
+                                  ) : emailSent ? (
+                                    'Booking Confirmed!'
                                   ) : (
                                     <>
                                       <FiCreditCard className="mr-2" />
@@ -1258,7 +1329,7 @@ const Hotels = () => {
 
                               {/* Security Message */}
                               <div className="text-xs text-gray-500 mt-3 flex items-center">
-                                <FiLock className="mr-2 text-pink-500" />
+                                <FiLock className="mr-2 text-rose-500" />
                                 Your payment is secure and your data is protected
                               </div>
                             </div>
